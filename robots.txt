@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://look4end.com/sitemap.xml

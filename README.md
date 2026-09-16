@@ -9,6 +9,9 @@ look4end-site/
 ├── index.html            首页
 ├── style.css             全站共用样式（所有页面的外观都在这一个文件里）
 ├── 404.html              访问不存在的地址时显示的页面
+├── og-image.png          分享到微信 / QQ 时显示的预览图（1200×630）
+├── robots.txt            告诉搜索引擎可以抓什么
+├── sitemap.xml           给搜索引擎的页面清单
 ├── posts/index.html      思想笔记
 ├── games/index.html      游戏企划
 ├── timeseed/index.html   TimeSeed
@@ -70,6 +73,17 @@ look4end-site/
 ```
 
 （`<span class="br">` 就是左右方括号，`aria-hidden` 是让读屏软件别把方括号念出来。照抄就行。）
+
+### 改分享卡片的预览图
+
+把链接发到微信 / QQ 时对方看到的那张卡片，由每个页面 `<head>` 里的 `og:` 标签决定。
+
+- **换预览图**：替换 `og-image.png`（保持 1200×630 最保险）
+- **换卡片文字**：改对应页面里的 `og:title` 和 `og:description`
+
+> ⚠️ `og:image` **必须写完整网址**（`https://look4end.com/og-image.png`），写相对路径微信认不出来。
+
+**新加页面时，一定要加一套自己的 og 标签**——直接复制 `posts/index.html` 里那段改就行，但记得把 `og:url` 和标题换成这一页自己的。忘了换的话，分享出去会显示成别的页面的标题。
 
 ---
 
