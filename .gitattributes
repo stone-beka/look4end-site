@@ -1,1 +1,5 @@
 * text=auto
+
+# 批处理文件必须是 CRLF 换行，LF 会让 cmd 从每行中间开始读，命令全被截断。
+# 显式钉死，避免换机器 / 换 git 配置时又变回 LF。
+*.bat text eol=crlf
