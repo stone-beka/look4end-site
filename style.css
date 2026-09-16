@@ -165,6 +165,109 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   文章列表
+   -------------------------------------------------------------------------- */
+
+.list {
+  list-style: none;
+  margin: clamp(32px, 7vw, 46px) 0 0;
+  padding: 0;
+  text-align: left;
+}
+
+.list li + li { border-top: 1px solid var(--line); }
+
+.list a {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 18px;
+  padding: 15px 2px;
+  color: var(--fg-dim);
+  text-decoration: none;
+  transition: color 0.22s ease;
+}
+
+.list a:hover { color: var(--accent); }
+
+.list a:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.list .name {
+  font-size: clamp(14px, 3.6vw, 16px);
+  letter-spacing: 0.08em;
+}
+
+.list .date {
+  font-size: 12px;
+  color: var(--fg-faint);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.list a:hover .date { color: var(--accent); }
+
+/* --------------------------------------------------------------------------
+   文章正文
+   外层容器是居中的，但正文必须左对齐、限制行宽，否则长文没法读。
+   -------------------------------------------------------------------------- */
+
+.article {
+  margin-top: clamp(28px, 6vw, 42px);
+  text-align: left;
+  font-size: clamp(15px, 3.8vw, 17px);
+  line-height: 1.95;
+  color: var(--fg-dim);
+}
+
+.article p { margin: 0 0 1.4em; }
+.article p:last-child { margin-bottom: 0; }
+
+.article h2 {
+  margin: 2em 0 0.7em;
+  font-size: clamp(17px, 4.2vw, 20px);
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: 0.06em;
+}
+
+.article a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(94, 234, 212, 0.3);
+}
+
+.article a:hover { border-bottom-color: var(--accent); }
+
+.article blockquote {
+  margin: 1.6em 0;
+  padding-left: 1em;
+  border-left: 2px solid var(--line);
+  color: var(--fg-faint);
+}
+
+.article code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.9em;
+  background: #16181c;
+  padding: 0.15em 0.4em;
+  border-radius: 3px;
+}
+
+/* 文章顶部的日期 */
+.article-meta {
+  margin: clamp(12px, 3vw, 16px) 0 0;
+  font-size: 12px;
+  color: var(--fg-faint);
+  letter-spacing: 0.1em;
+  margin-right: -0.1em;
+}
+
+/* --------------------------------------------------------------------------
    无障碍：系统设置了"减少动态效果"就关掉入场动画
    -------------------------------------------------------------------------- */
 
