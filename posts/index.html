@@ -30,27 +30,23 @@
   <a class="back" href="../">← 返回</a>
   <h1 class="section-title">思想笔记</h1>
 
-  <!-- ↓↓↓ 一篇都还没写的时候显示这行。有第一篇之后，把它整行删掉。 ↓↓↓ -->
-  <p class="placeholder">还没有写东西</p>
+  <ul class="list">
+    <li>
+      <a href="001.html">
+        <span class="name">创作真的需要我吗</span>
+        <span class="date">2026-09-16</span>
+      </a>
+    </li>
+  </ul>
 
   <!--
     加一篇笔记 = 两步：
 
-    第 1 步：在 posts/ 下新建一个文件，数字往后排（001.html、002.html……）
+    第 1 步：在 posts/ 下新建一个文件，数字往后排（002.html、003.html……）
              内容直接从「本文件」复制过去改（同一个文件夹，路径都不用动）。
              改 <title>、og 那几行、大标题，正文写进 <div class="article"> 里。
 
-    第 2 步：回到本文件，把上面那行 placeholder 删掉，
-             然后把下面这段的注释符号去掉，改成这一篇的标题和日期。
-
-    <ul class="list">
-      <li>
-        <a href="001.html">
-          <span class="name">标题写这里</span>
-          <span class="date">2026-09-16</span>
-        </a>
-      </li>
-    </ul>
+    第 2 步：回到本文件，照着上面的 <ul class="list"> 再加一条。
 
     第 3 步：sitemap.xml 里补一条 <url>，<lastmod> 写当天。
   -->

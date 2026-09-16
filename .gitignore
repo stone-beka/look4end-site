@@ -9,3 +9,7 @@ desktop.ini
 # CLAUDE.md 是本地工作笔记（含草稿箱路径、内部规矩），
 # 这个仓库是公开的，推上去会变成 look4end.com/CLAUDE.md
 CLAUDE.md
+
+# 同理：Claude Code 的本地配置（权限白名单、本机路径）也不该进公开仓库。
+# 不挡的话 publish.bat 的 git add -A 会把整个 .claude/ 一起推上去。
+.claude/
