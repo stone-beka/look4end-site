@@ -36,22 +36,23 @@
   <!--
     加一篇笔记 = 两步：
 
-    第 1 步：在 posts/ 下新建一个文件，用数字命名，比如 posts/001.html
-             内容直接从「本文件」复制过去改（因为同一个文件夹，路径都不用动）。
-             改 <title>、og 那几行、大标题，然后把正文写进 <div class="article"> 里。
-             ↑ 具体正文模板见 README.md 的「写一篇文章」。
+    第 1 步：在 posts/ 下新建一个文件，数字往后排（001.html、002.html……）
+             内容直接从「本文件」复制过去改（同一个文件夹，路径都不用动）。
+             改 <title>、og 那几行、大标题，正文写进 <div class="article"> 里。
 
-    第 2 步：回到本文件，把下面这段的注释符号去掉，改成你的标题和日期。
-             href 写文件名就行，因为和本文件在同一个文件夹。
+    第 2 步：回到本文件，把上面那行 placeholder 删掉，
+             然后把下面这段的注释符号去掉，改成这一篇的标题和日期。
 
     <ul class="list">
       <li>
         <a href="001.html">
-          <span class="name">为什么是黑箱</span>
+          <span class="name">标题写这里</span>
           <span class="date">2026-09-16</span>
         </a>
       </li>
     </ul>
+
+    第 3 步：sitemap.xml 里补一条 <url>，<lastmod> 写当天。
   -->
 
 </main>

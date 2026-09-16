@@ -5,3 +5,7 @@ desktop.ini
 *.log
 .idea/
 .vscode/
+
+# CLAUDE.md 是本地工作笔记（含草稿箱路径、内部规矩），
+# 这个仓库是公开的，推上去会变成 look4end.com/CLAUDE.md
+CLAUDE.md
