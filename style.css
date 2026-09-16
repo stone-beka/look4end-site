@@ -251,6 +251,25 @@ body {
   letter-spacing: 0.06em;
 }
 
+/* 比 h2 小一号的分节；写法跟 h2 一样，只是标题短一点时用 */
+.article h3 {
+  margin: 1.7em 0 0.6em;
+  font-size: clamp(15px, 3.9vw, 17px);
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: 0.06em;
+}
+
+/* 正文是偏灰的，加粗的字提回主色，不然加粗了也不显眼 */
+.article strong { color: var(--fg); font-weight: 600; }
+
+/* 分隔线：一段长文里换气用 */
+.article hr {
+  margin: 2.2em 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
 .article a {
   color: var(--accent);
   text-decoration: none;
