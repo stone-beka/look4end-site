@@ -1,0 +1,7 @@
+# 系统 / 编辑器产生的杂项，不该进仓库
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log
+.idea/
+.vscode/
