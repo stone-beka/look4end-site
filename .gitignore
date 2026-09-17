@@ -13,3 +13,9 @@ CLAUDE.md
 # 同理：Claude Code 的本地配置（权限白名单、本机路径）也不该进公开仓库。
 # 不挡的话 publish.bat 的 git add -A 会把整个 .claude/ 一起推上去。
 .claude/
+
+# 写作台写文件时的临时文件（写完整了才改名盖上，见那边的 writeAtomic）。
+# 它们本来就不该留下；这一条是防线中的一道 —— 另外两道在写作台里
+# （自己扫掉、安全检查时不算数），因为 .gitignore 挡得住 git status，
+# 挡不住 `git add -A`。带这一条是为了万一残留时别让它进 git status。
+*.l4e-tmp-*

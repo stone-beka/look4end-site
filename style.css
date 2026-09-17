@@ -293,6 +293,84 @@ body {
   border-radius: 3px;
 }
 
+/* 代码块。行内 code 有个浅底，整块的时候不能再要那个底 —— 会变成一块补丁。 */
+.article pre {
+  margin: 1.8em 0;
+  padding: 0.9em 1.1em;
+  background: #16181c;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9em;
+  line-height: 1.7;
+}
+
+.article pre code { background: none; padding: 0; }
+
+/* --------------------------------------------------------------------------
+   列表 / 图 / 表格 —— 2026-09-17 加
+   这三样写作台里能插，但之前一直没管样式：列表是浏览器的默认缩进，
+   表格没有框线，图不设限。一张手机横拍的图有一千多像素宽，
+   而正文这一栏在电脑上只有 560 —— 不设限就是撑破版面。
+   全部以 .article 打头：列表页那套 .list 挂在 .page 下面，
+   裸写 ul/li 会连它一起改掉。
+   -------------------------------------------------------------------------- */
+
+.article ul, .article ol { margin: 1.4em 0; padding-left: 1.5em; }
+.article li { margin: 0.4em 0; }
+.article li::marker { color: var(--fg-faint); }
+/* 套一层的列表别把行距越套越大 */
+.article ul ul, .article ol ol, .article ul ol, .article ol ul { margin: 0.4em 0; }
+
+/* 图：多宽都不许出栏。图注在图底下，小一号、居中、淡一点 */
+.article img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.8em auto;
+  border-radius: 3px;
+}
+
+.article figure { margin: 1.8em 0; }
+.article figure img { margin: 0 auto; }
+.article figcaption {
+  margin-top: 0.7em;
+  font-size: 12.5px;
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+  color: var(--fg-faint);
+  text-align: center;
+}
+
+.article table {
+  border-collapse: collapse;
+  margin: 1.8em 0;
+  font-size: 0.92em;
+  /* 固定列宽 + 占满整栏，不是随手写的：
+     默认的自动布局按内容分配宽度，中文每个字都能断行，于是「第一天」这种
+     三个字的格子会被挤到 70px、刚好差两像素放不下，硬生生折成两行 ——
+     而同一行里那个长格子却宽到 400px。固定列宽下每列一样宽，
+     短格子一行放得下，长格子在自己那一栏里老实换行。 */
+  table-layout: fixed;
+  width: 100%;
+}
+
+.article th, .article td {
+  border: 1px solid var(--line);
+  padding: 0.55em 0.8em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.article th { color: var(--fg); font-weight: 600; background: #16181c; }
+
+/* 这里原本有一条手机专用的「表格自己横着滚」（display:block + overflow-x:auto）。
+   加了固定列宽之后它没用了，删掉更省事：固定列宽 + 占满整栏，
+   表格在任何宽度下都不超过那一栏，根本没有要滚的东西 ——
+   留着反而会让手机上的表格退回自动列宽，短格子又被挤成两行。
+   万一以后哪一格塞了超长不断行的一串字符（长网址之类），它会溢出格子边界，
+   不会把整页顶横。 */
+
+
 /* 文章顶部的日期 */
 .article-meta {
   margin: clamp(12px, 3vw, 16px) 0 0;
