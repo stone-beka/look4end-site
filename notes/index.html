@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="9 条形式法则 / 设计系统 / 交互模式 / 踩坑清单">
+<!-- 分享卡片：微信/QQ/X 抓的是这几条。og:url 必须是完整网址，相对路径不认。 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="构成主义 · HTML 设计美学经验">
+<meta property="og:title" content="构成主义 · HTML 设计美学经验">
+<meta property="og:description" content="9 条形式法则 / 设计系统 / 交互模式 / 踩坑清单">
+<meta property="og:url" content="https://look4end.com/">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="构成主义 · HTML 设计美学经验">
+<meta name="twitter:description" content="9 条形式法则 / 设计系统 / 交互模式 / 踩坑清单">
+<link rel="stylesheet" href="kit/kv.css">
+<style>
+  .home { position: relative; z-index: 2; max-width: 1440px; margin-inline: auto;
+          padding: clamp(1.5rem,5vw,4rem) var(--kv-margin) clamp(4rem,9vw,8rem); }
+  .home__eyebrow { font-family: var(--kv-font-mono); font-size: .75rem;
+        letter-spacing: .22em; text-transform: uppercase; color: var(--kv-red); margin: 0 0 .8rem; }
+  .home__title { font-family: var(--kv-font-alt); font-weight: 900;
+        font-size: clamp(2.2rem,7.5vw,6rem); line-height: .9; letter-spacing: -.04em;
+        text-transform: uppercase; margin: 0 0 .4rem; overflow-wrap: anywhere; }
+  .home__sub { font-family: var(--kv-font-display); font-weight: 400;
+        font-size: clamp(.95rem,1.8vw,1.5rem); letter-spacing: .06em;
+        margin: 0 0 clamp(1.5rem,4vw,2.5rem); color: var(--kv-ink-soft); }
+  .home__note { max-width: 70ch; margin: 0 0 clamp(2rem,5vw,3.5rem);
+        border-left: var(--kv-rule) solid var(--kv-red); padding-left: 1.1rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+        gap: var(--kv-space-4); border-top: var(--kv-rule) solid var(--kv-ink); padding-top: var(--kv-space-5); }
+  .card { display: block; text-decoration: none; color: inherit; position: relative;
+        border: 2px solid var(--kv-ink); background: var(--kv-paper-lift);
+        padding: var(--kv-space-5) var(--kv-space-4) var(--kv-space-4);
+        transition: transform var(--kv-dur-base) var(--kv-ease-mech),
+                    box-shadow var(--kv-dur-base) var(--kv-ease-mech),
+                    background-color var(--kv-dur-base) var(--kv-ease-mech); }
+  .card:hover { transform: translate(-4px,-4px) skewX(-3deg); box-shadow: var(--kv-shadow-red); }
+  .card:active { background: var(--kv-ink); color: var(--kv-paper); transform: none; box-shadow: none; }
+  .card__no { position: absolute; top: 0; left: 0; padding: .1rem .5rem;
+        background: var(--kv-ink); color: var(--kv-paper);
+        font-family: var(--kv-font-mono); font-size: .7rem; letter-spacing: .16em; }
+  .card:hover .card__no { background: var(--kv-red); }
+  .card__t { font-family: var(--kv-font-display); font-weight: 700;
+        font-size: clamp(1.05rem,1.9vw,1.5rem); line-height: 1.06;
+        letter-spacing: -.01em; text-transform: uppercase; margin: 0 .2rem .5rem; }
+  .card__d { margin: 0 .2rem; font-size: .875rem; line-height: 1.55; color: var(--kv-ink-soft); }
+  .card:active .card__d { color: var(--kv-paper); }
+  .home__foot { margin-top: clamp(2.5rem,6vw,4rem); padding-top: 1rem;
+        border-top: var(--kv-rule) solid var(--kv-ink);
+        font-size: .8125rem; color: var(--kv-ink-soft); }
+  .home__foot a { color: inherit; }
+</style>
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="home">
+  <p class="home__eyebrow">Constructivism · Design Notes</p>
+  <h1 class="home__title">构成主义<br>HTML 设计</h1>
+  <p class="home__sub">9 条形式法则 / 设计系统 / 交互模式 / 踩坑清单</p>
+
+  <p class="home__note">
+    这一组文档记录的是「设计 HTML」这件事本身：一个具体风格的美学考据，
+    加上实现过程中沉淀下来的、可跨项目复用的规则与踩坑。
+    所有关键数值都经过实测或精算，未验证的部分明确标注。
+  </p>
+
+  <div class="cards">
+      <a class="card" href="01-美学谱系与形式法则.html">
+        <span class="card__no">A</span>
+        <h2 class="card__t">构成主义美学谱系与形式法则</h2>
+        <p class="card__d">目的：把「构成主义」从一堆风格印象，压缩成可以照着做决策的形式规则。 阅读顺序：先看第 0 节建立坐标系，再看第 3 节的九条形式法则（这是真正要用的部分），第 2 节的代表作…</p>
+      </a>
+      <a class="card" href="02-设计系统规格.html">
+        <span class="card__no">A</span>
+        <h2 class="card__t">构成主义设计系统规格 v0.1</h2>
+        <p class="card__d">这是一份可直接翻译成 CSS 变量的规格书。所有色值都经过 WCAG 对比度实测，所有字体都经过西里尔覆盖核实——不是凭感觉挑的。 实测方法与版本见文末"数据来源与验证状态"。</p>
+      </a>
+      <a class="card" href="03-资源清单.html">
+        <span class="card__no">A</span>
+        <h2 class="card__t">构成主义 Web 设计 · 资源清单</h2>
+        <p class="card__d">验证规则：本清单中每一条都标注了验证方式。星数与许可证来自 api.github.com 的实际返回（不是搜索结果摘要），字体西里尔覆盖来自 Google Fonts 官方元数…</p>
+      </a>
+      <a class="card" href="04-技术实现手册.html">
+        <span class="card__no">A</span>
+        <h2 class="card__t">构成主义 Web 技术实现手册</h2>
+        <p class="card__d">每个配方都给出：要解决什么视觉问题 → 可复制代码 → 坑 → 兼容性。 兼容性结论来自 MDN 页面上的 Baseline 标识（本环境实测抓取），不是凭印象。</p>
+      </a>
+      <a class="card" href="05-前端技术方案.html">
+        <span class="card__no">A</span>
+        <h2 class="card__t">俄国构成主义网页 · 现代 CSS/SVG/JS 实现技术方案</h2>
+        <p class="card__d">目标风格：强对角线构图、红/黑/白三色撞色、巨型无衬线大写标题、几何原语（楔形/射线/圆环）、文字沿斜线或沿路径、半调网点、套印错位、纸张颗粒、硬边零圆角。</p>
+      </a>
+      <a class="card" href="06-素材情报报告.html">
+        <span class="card__no">A</span>
+        <h2 class="card__t">构成主义 / 至上主义 / 包豪斯 —— 免费商用素材情报报告</h2>
+        <p class="card__d">检索时间：2026-10-12（Asia/Shanghai） 所有 URL 均为本次实际访问到的页面。凡无法验证的一律写「未找到」，不做记忆推测。</p>
+      </a>
+      <a class="card" href="07-设计规则速查.html">
+        <span class="card__no">B</span>
+        <h2 class="card__t">设计规则速查</h2>
+        <p class="card__d">本文件只记录能跨项目复用的规则与数值。具体到「构成主义」这一风格的美学考据在 01-美学谱系与形式法则.md，实现配方在 04-技术实现手册.md。 全目录导航见 README…</p>
+      </a>
+      <a class="card" href="08-交互模式.html">
+        <span class="card__no">B</span>
+        <h2 class="card__t">交互模式：history 驱动的多级返回</h2>
+        <p class="card__d">提取自 soviet-press 的「报纸 → 海报 → 文章抽屉」两级返回。 这套模式解决的是一个很常见、但多数实现都会做错的问题： 点击驱动的状态机，返回键和 ESC 行为…</p>
+      </a>
+      <a class="card" href="09-踩坑清单.html">
+        <span class="card__no">B</span>
+        <h2 class="card__t">踩坑清单</h2>
+        <p class="card__d">每一条都是本次实际踩到并修掉的，不是从文档里抄的。 格式：现象 → 原因 → 修法 → 可复用判据。 其中很大一部分只有靠"截图看"或"算一遍"才能发现 —— 看代码是看不出来…</p>
+      </a>
+      <a class="card" href="10-验证工作流.html">
+        <span class="card__no">B</span>
+        <h2 class="card__t">验证工作流</h2>
+        <p class="card__d">本次抓到的问题里，大多数靠看代码发现不了。这份文档是那套"能真的抓到问题"的验证手段。 配套脚本在 verify/，可直接改路径复用。</p>
+      </a>
+      <a class="card" href="README.html">
+        <span class="card__no">B</span>
+        <h2 class="card__t">HTML 设计 · 美学经验库</h2>
+        <p class="card__d">这个文件夹装的是「设计 HTML」这件事本身的经验：一个具体风格（构成主义）的美学考据， 加上从实现过程中沉淀出来的、可跨项目复用的规则与踩坑。 边界：动画 / 视频那条线不在…</p>
+      </a>
+  </div>
+
+  <div class="home__foot">
+    可运行的样式套件与样式指南：<a href="kit/index.html">kit/index.html</a>
+  </div>
+</div>
+
+</body>
+</html>

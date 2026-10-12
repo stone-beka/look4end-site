@@ -6,7 +6,7 @@ desktop.ini
 .idea/
 .vscode/
 
-# CLAUDE.md 是本地工作笔记（含草稿箱路径、内部规矩），
+# CLAUDE.md 是本地工作笔记（含本机路径、内部规矩），
 # 这个仓库是公开的，推上去会变成 look4end.com/CLAUDE.md
 CLAUDE.md
 
@@ -14,8 +14,6 @@ CLAUDE.md
 # 不挡的话 publish.bat 的 git add -A 会把整个 .claude/ 一起推上去。
 .claude/
 
-# 写作台写文件时的临时文件（写完整了才改名盖上，见那边的 writeAtomic）。
-# 它们本来就不该留下；这一条是防线中的一道 —— 另外两道在写作台里
-# （自己扫掉、安全检查时不算数），因为 .gitignore 挡得住 git status，
-# 挡不住 `git add -A`。带这一条是为了万一残留时别让它进 git status。
+# 历史遗留的临时文件命名（半成品，写完整了才改名盖上）。留着当兜底：
+# .gitignore 挡得住 git status，挡不住 `git add -A`，万一残留也别让它进仓库。
 *.l4e-tmp-*

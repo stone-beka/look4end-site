@@ -3,134 +3,399 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>构成主义 · HTML 设计美学经验</title>
-<meta name="description" content="9 条形式法则 / 设计系统 / 交互模式 / 踩坑清单">
-<!-- 分享卡片：微信/QQ/X 抓的是这几条。og:url 必须是完整网址，相对路径不认。 -->
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="构成主义 · HTML 设计美学经验">
-<meta property="og:title" content="构成主义 · HTML 设计美学经验">
-<meta property="og:description" content="9 条形式法则 / 设计系统 / 交互模式 / 踩坑清单">
-<meta property="og:url" content="https://look4end.com/">
-<meta property="og:locale" content="zh_CN">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="构成主义 · HTML 设计美学经验">
-<meta name="twitter:description" content="9 条形式法则 / 设计系统 / 交互模式 / 踩坑清单">
-<link rel="stylesheet" href="kit/kv.css">
-<style>
-  .home { position: relative; z-index: 2; max-width: 1440px; margin-inline: auto;
-          padding: clamp(1.5rem,5vw,4rem) var(--kv-margin) clamp(4rem,9vw,8rem); }
-  .home__eyebrow { font-family: var(--kv-font-mono); font-size: .75rem;
-        letter-spacing: .22em; text-transform: uppercase; color: var(--kv-red); margin: 0 0 .8rem; }
-  .home__title { font-family: var(--kv-font-alt); font-weight: 900;
-        font-size: clamp(2.2rem,7.5vw,6rem); line-height: .9; letter-spacing: -.04em;
-        text-transform: uppercase; margin: 0 0 .4rem; overflow-wrap: anywhere; }
-  .home__sub { font-family: var(--kv-font-display); font-weight: 400;
-        font-size: clamp(.95rem,1.8vw,1.5rem); letter-spacing: .06em;
-        margin: 0 0 clamp(1.5rem,4vw,2.5rem); color: var(--kv-ink-soft); }
-  .home__note { max-width: 70ch; margin: 0 0 clamp(2rem,5vw,3.5rem);
-        border-left: var(--kv-rule) solid var(--kv-red); padding-left: 1.1rem; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
-        gap: var(--kv-space-4); border-top: var(--kv-rule) solid var(--kv-ink); padding-top: var(--kv-space-5); }
-  .card { display: block; text-decoration: none; color: inherit; position: relative;
-        border: 2px solid var(--kv-ink); background: var(--kv-paper-lift);
-        padding: var(--kv-space-5) var(--kv-space-4) var(--kv-space-4);
-        transition: transform var(--kv-dur-base) var(--kv-ease-mech),
-                    box-shadow var(--kv-dur-base) var(--kv-ease-mech),
-                    background-color var(--kv-dur-base) var(--kv-ease-mech); }
-  .card:hover { transform: translate(-4px,-4px) skewX(-3deg); box-shadow: var(--kv-shadow-red); }
-  .card:active { background: var(--kv-ink); color: var(--kv-paper); transform: none; box-shadow: none; }
-  .card__no { position: absolute; top: 0; left: 0; padding: .1rem .5rem;
-        background: var(--kv-ink); color: var(--kv-paper);
-        font-family: var(--kv-font-mono); font-size: .7rem; letter-spacing: .16em; }
-  .card:hover .card__no { background: var(--kv-red); }
-  .card__t { font-family: var(--kv-font-display); font-weight: 700;
-        font-size: clamp(1.05rem,1.9vw,1.5rem); line-height: 1.06;
-        letter-spacing: -.01em; text-transform: uppercase; margin: 0 .2rem .5rem; }
-  .card__d { margin: 0 .2rem; font-size: .875rem; line-height: 1.55; color: var(--kv-ink-soft); }
-  .card:active .card__d { color: var(--kv-paper); }
-  .home__foot { margin-top: clamp(2.5rem,6vw,4rem); padding-top: 1rem;
-        border-top: var(--kv-rule) solid var(--kv-ink);
-        font-size: .8125rem; color: var(--kv-ink-soft); }
-  .home__foot a { color: inherit; }
-</style>
+<title>ЛЕФ — 构成主义报纸 / 原型 v0</title>
+<meta name="description" content="苏联构成主义风格的报纸首页 → 三张海报 → 文章抽屉交互原型">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Unbounded:wght@400;700;900&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="press.css">
 </head>
-<body>
+<body data-view="paper" data-drawer="closed">
 
-<div class="kv-axis" aria-hidden="true"></div>
+<a class="skip" href="#main">跳到主内容</a>
 
-<div class="home">
-  <p class="home__eyebrow">Constructivism · Design Notes</p>
-  <h1 class="home__title">构成主义<br>HTML 设计</h1>
-  <p class="home__sub">9 条形式法则 / 设计系统 / 交互模式 / 踩坑清单</p>
-
-  <p class="home__note">
-    这一组文档记录的是「设计 HTML」这件事本身：一个具体风格的美学考据，
-    加上实现过程中沉淀下来的、可跨项目复用的规则与踩坑。
-    所有关键数值都经过实测或精算，未验证的部分明确标注。
+<noscript>
+  <p class="noscript">
+    本页的交互（进入海报、展开文章、<kbd>ESC</kbd> 返回）需要 JavaScript。
+    报纸首页与三张海报的静态排版不依赖脚本，但抽屉无法展开。
   </p>
+</noscript>
 
-  <div class="cards">
-      <a class="card" href="01-美学谱系与形式法则.html">
-        <span class="card__no">A</span>
-        <h2 class="card__t">构成主义美学谱系与形式法则</h2>
-        <p class="card__d">目的：把「构成主义」从一堆风格印象，压缩成可以照着做决策的形式规则。 阅读顺序：先看第 0 节建立坐标系，再看第 3 节的九条形式法则（这是真正要用的部分），第 2 节的代表作…</p>
-      </a>
-      <a class="card" href="02-设计系统规格.html">
-        <span class="card__no">A</span>
-        <h2 class="card__t">构成主义设计系统规格 v0.1</h2>
-        <p class="card__d">这是一份可直接翻译成 CSS 变量的规格书。所有色值都经过 WCAG 对比度实测，所有字体都经过西里尔覆盖核实——不是凭感觉挑的。 实测方法与版本见文末"数据来源与验证状态"。</p>
-      </a>
-      <a class="card" href="03-资源清单.html">
-        <span class="card__no">A</span>
-        <h2 class="card__t">构成主义 Web 设计 · 资源清单</h2>
-        <p class="card__d">验证规则：本清单中每一条都标注了验证方式。星数与许可证来自 api.github.com 的实际返回（不是搜索结果摘要），字体西里尔覆盖来自 Google Fonts 官方元数…</p>
-      </a>
-      <a class="card" href="04-技术实现手册.html">
-        <span class="card__no">A</span>
-        <h2 class="card__t">构成主义 Web 技术实现手册</h2>
-        <p class="card__d">每个配方都给出：要解决什么视觉问题 → 可复制代码 → 坑 → 兼容性。 兼容性结论来自 MDN 页面上的 Baseline 标识（本环境实测抓取），不是凭印象。</p>
-      </a>
-      <a class="card" href="05-前端技术方案.html">
-        <span class="card__no">A</span>
-        <h2 class="card__t">俄国构成主义网页 · 现代 CSS/SVG/JS 实现技术方案</h2>
-        <p class="card__d">目标风格：强对角线构图、红/黑/白三色撞色、巨型无衬线大写标题、几何原语（楔形/射线/圆环）、文字沿斜线或沿路径、半调网点、套印错位、纸张颗粒、硬边零圆角。</p>
-      </a>
-      <a class="card" href="06-素材情报报告.html">
-        <span class="card__no">A</span>
-        <h2 class="card__t">构成主义 / 至上主义 / 包豪斯 —— 免费商用素材情报报告</h2>
-        <p class="card__d">检索时间：2026-10-12（Asia/Shanghai） 所有 URL 均为本次实际访问到的页面。凡无法验证的一律写「未找到」，不做记忆推测。</p>
-      </a>
-      <a class="card" href="07-设计规则速查.html">
-        <span class="card__no">B</span>
-        <h2 class="card__t">设计规则速查</h2>
-        <p class="card__d">本文件只记录能跨项目复用的规则与数值。具体到「构成主义」这一风格的美学考据在 01-美学谱系与形式法则.md，实现配方在 04-技术实现手册.md。 全目录导航见 README…</p>
-      </a>
-      <a class="card" href="08-交互模式.html">
-        <span class="card__no">B</span>
-        <h2 class="card__t">交互模式：history 驱动的多级返回</h2>
-        <p class="card__d">提取自 soviet-press 的「报纸 → 海报 → 文章抽屉」两级返回。 这套模式解决的是一个很常见、但多数实现都会做错的问题： 点击驱动的状态机，返回键和 ESC 行为…</p>
-      </a>
-      <a class="card" href="09-踩坑清单.html">
-        <span class="card__no">B</span>
-        <h2 class="card__t">踩坑清单</h2>
-        <p class="card__d">每一条都是本次实际踩到并修掉的，不是从文档里抄的。 格式：现象 → 原因 → 修法 → 可复用判据。 其中很大一部分只有靠"截图看"或"算一遍"才能发现 —— 看代码是看不出来…</p>
-      </a>
-      <a class="card" href="10-验证工作流.html">
-        <span class="card__no">B</span>
-        <h2 class="card__t">验证工作流</h2>
-        <p class="card__d">本次抓到的问题里，大多数靠看代码发现不了。这份文档是那套"能真的抓到问题"的验证手段。 配套脚本在 verify/，可直接改路径复用。</p>
-      </a>
-      <a class="card" href="README.html">
-        <span class="card__no">B</span>
-        <h2 class="card__t">HTML 设计 · 美学经验库</h2>
-        <p class="card__d">这个文件夹装的是「设计 HTML」这件事本身的经验：一个具体风格（构成主义）的美学考据， 加上从实现过程中沉淀出来的、可跨项目复用的规则与踩坑。 边界：动画 / 视频那条线不在…</p>
-      </a>
-  </div>
-
-  <div class="home__foot">
-    可运行的样式套件与样式指南：<a href="kit/index.html">kit/index.html</a>
-  </div>
+<!-- 转场擦除层：全屏红色硬边，clippath 从顶部落下 → 覆盖 → 从底部退出 -->
+<div class="wipe" id="wipe" aria-hidden="true">
+  <span class="wipe__mark" lang="ru">ЛЕФ</span>
 </div>
 
+<main id="main">
+
+  <!-- ══════════════════════════════════════════════════════
+       视图 1：苏联报纸首页
+       ══════════════════════════════════════════════════════ -->
+  <section class="view view--paper" id="view-paper" aria-label="报纸首页">
+
+    <header class="masthead">
+      <div class="masthead__top">
+        <p class="masthead__organ" lang="ru">ОРГАН ЛЕВОГО ФРОНТА ИСКУССТВ</p>
+        <p class="masthead__price" lang="ru">ЦЕНА 5 КОП.</p>
+      </div>
+      <h1 class="masthead__name" lang="ru">ЛЕФ</h1>
+      <div class="masthead__rule" aria-hidden="true"></div>
+      <ul class="dateline">
+        <li lang="ru">№ 1</li>
+        <li lang="ru">МОСКВА · 1923</li>
+        <li>第 1 版</li>
+        <li class="dateline__doc"><a href="notes/index.html">设计笔记 · 11 篇</a></li>
+        <li>设计原型 · 非真实出版物</li>
+      </ul>
+    </header>
+
+    <div class="lead">
+      <p class="lead__kicker" lang="ru">ВМЕСТО ПРЕДИСЛОВИЯ</p>
+      <p class="lead__text">
+        报纸是构成主义最早的战场。1919 年，罗德琴科与马雅可夫斯基在俄罗斯电讯社的橱窗里，
+        把标语和几何形并置；1923 年，《ЛЕФ》杂志发表宣言：
+        <span lang="ru">«Материальное оформление объекта должно заменить его эстетическую комбинацию»</span> ——
+        材料的成形要取代审美的组合。下面三版是三张海报，点击任意一版进入。
+      </p>
+    </div>
+
+    <!-- 三个板块 -->
+    <div class="columns">
+
+      <!-- 板块 01 -->
+      <article class="block">
+        <a class="block__link" href="#/p/0" data-goto="0">
+          <span class="block__num" aria-hidden="true">01</span>
+          <p class="block__kicker" lang="ru">КЛИН</p>
+          <h2 class="block__head" lang="ru">КЛИНОМ КРАСНЫМ<br>БЕЙ БЕЛЫХ</h2>
+          <p class="block__zh">用红色楔子打击白军</p>
+        </a>
+        <figure class="block__fig">
+          <img src="assets/lissitzky-wedge.jpg" width="1920" height="1572"
+               alt="李西茨基 1919 年石版画《用红色楔子打击白军》：红色三角楔子刺入白色圆圈，红白黑三色。公有领域。"
+               loading="lazy" decoding="async">
+          <figcaption>
+            <span class="fig__tag" lang="ru">АРХИВ</span>
+            李西茨基，1919，石版画 · 公有领域（Wikimedia Commons）
+          </figcaption>
+        </figure>
+        <p class="block__body">
+          红三角是共产党，白圆是资产阶级。照片与几何在这里不是装饰——
+          它们是论证本身。楔子的方向就是整张画面的动势来源。
+        </p>
+        <p class="block__cta" aria-hidden="true">进入海报 <span lang="ru">→ ПОСТЕР</span></p>
+      </article>
+
+      <!-- 板块 02 -->
+      <article class="block">
+        <a class="block__link" href="#/p/1" data-goto="1">
+          <span class="block__num" aria-hidden="true">02</span>
+          <p class="block__kicker" lang="ru">КНИГИ</p>
+          <h2 class="block__head" lang="ru">КНИГИ —<br>ВО ВСЕХ ОТРАСЛЯХ ЗНАНИЯ</h2>
+          <p class="block__zh">书籍！在一切知识分支中</p>
+        </a>
+        <p class="block__body">
+          罗德琴科 1924 年为列宁格勒国家出版社做的广告海报。一张女性侧脸照片，
+          加上一个吃掉半个画面的词。照片是材料，文字也是材料，两者被拼接而不是排版。
+        </p>
+        <div class="block__stat">
+          <span class="stat__n" lang="ru">1924</span>
+          <span class="stat__d">照片拼贴 + 水粉 · 列宁格勒国家出版社</span>
+        </div>
+        <p class="block__cta" aria-hidden="true">进入海报 <span lang="ru">→ ПОСТЕР</span></p>
+      </article>
+
+      <!-- 板块 03 -->
+      <article class="block">
+        <a class="block__link" href="#/p/2" data-goto="2">
+          <span class="block__num" aria-hidden="true">03</span>
+          <p class="block__kicker" lang="ru">БАШНЯ</p>
+          <h2 class="block__head" lang="ru">ПАМЯТНИК<br>ТРЕТЬЕМУ ИНТЕРНАЦИОНАЛУ</h2>
+          <p class="block__zh">第三国际纪念塔</p>
+        </a>
+        <p class="block__body">
+          塔特林 1919 年的方案：一根斜向主梁上挂着三个旋转的玻璃体——
+          圆柱一年转一圈，圆锥一月一圈，小圆柱每日一圈。若建成将达 400 米，高于埃菲尔铁塔。
+          它从未被建造，却成了整个运动最著名的符号。
+        </p>
+        <div class="block__stat">
+          <span class="stat__n" lang="ru">400 М</span>
+          <span class="stat__d">方案高度 · 1919–1920 · 未建成</span>
+        </div>
+        <p class="block__cta" aria-hidden="true">进入海报 <span lang="ru">→ ПОСТЕР</span></p>
+      </article>
+
+    </div>
+
+    <footer class="paper-foot">
+      <p>
+        <strong>原型说明</strong>：本页是构成主义风格的交互原型 v0。报头
+        <span lang="ru">«ЛЕФ»</span> 借用 1923–1925 年苏联先锋派杂志之名，
+        <strong>页面内容与排版均为本设计原创，不对应任何真实历史出版物</strong>。
+        仅左栏历史照片为公有领域扫描件。
+      </p>
+      <p class="paper-foot__nav">
+        <span>操作：点击任一版进入海报 · 点击底部文章条展开 · <kbd>ESC</kbd> 逐级返回</span>
+      </p>
+    </footer>
+
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       视图 2：海报 01 — КЛИН
+       ══════════════════════════════════════════════════════ -->
+  <section class="view view--poster" id="view-p0" data-index="0" aria-label="海报：用红色楔子打击白军" hidden>
+
+    <div class="poster poster--klin">
+      <svg class="klin__art" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice"
+           role="img" aria-label="红色三角楔子自左下刺入带黑色轮廓的圆">
+        <!-- viewBox 与画幅同比，slice 时不会裁掉构图主体 -->
+        <circle cx="890" cy="380" r="310" fill="#EFE9DC" stroke="#12100E" stroke-width="9"/>
+        <!-- 真正的楔形：底边在左下（宽），顶点在右上（尖），斜穿圆周 -->
+        <polygon points="110,1010 600,1010 1260,20" fill="#D6281F"/>
+        <circle cx="890" cy="380" r="310" fill="none" stroke="#12100E" stroke-width="9"/>
+        <line x1="1170" y1="150" x2="1372" y2="642" stroke="#12100E" stroke-width="9"/>
+        <circle cx="1292" cy="212" r="36" fill="#12100E"/>
+      </svg>
+
+      <p class="poster__side" lang="ru">ПРОЛЕТАРИИ ВСЕХ СТРАН</p>
+
+      <h1 class="poster__mega poster__mega--rot" lang="ru">КЛИН</h1>
+
+      <div class="poster__foot">
+        <p class="poster__no" lang="ru">№ 01 / 1919</p>
+        <p class="poster__zh">用红色楔子打击白军 · 李西茨基</p>
+        <p class="poster__hint">点击下方文章条阅读 · <kbd>ESC</kbd> 退回报纸</p>
+      </div>
+    </div>
+
+    <section class="drawer" aria-label="文章：用红色楔子打击白军">
+      <h2 class="sr-only">文章：用红色楔子打击白军</h2>
+      <button class="drawer__bar" type="button" aria-expanded="false" aria-controls="p0-body">
+        <span class="drawer__kicker" lang="ru">ЧИТАТЬ</span>
+        <span class="drawer__title">用红色楔子打击白军</span>
+        <span class="drawer__meta">李西茨基 · 1919 · 石版画</span>
+        <span class="drawer__arrow" aria-hidden="true">↑</span>
+      </button>
+      <div class="drawer__body" id="p0-body">
+        <div class="drawer__inner">
+          <div class="drawer__cols">
+            <div>
+              <p class="art__kicker" lang="ru">СУПРЕМАТИЗМ · 1919</p>
+              <p class="art__lead">
+                红三角（共产党）刺入白圆（资产阶级）。红、白、黑三色加上基本几何形，
+                是李西茨基至上主义时期的招牌手法；而文字被用来引导观者跟随那个主导向量的轨迹——
+                红三角像一根针，扎破一只气球。
+              </p>
+              <p>
+                动作在画面里被重复：更小的几何形以同样的方向贯穿全图。
+                整张海报没有一处是"构图上的平衡"，它是被一条斜轴拉着的。
+              </p>
+              <blockquote class="art__quote">
+                在这张海报里，我们看到的不仅是一件现代平面设计的杰作，也是至上主义视觉语言的
+                一次新应用：把原本指向精神超越的语言，转变成传达物质世界具体观念与信息的实用语言。
+                <cite>— 查尔斯·克莱默 &amp; 金·格兰特，艺术史学者</cite>
+              </blockquote>
+              <p>
+                李西茨基当时在马列维奇主持的维捷布斯克 UNOVIS 工作室。
+                这套语言后来被证明可以承载具体信息——这正是"海报"与"绘画"的分岔点。
+              </p>
+            </div>
+            <aside class="art__side">
+              <p class="art__side-h">对网页设计的三条直接推论</p>
+              <ol class="art__list">
+                <li><strong>楔形是最强的识别符号。</strong>可做 Hero 的分区切分、按钮、箭头、图片遮罩。</li>
+                <li><strong>一条斜轴决定整页动势。</strong>全站统一一个角度，不要每块换角度。</li>
+                <li><strong>重叠要靠混合模式。</strong>红楔压白圆用 <code>mix-blend-mode: multiply</code>，
+                  前提是父层加 <code>isolation: isolate</code>，否则会混到页面背景上。</li>
+              </ol>
+              <p class="art__src">
+                来源：Tate「Constructivism」条目；TheArtStory「Constructivism」运动页
+                （含 Cramer &amp; Grant 引文）。图像：Wikimedia Commons，公有领域。
+              </p>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       视图 3：海报 02 — КНИГИ
+       ══════════════════════════════════════════════════════ -->
+  <section class="view view--poster" id="view-p1" data-index="1" aria-label="海报：书籍！在一切知识分支中" hidden>
+
+    <div class="poster poster--knigi">
+      <div class="knigi__band" aria-hidden="true"></div>
+
+      <div class="knigi__photo">
+        <img src="assets/lissitzky-wedge.jpg" width="1920" height="1572"
+             alt="经过双色调处理的档案图版，用于演示照片拼贴手法" loading="lazy" decoding="async">
+      </div>
+
+      <h1 class="poster__mega poster__mega--fill" lang="ru">КНИГИ</h1>
+
+      <p class="knigi__sub" lang="ru">ВО ВСЕХ ОТРАСЛЯХ ЗНАНИЯ</p>
+      <p class="knigi__zh">书籍！在一切知识分支中</p>
+
+      <div class="poster__foot">
+        <p class="poster__no" lang="ru">№ 02 / 1924</p>
+        <p class="poster__zh">罗德琴科 · 列宁格勒国家出版社广告海报</p>
+        <p class="poster__hint">点击下方文章条阅读 · <kbd>ESC</kbd> 退回报纸</p>
+      </div>
+    </div>
+
+    <section class="drawer" aria-label="文章：书籍！在一切知识分支中">
+      <h2 class="sr-only">文章：书籍！在一切知识分支中</h2>
+      <button class="drawer__bar" type="button" aria-expanded="false" aria-controls="p1-body">
+        <span class="drawer__kicker" lang="ru">ЧИТАТЬ</span>
+        <span class="drawer__title">书籍！在一切知识分支中</span>
+        <span class="drawer__meta">罗德琴科 · 1924 · 照片拼贴</span>
+        <span class="drawer__arrow" aria-hidden="true">↑</span>
+      </button>
+      <div class="drawer__body" id="p1-body">
+        <div class="drawer__inner">
+          <div class="drawer__cols">
+            <div>
+              <p class="art__kicker" lang="ru">ФОТОМОНТАЖ · 1924</p>
+              <p class="art__lead">
+                这张为列宁格勒国家出版社做的广告海报，构图是他 1920 年代中期照片拼贴的典型：
+                <strong>照片与文字的拼接</strong>，而不是让文字去"配合"图片。
+              </p>
+              <p>
+                罗德琴科 1921 年放弃架上绘画，转而把自己当作工程师。同年起他与诗人马雅可夫斯基
+                合作了一系列广告——那批作品第一次把现代设计带进俄国广告业，
+                同时也在卖商品的同时卖革命的价值。
+              </p>
+              <p>
+                用几何构图与"响亮"的色彩去宣告现代性：这是他的原话所指向的东西。
+                一个词占掉半个画面，在今天看来仍然冒犯版式教科书。
+              </p>
+              <p>
+                本页右侧的档案图版经过<strong>双色调 + 半调网点</strong>处理——
+                对应当时只能套两三种油墨的印刷条件。照片在这里是被"加工过的材料"，
+                不是插图。
+              </p>
+            </div>
+            <aside class="art__side">
+              <p class="art__side-h">对网页设计的三条直接推论</p>
+              <ol class="art__list">
+                <li><strong>一个字可以吃掉一屏。</strong>用 <code>clamp()</code> 让标题随视口放大，
+                  而不是固定像素。</li>
+                <li><strong>照片必须被加工。</strong>灰度 + 双色调 + 网点，
+                  让它看起来"被印上去"而不是"被放上去"。</li>
+                <li><strong>不要圆角卡片装图片。</strong>那是 2015 年后的 SaaS 语言，
+                  和"硬边、零装饰"直接冲突。</li>
+              </ol>
+              <p class="art__src">
+                来源：TheArtStory「Alexander Rodchenko」条目（Lengiz 出版社广告海报，
+                照片拼贴与水粉）。左侧图版为公有领域扫描件，仅用于演示加工手法。
+              </p>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       视图 4：海报 03 — БАШНЯ
+       ══════════════════════════════════════════════════════ -->
+  <section class="view view--poster" id="view-p2" data-index="2" aria-label="海报：第三国际纪念塔" hidden>
+
+    <div class="poster poster--bashnya">
+      <div class="bashnya__rays" aria-hidden="true"></div>
+
+      <svg class="bashnya__art" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet"
+           role="img" aria-label="斜向主梁上悬着三个同心圆，代表塔特林塔的三个旋转玻璃体">
+        <line x1="60" y1="960" x2="860" y2="140" stroke="#12100E" stroke-width="22"/>
+        <line x1="120" y1="980" x2="920" y2="160" stroke="#D6281F" stroke-width="10"/>
+        <g class="bashnya__spin">
+          <circle cx="620" cy="330" r="130" fill="none" stroke="#12100E" stroke-width="8"/>
+          <circle cx="620" cy="330" r="86"  fill="none" stroke="#12100E" stroke-width="4"/>
+        </g>
+        <g class="bashnya__spin bashnya__spin--slow">
+          <circle cx="430" cy="560" r="96"  fill="none" stroke="#12100E" stroke-width="7"/>
+          <ellipse cx="430" cy="560" rx="96" ry="30" fill="none" stroke="#D6281F" stroke-width="4"/>
+        </g>
+        <rect x="250" y="690" width="150" height="150" fill="#D6281F"
+              transform="rotate(-32 325 765)" style="mix-blend-mode:multiply"/>
+      </svg>
+
+      <h1 class="poster__mega poster__mega--vertical" lang="ru">БАШНЯ</h1>
+
+      <div class="poster__foot">
+        <p class="poster__no" lang="ru">№ 03 / 1919–20</p>
+        <p class="poster__zh">第三国际纪念塔 · 塔特林</p>
+        <p class="poster__hint">点击下方文章条阅读 · <kbd>ESC</kbd> 退回报纸</p>
+      </div>
+    </div>
+
+    <section class="drawer" aria-label="文章：第三国际纪念塔">
+      <h2 class="sr-only">文章：第三国际纪念塔</h2>
+      <button class="drawer__bar" type="button" aria-expanded="false" aria-controls="p2-body">
+        <span class="drawer__kicker" lang="ru">ЧИТАТЬ</span>
+        <span class="drawer__title">第三国际纪念塔</span>
+        <span class="drawer__meta">塔特林 · 1919–20 · 未建成</span>
+        <span class="drawer__arrow" aria-hidden="true">↑</span>
+      </button>
+      <div class="drawer__body" id="p2-body">
+        <div class="drawer__inner">
+          <div class="drawer__cols">
+            <div>
+              <p class="art__kicker" lang="ru">ПРОЕКТ · 1919–1920</p>
+              <p class="art__lead">
+                1917 年，塔特林开始构想一座纪念社会主义革命的巨型结构；到 1920 年，
+                他拿出了"塔特林塔"的完整方案。原始模型是一具 15 英尺高的木构，
+                <strong>从未进入实际建造</strong>。
+              </p>
+              <p>
+                按设计，它将是 400 米高的螺旋钢结构——比埃菲尔铁塔还要高三分之一。
+                斜向的主梁锚定整座塔，梁上挂着三个旋转的玻璃体：
+              </p>
+              <ul class="art__facts">
+                <li><span lang="ru">ЦИЛИНДР</span> 圆柱 · 立法机构 · <strong>一年</strong>转一圈</li>
+                <li><span lang="ru">КОНУС</span> 圆锥 · 政府行政办公室 · <strong>一月</strong>转一圈</li>
+                <li><span lang="ru">ЦИЛИНДР</span> 小圆柱 · 新闻局 · <strong>每日</strong>转一圈</li>
+              </ul>
+              <p>
+                塔顶是一个每小时转一次的半球，内含无线电台，向云层投射布尔什维克标语。
+              </p>
+              <p>
+                它成为共产主义乌托邦的象征，也是构成主义运动最著名的标志——
+                尽管没有一根钢梁真的被立起来。
+              </p>
+            </div>
+            <aside class="art__side">
+              <p class="art__side-h">对网页设计的三条直接推论</p>
+              <ol class="art__list">
+                <li><strong>用一条斜向主梁贯穿全页。</strong>它是整页的骨架，
+                  其余元素都相对它定位——这比"居中对称"有力得多。</li>
+                <li><strong>旋转可以被理解为"节律"。</strong>塔上三个体以不同周期转动，
+                  对应到界面就是不同层以不同速度运动；但必须遵守
+                  <code>prefers-reduced-motion</code>。</li>
+                <li><strong>敢于展示未完成。</strong>暴露结构与构造，
+                  比藏起脚手架更诚实——这也正是"粗野主义 Web"的核心原则。</li>
+              </ol>
+              <p class="art__src">
+                来源：TheArtStory「Constructivism」运动页（Monument to the Third International
+                条目）。本海报为原创 SVG 绘制，非历史图像。
+              </p>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<!-- 屏幕阅读器状态播报 -->
+<p class="sr-only" id="live" role="status" aria-live="polite"></p>
+
+<script src="press.js"></script>
 </body>
 </html>
