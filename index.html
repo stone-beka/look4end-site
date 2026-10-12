@@ -73,57 +73,57 @@
       <a class="card" href="01-美学谱系与形式法则.html">
         <span class="card__no">A</span>
         <h2 class="card__t">构成主义美学谱系与形式法则</h2>
-        <p class="card__d">做网页之前必须先分清这四件事，否则做出来的东西会变成"混搭拼贴"。</p>
+        <p class="card__d">目的：把「构成主义」从一堆风格印象，压缩成可以照着做决策的形式规则。 阅读顺序：先看第 0 节建立坐标系，再看第 3 节的九条形式法则（这是真正要用的部分），第 2 节的代表作…</p>
       </a>
       <a class="card" href="02-设计系统规格.html">
         <span class="card__no">A</span>
         <h2 class="card__t">构成主义设计系统规格 v0.1</h2>
-        <p class="card__d">构成主义海报是双色油墨印在廉价纸上：纸本身是米黄偏灰的（不是纯白），墨只有黑和红。所以色板要以"纸"为基准，而不是以"白"为基准。</p>
+        <p class="card__d">这是一份可直接翻译成 CSS 变量的规格书。所有色值都经过 WCAG 对比度实测，所有字体都经过西里尔覆盖核实——不是凭感觉挑的。 实测方法与版本见文末"数据来源与验证状态"。</p>
       </a>
       <a class="card" href="03-资源清单.html">
         <span class="card__no">A</span>
         <h2 class="card__t">构成主义 Web 设计 · 资源清单</h2>
-        <p class="card__d">实测：以 constructivist 搜索 GitHub 全站，总共只有 78 个仓库，排在前面的全是机器学习/教育学（"constructivism" 在教育学里是"建构主…</p>
+        <p class="card__d">验证规则：本清单中每一条都标注了验证方式。星数与许可证来自 api.github.com 的实际返回（不是搜索结果摘要），字体西里尔覆盖来自 Google Fonts 官方元数…</p>
       </a>
       <a class="card" href="04-技术实现手册.html">
         <span class="card__no">A</span>
         <h2 class="card__t">构成主义 Web 技术实现手册</h2>
-        <p class="card__d">凡是可交互元素（a / button / input）都不要在它自己身上用 clip-path。</p>
+        <p class="card__d">每个配方都给出：要解决什么视觉问题 → 可复制代码 → 坑 → 兼容性。 兼容性结论来自 MDN 页面上的 Baseline 标识（本环境实测抓取），不是凭印象。</p>
       </a>
       <a class="card" href="05-前端技术方案.html">
         <span class="card__no">A</span>
         <h2 class="card__t">俄国构成主义网页 · 现代 CSS/SVG/JS 实现技术方案</h2>
-        <p class="card__d">另外（CSS-Tricks polygon() 实测原文）：多边形顶点是 x y 空格分隔、逗号分隔点，至少 3 点；fill-rule 可选（nonzero 默认 / eve…</p>
+        <p class="card__d">目标风格：强对角线构图、红/黑/白三色撞色、巨型无衬线大写标题、几何原语（楔形/射线/圆环）、文字沿斜线或沿路径、半调网点、套印错位、纸张颗粒、硬边零圆角。</p>
       </a>
       <a class="card" href="06-素材情报报告.html">
         <span class="card__no">A</span>
         <h2 class="card__t">构成主义 / 至上主义 / 包豪斯 —— 免费商用素材情报报告</h2>
-        <p class="card__d">全部通过 Commons api.php?action=query&prop=imageinfo&iiprop=url|size|extmetadata 逐条读取。</p>
+        <p class="card__d">检索时间：2026-10-12（Asia/Shanghai） 所有 URL 均为本次实际访问到的页面。凡无法验证的一律写「未找到」，不做记忆推测。</p>
       </a>
       <a class="card" href="07-设计规则速查.html">
         <span class="card__no">B</span>
         <h2 class="card__t">设计规则速查</h2>
-        <p class="card__d">不要依赖"颜色变化"来传达状态（色盲 + 强制色模式会吞掉它）。</p>
+        <p class="card__d">本文件只记录能跨项目复用的规则与数值。具体到「构成主义」这一风格的美学考据在 01-美学谱系与形式法则.md，实现配方在 04-技术实现手册.md。 全目录导航见 README…</p>
       </a>
       <a class="card" href="08-交互模式.html">
         <span class="card__no">B</span>
         <h2 class="card__t">交互模式：history 驱动的多级返回</h2>
-        <p class="card__d">这样从任意深链接进来，ESC / 返回都是一级一级退，而不是一步跳出。</p>
+        <p class="card__d">提取自 soviet-press 的「报纸 → 海报 → 文章抽屉」两级返回。 这套模式解决的是一个很常见、但多数实现都会做错的问题： 点击驱动的状态机，返回键和 ESC 行为…</p>
       </a>
       <a class="card" href="09-踩坑清单.html">
         <span class="card__no">B</span>
         <h2 class="card__t">踩坑清单</h2>
-        <p class="card__d"></p>
+        <p class="card__d">每一条都是本次实际踩到并修掉的，不是从文档里抄的。 格式：现象 → 原因 → 修法 → 可复用判据。 其中很大一部分只有靠"截图看"或"算一遍"才能发现 —— 看代码是看不出来…</p>
       </a>
       <a class="card" href="10-验证工作流.html">
         <span class="card__no">B</span>
         <h2 class="card__t">验证工作流</h2>
-        <p class="card__d">🔴 这是本次踩过的坑（见 09-踩坑清单.md 的 F1）。</p>
+        <p class="card__d">本次抓到的问题里，大多数靠看代码发现不了。这份文档是那套"能真的抓到问题"的验证手段。 配套脚本在 verify/，可直接改路径复用。</p>
       </a>
       <a class="card" href="README.html">
         <span class="card__no">B</span>
         <h2 class="card__t">HTML 设计 · 美学经验库</h2>
-        <p class="card__d">用 A 组美学 + B 组规则做的第一个页面：报纸首页 → 三个板块转场进入三张海报 → 底部挂着文章条 → 点击上滑展开 → ESC 收回文章 → 再按 ESC 退回报纸（与…</p>
+        <p class="card__d">这个文件夹装的是「设计 HTML」这件事本身的经验：一个具体风格（构成主义）的美学考据， 加上从实现过程中沉淀出来的、可跨项目复用的规则与踩坑。 边界：动画 / 视频那条线不在…</p>
       </a>
   </div>
 
