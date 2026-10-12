@@ -1,0 +1,189 @@
+/* ============================================================================
+   doc.css —— 文章页版面（在 kit/kv.css 之后加载）
+   只负责"把 Markdown 排成一篇文章"，不重新定义设计系统。
+   设计令牌全部沿用 kv.css，色彩纪律见 02-设计系统规格.md。
+   ========================================================================== */
+
+/* ---------- 页面骨架 ---------- */
+.doc {
+  position: relative; z-index: 2;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding: clamp(1rem, 3vw, 2.5rem) var(--kv-margin) clamp(4rem, 9vw, 8rem);
+}
+
+.doc__top {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--kv-space-4);
+  border-bottom: var(--kv-rule) solid var(--kv-ink);
+  padding-bottom: .6rem; margin-bottom: clamp(1.5rem, 4vw, 3rem);
+}
+.doc__back {
+  font-family: var(--kv-font-mono); font-size: .75rem;
+  letter-spacing: var(--kv-track-label); text-transform: uppercase;
+  text-decoration: none; color: var(--kv-ink);
+  border-bottom: 2px solid var(--kv-red);
+  transition: background-color var(--kv-dur-base) var(--kv-ease-mech),
+              color var(--kv-dur-base) var(--kv-ease-mech);
+}
+.doc__back:hover { background: var(--kv-red); color: var(--kv-paper); }
+.doc__no {
+  font-family: var(--kv-font-mono); font-size: .75rem;
+  letter-spacing: var(--kv-track-label); color: var(--kv-red);
+}
+
+/* 页码导航（上一篇 / 下一篇）——由 build.py 注入 */
+.doc__nav {
+  display: flex; flex-wrap: wrap; gap: var(--kv-space-3);
+  justify-content: space-between;
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  padding-top: 1rem;
+  border-top: var(--kv-rule) solid var(--kv-ink);
+}
+.doc__nav a {
+  font-family: var(--kv-font-mono); font-size: .75rem;
+  letter-spacing: .12em; text-decoration: none; color: var(--kv-ink);
+  border: 2px solid var(--kv-ink); padding: .5rem .9rem;
+  transition: background-color var(--kv-dur-base) var(--kv-ease-mech),
+              color var(--kv-dur-base) var(--kv-ease-mech),
+              border-color var(--kv-dur-base) var(--kv-ease-mech);
+}
+.doc__nav a:hover { background: var(--kv-ink); color: var(--kv-paper); }
+.doc__nav a.is-active { background: var(--kv-red); border-color: var(--kv-red); color: var(--kv-paper); }
+
+/* ---------- 文章正文 ---------- */
+.doc__body { max-width: 82ch; }
+
+.doc__body > *:first-child { margin-top: 0; }
+
+.doc__body h1 {
+  font-family: var(--kv-font-alt); font-weight: 900;
+  font-size: clamp(2rem, 6.2vw, 4.4rem);
+  line-height: .92; letter-spacing: -.035em;
+  text-transform: uppercase;
+  margin: 0 0 .6em;
+  overflow-wrap: anywhere;
+}
+.doc__body h2 {
+  font-family: var(--kv-font-display); font-weight: 700;
+  font-size: clamp(1.5rem, 3.2vw, 2.5rem);
+  line-height: 1.02; letter-spacing: -.02em;
+  text-transform: uppercase;
+  margin: clamp(2.2rem, 5vw, 3.6rem) 0 .8rem;
+  padding-top: .6rem;
+  border-top: var(--kv-rule) solid var(--kv-ink);
+  overflow-wrap: anywhere;
+}
+.doc__body h3 {
+  font-family: var(--kv-font-display); font-weight: 600;
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  line-height: 1.15; margin: 2rem 0 .6rem;
+  color: var(--kv-ink);
+}
+.doc__body h4 {
+  font-family: var(--kv-font-mono); font-weight: 700;
+  font-size: .8125rem; letter-spacing: var(--kv-track-label);
+  text-transform: uppercase; color: var(--kv-red);
+  margin: 1.6rem 0 .5rem;
+}
+/* 标题内的锚点：只做装饰，不占位 */
+.doc__body .headerlink {
+  margin-left: .35em; font-size: .6em; text-decoration: none;
+  color: var(--kv-red); opacity: 0; transition: opacity var(--kv-dur-base) var(--kv-ease-mech);
+}
+.doc__body h2:hover .headerlink,
+.doc__body h3:hover .headerlink { opacity: 1; }
+
+.doc__body p { margin: 0 0 1.05rem; }
+.doc__body strong { font-weight: 700; }
+.doc__body em { font-style: italic; }
+
+.doc__body a {
+  color: var(--kv-ink);
+  text-decoration: underline; text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.doc__body a:hover { background: var(--kv-yellow); }
+
+/* 列表 */
+.doc__body ul, .doc__body ol { margin: 0 0 1.1rem; padding-left: 1.4rem; }
+.doc__body li { margin-bottom: .35rem; }
+.doc__body li::marker { color: var(--kv-red); font-family: var(--kv-font-mono); }
+
+/* 引文 */
+.doc__body blockquote {
+  margin: 1.5rem 0; padding: .2rem 0 .2rem 1.1rem;
+  border-left: var(--kv-rule) solid var(--kv-red);
+  font-family: var(--kv-font-alt); font-size: 1.02em; line-height: 1.45;
+  color: var(--kv-ink);
+}
+.doc__body blockquote p:last-child { margin-bottom: 0; }
+
+/* 行内代码 */
+.doc__body code {
+  font-family: var(--kv-font-mono); font-size: .86em;
+  background: rgba(26, 26, 26, .07);
+  padding: .08em .34em;
+}
+
+/* 代码块 —— 横向可滚，不撑破版面 */
+.doc__body pre {
+  margin: 0 0 1.3rem;
+  padding: .9rem 1rem;
+  background: var(--kv-ink); color: var(--kv-paper);
+  overflow-x: auto; overscroll-behavior-x: contain;
+  border-left: var(--kv-rule) solid var(--kv-red);
+  font-size: .8125rem; line-height: 1.6;
+}
+.doc__body pre code { background: none; color: inherit; padding: 0; font-size: 1em; }
+
+/* 分隔线 */
+.doc__body hr {
+  border: 0; border-top: var(--kv-rule) solid var(--kv-ink);
+  margin: clamp(2rem, 5vw, 3.2rem) 0;
+}
+
+/* 表格 —— 宽表可横向滚；长内容换行不撑破 */
+.doc__body .table-wrap { overflow-x: auto; margin: 0 0 1.4rem; }
+.doc__body table {
+  width: 100%; border-collapse: collapse;
+  font-size: .875rem; line-height: 1.55;
+}
+.doc__body th, .doc__body td {
+  border-bottom: 1px solid var(--kv-ink);
+  padding: .5rem .7rem; text-align: left; vertical-align: top;
+}
+.doc__body th {
+  font-family: var(--kv-font-display); font-weight: 700;
+  text-transform: uppercase; font-size: .75rem; letter-spacing: .08em;
+  border-bottom: var(--kv-rule) solid var(--kv-ink);
+  white-space: nowrap;
+}
+.doc__body tbody tr:hover { background: var(--kv-paper-dim); }
+
+/* 图片 */
+.doc__body img { max-width: 100%; height: auto; border: 2px solid var(--kv-ink); }
+
+/* 首次出现的 h2 之前不要那根顶线（因为上面已经有 doc__top 的分隔） */
+.doc__body > h2:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+
+/* ---------- 窄屏 ---------- */
+@media (max-width: 780px) {
+  .doc__body { max-width: none; }
+  .doc__body th { white-space: normal; }
+  .doc__nav { flex-direction: column; }
+  .doc__nav a { text-align: center; }
+}
+
+/* ---------- 无障碍降级 ---------- */
+@media (prefers-contrast: more) {
+  .doc__body pre { background: #000; }
+  .doc__body tbody tr:hover { background: none; }
+}
+@media (forced-colors: active) {
+  .doc__body pre { border: 2px solid ButtonText; }
+}
+@media print {
+  .doc__top, .doc__nav, .kv-axis { display: none !important; }
+  .doc__body pre { background: #fff; color: #000; border: 1px solid #000; }
+}

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>构成主义 Web 技术实现手册 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="构成主义 Web 技术实现手册">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">04 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="web">构成主义 Web 技术实现手册</h1>
+<blockquote>
+<p>每个配方都给出：<strong>要解决什么视觉问题 → 可复制代码 → 坑 → 兼容性</strong>。
+兼容性结论来自 MDN 页面上的 <strong>Baseline</strong> 标识（本环境实测抓取），不是凭印象。</p>
+</blockquote>
+<hr />
+<h2 id="0">0. 兼容性核查表（实测结果）<a class="headerlink" href="#0" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>MDN Baseline 状态</th>
+<th>用途</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>clip-path</code></td>
+<td>✅ <strong>Widely available</strong>（2020-01 起全浏览器）</td>
+<td>斜切、楔形、裁切揭示</td>
+<td>主力工具</td>
+</tr>
+<tr>
+<td><code>mix-blend-mode</code></td>
+<td>✅ <strong>Widely available</strong>（2020-01 起，部分子特性有差异）</td>
+<td>套印、双色调、文字压图</td>
+<td>会创建层叠上下文</td>
+</tr>
+<tr>
+<td><code>background-blend-mode</code></td>
+<td>✅ <strong>Widely available</strong></td>
+<td>背景层叠（纸+网点）</td>
+<td>只混合自身背景层</td>
+</tr>
+<tr>
+<td><code>text-wrap</code></td>
+<td>✅ <strong>Widely available</strong>（部分子特性有差异）</td>
+<td><code>balance</code> / <code>pretty</code> 断行</td>
+<td>标题必用</td>
+</tr>
+<tr>
+<td><code>shape-outside</code></td>
+<td>✅ <strong>Widely available</strong>（部分子特性有差异）</td>
+<td>文字绕几何形</td>
+<td>需配合 <code>float</code></td>
+</tr>
+<tr>
+<td><code>mask</code></td>
+<td>✅ <strong>Widely available</strong></td>
+<td>网点遮罩、渐隐</td>
+<td>加 <code>-webkit-</code> 前缀更稳</td>
+</tr>
+<tr>
+<td><code>writing-mode</code></td>
+<td>✅ <strong>Widely available</strong>（部分子特性有差异）</td>
+<td>竖排文字</td>
+<td>中文竖排可用</td>
+</tr>
+<tr>
+<td><code>font-variant-numeric</code></td>
+<td>✅ <strong>Widely available</strong></td>
+<td>表格数字对齐</td>
+<td>编号列必用</td>
+</tr>
+<tr>
+<td>SVG <code>feTurbulence</code></td>
+<td>✅ <strong>Widely available</strong></td>
+<td>颗粒/噪声</td>
+<td>内联为 data-URI</td>
+</tr>
+<tr>
+<td>SVG <code>textPath</code></td>
+<td>✅ <strong>Widely available</strong>（部分子特性有差异）</td>
+<td>沿路径/沿圆排字</td>
+<td>必须配 <code>&lt;path id&gt;</code></td>
+</tr>
+<tr>
+<td><code>filter: contrast()</code></td>
+<td>✅ <strong>Widely available</strong></td>
+<td>照片加工</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>container-type</code></td>
+<td>✅ <strong>Widely available</strong>（部分子特性有差异）</td>
+<td>组件级响应式</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>:has()</code></td>
+<td>✅ <strong>Widely available</strong>（部分子特性有差异）</td>
+<td>父级/兄弟选择</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>@property</code></td>
+<td>⚠️ <strong>未验证</strong></td>
+<td>注册自定义属性做动画</td>
+<td><strong>使用前请自行在 MDN 确认</strong></td>
+</tr>
+<tr>
+<td><code>animation-timeline</code>（滚动驱动动画）</td>
+<td>⚠️ <strong>未验证</strong></td>
+<td>滚动联动动效</td>
+<td><strong>使用前请自行确认</strong></td>
+</tr>
+<tr>
+<td><code>text-spacing-trim</code></td>
+<td>⚠️ <strong>未验证</strong></td>
+<td>中文标点压缩</td>
+<td><strong>使用前请自行确认</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>后三项在本环境抓取 MDN 时未取到 Baseline 标识，<strong>不做断言</strong>。它们是加分项，不是构成主义风格的必需品——<strong>不依赖它们也能 100% 实现这套风格</strong>。</p>
+</blockquote>
+<hr />
+<h2 id="1">1. 纸张底 + 印刷颗粒<a class="headerlink" href="#1" aria-hidden="true">#</a></h2>
+<p><strong>问题</strong>：纯白背景是"屏幕感"，构成主义必须是"纸感"。但直接用纹理图片会有：体积大、拉伸变形、色彩偏移。</p>
+<p><strong>解法</strong>：SVG <code>feTurbulence</code> 内联为 data-URI，程序生成颗粒。</p>
+<pre><code class="language-css">:root {
+  --kv-paper: #EFE9DC;
+  /* feTurbulence 生成的噪声纹，baseFrequency 越小颗粒越大 */
+  --kv-grain: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E&quot;);
+}
+
+body {
+  background-color: var(--kv-paper);
+  background-image: var(--kv-grain);
+  background-size: 160px 160px;
+  background-blend-mode: multiply;   /* 让噪声成为&quot;墨点&quot;而不是&quot;白霜&quot; */
+  background-attachment: fixed;      /* 可选：滚动时纸不动，更像印刷品 */
+}
+</code></pre>
+<p><strong>坑</strong>：
+- <code>baseFrequency</code> 调大 → 颗粒更细；调到 <code>0.9+</code> 会接近纯噪声，反而更脏。<strong>0.7–0.85 是甜区</strong>。
+- <code>opacity</code> 必须压到 <strong>0.04–0.08 区间</strong>（这里靠 SVG 内部 <code>opacity</code> + <code>background-blend-mode: multiply</code> 双重压低）。超过 0.1 就从"纸"变成"脏屏幕"。
+- 🔴 <strong>URL 编码：<code>#</code> 必须写成 <code>%23</code>。</strong> 这是最容易忘、且一忘就整个滤镜失效的坑（<code>#a</code> 会被浏览器当成 URL fragment 截断）。同理 <code>%</code> → <code>%25</code>（所以 <code>100%</code> 要写 <code>100%25</code>），<code>&lt;</code> → <code>%3C</code>，<code>&gt;</code> → <code>%3E</code>。内部属性用单引号，外层用双引号。
+- 🔴 <strong>性能：内联 SVG <code>feTurbulence</code> 是"每次重绘都要重新光栅化滤镜"的</strong>。全屏常驻（比如挂在 <code>body</code> 上）在生产环境是有代价的 —— 滚动、缩放、合成都会触发重算。
+  - <strong>全屏常驻颗粒层 → 换成无缝 PNG/WebP 贴图</strong>（GPU 平铺，成本极低）：<code>:root { --kv-grain: url("./grain-160.png"); }</code>
+  - 小面积元素（卡片、Hero、单个色块）用 SVG 版本完全没问题
+  - <code>background-size</code> 一律用<strong>固定 px</strong>，不要用 <code>%</code> / <code>cover</code>，否则滤镜被反复重算
+- 🔴 <strong>不要用 <code>background-attachment: fixed</code></strong> —— 移动端会强制全屏重绘。想要"纸不动"的观感，改用独立固定层（务必 <code>pointer-events: none</code>）。
+- 独立覆盖层必须加 <code>pointer-events: none</code>，否则会挡住整页点击。
+- 可用 <code>contain: paint</code> 或 <code>content-visibility</code> 把滤镜重算锁在局部。</p>
+<pre><code class="language-css">/* 若确实需要独立固定颗粒层 */
+.kv-grain-layer {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background-image: var(--kv-grain); background-size: 160px 160px;
+  mix-blend-mode: multiply; opacity: .5;
+}
+</code></pre>
+<blockquote>
+<p>💡 <strong><code>background-blend-mode</code> 只混合元素自己的多层背景</strong>，要让<strong>文字也"压"进纸里</strong>，只能用 <code>mix-blend-mode</code> + <code>isolation</code>。这是两者的分工，别混。详见 <a href="./05-前端技术方案.html"><code>05-前端技术方案.md</code> 第 7 节</a>。</p>
+</blockquote>
+<hr />
+<h2 id="2">2. 斜向网格底纹（"可见的构造"）<a class="headerlink" href="#2" aria-hidden="true">#</a></h2>
+<p><strong>问题</strong>：构成主义的网格是<strong>露出来的</strong>。但用 <code>&lt;table&gt;</code> 或大量 div 画网格很蠢。</p>
+<p><strong>解法</strong>：两组 <code>repeating-linear-gradient</code> 叠加。</p>
+<pre><code class="language-css">.kv-grid-bg {
+  background-image:
+    repeating-linear-gradient(90deg,  rgba(18,16,14,.07) 0 1px, transparent 1px 6.25%),
+    repeating-linear-gradient(0deg,   rgba(18,16,14,.07) 0 1px, transparent 1px 48px);
+  background-size: 100% 100%;
+}
+</code></pre>
+<p><strong>斜向网格</strong>（更有构成主义味）：</p>
+<pre><code class="language-css">.kv-grid-diagonal {
+  background-image:
+    repeating-linear-gradient(60deg,  rgba(18,16,14,.06) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(-60deg, rgba(18,16,14,.06) 0 1px, transparent 1px 28px);
+}
+</code></pre>
+<p><strong>坑</strong>：透明度超过 0.1 就会和正文抢注意力。<strong>0.05–0.08 是上限。</strong></p>
+<hr />
+<h2 id="3">3. 主斜轴（贯穿全页的"主梁"）<a class="headerlink" href="#3" aria-hidden="true">#</a></h2>
+<p><strong>问题</strong>：一条从页面顶部贯穿到底部的斜线，是构成主义最重要的动势来源。</p>
+<p><strong>解法</strong>：<code>position: fixed</code> + <code>transform: rotate()</code>，或用 <code>clip-path</code> 做一个斜切色带。</p>
+<pre><code class="language-css">.kv-axis {
+  position: fixed;
+  inset: -20% -10%;
+  width: 140%;
+  height: 14px;
+  background: var(--kv-ink);
+  transform: rotate(-15deg);        /* 与 --kv-axis-angle 保持一致 */
+  transform-origin: center;
+  pointer-events: none;
+  z-index: 1;                        /* 在内容之下、背景之上 */
+  mix-blend-mode: multiply;
+}
+
+/* 变体：斜切色带（更宽，带面积） */
+.kv-axis--band {
+  height: 38vh;
+  background: var(--kv-red);
+  opacity: .94;
+  z-index: 0;
+}
+</code></pre>
+<p><strong>坑</strong>：
+- 用 <code>transform: rotate()</code> 而不是 <code>clip-path</code> 画<strong>细线</strong>——旋转更简单且抗锯齿更好。
+- 斜轴必须在 <code>z-index</code> 上低于内容，且 <code>pointer-events: none</code>，否则会拦截点击。
+- <code>mix-blend-mode: multiply</code> 会让斜轴与纸张纹理叠印，产生"印上去"的感觉。<strong>但它会创建层叠上下文</strong>，可能影响内部元素的 <code>z-index</code>（见第 7 节）。</p>
+<hr />
+<h2 id="4">4. 楔形（最具识别度的符号）<a class="headerlink" href="#4" aria-hidden="true">#</a></h2>
+<p><strong>问题</strong>：红楔子刺入白圆是构成主义的"Logo"。网页里要能反复使用且有动势。</p>
+<p><strong>解法</strong>：<code>clip-path: polygon()</code>。<strong>注意坐标系</strong>：百分比是相对元素自身宽高的，所以宽高比变化时尖角会变形。</p>
+<pre><code class="language-css">/* 基础楔形：从左下向右上刺入 */
+.kv-wedge {
+  width: 100%;
+  aspect-ratio: 16 / 7;              /* 锁死宽高比，防止尖角变形 */
+  background: var(--kv-red);
+  clip-path: polygon(0% 100%, 100% 8%, 100% 40%, 0% 100%);
+}
+
+/* 变体：双楔咬合（红+黑），制造&quot;刺入&quot;关系 */
+.kv-wedge-clash { position: relative; aspect-ratio: 16/7; overflow: clip; }
+.kv-wedge-clash::before,
+.kv-wedge-clash::after {
+  content: &quot;&quot;; position: absolute; inset: 0;
+}
+.kv-wedge-clash::before {
+  background: var(--kv-paper);
+  clip-path: polygon(0 0, 62% 0, 20% 100%, 0 100%);
+}
+.kv-wedge-clash::after {
+  background: var(--kv-red);
+  clip-path: polygon(24% 0, 78% 0, 40% 100%, 0% 100%);
+  mix-blend-mode: multiply;
+}
+</code></pre>
+<p><strong>坑</strong>（前两条踩了会出功能性事故，不是审美问题）：
+- 🔴 <strong><code>clip-path</code> 会把 <code>outline</code> 一起裁掉 → 键盘焦点环不可见 → WCAG 2.4.7（焦点可见）失败。</strong>
+  凡是<strong>可交互</strong>元素（<code>a</code> / <code>button</code> / <code>input</code>）都<strong>不要</strong>在它自己身上用 <code>clip-path</code>。
+  正确做法：把 <code>clip-path</code> 交给一个 <code>aria-hidden="true"</code> 的装饰子层，交互元素本体不裁剪：
+  <code>html
+  &lt;button class="kv-wedge-btn"&gt;
+    &lt;span class="kv-wedge-btn__decor" aria-hidden="true"&gt;&lt;/span&gt;
+    &lt;span class="kv-wedge-btn__label"&gt;按此&lt;/span&gt;
+  &lt;/button&gt;</code>
+  <code>css
+  .kv-wedge-btn { position: relative; background: none; border: 0; padding: 0; }
+  .kv-wedge-btn__decor { position: absolute; inset: 0; background: var(--kv-red);
+    clip-path: polygon(0% 100%, 100% 6%, 100% 100%); z-index: 0; }
+  .kv-wedge-btn__label { position: relative; z-index: 1; display: block;
+    padding: 1rem 2rem; color: var(--kv-paper); }
+  .kv-wedge-btn:focus-visible { outline: 4px solid var(--kv-blue); outline-offset: 3px; }</code>
+- 🔴 <strong>非 <code>none</code> 的 <code>clip-path</code> 会新建 stacking context，从而截断 <code>mix-blend-mode</code> 的混合范围。</strong>
+  这就是"明明写了 <code>multiply</code> 却没变暗"的头号原因。同理会新建 stacking context 的属性还有：
+  <code>opacity &lt; 1</code>、<code>transform</code>、<code>filter</code>、<code>mask</code>、<code>will-change</code>、<code>contain: paint</code>、<code>position: fixed/sticky</code>。
+  <strong>构成主义页面里 <code>transform</code> 和 <code>clip-path</code> 到处都是 → 混合范围很容易被切得七零八落。</strong>
+  对策：用 <code>isolation: isolate</code> 显式划出混合作用域，并把需要混合的层放在<strong>同一层</strong>里。
+- <code>clip-path</code> 会把 <code>box-shadow</code> / <code>border</code> 一起裁掉 → <strong>硬阴影要靠外层包裹元素</strong>，不能加在被裁元素上；
+  <strong>楔形也不能靠 <code>border</code> 描边</strong>。要描边有三条出路：① 双层（底层当描边色，上层坐标内缩）
+  ② 用 SVG <code>&lt;polygon stroke&gt;</code> + <strong><code>paint-order: stroke fill</code></strong>（让描边压在填充之下，保住尖角）
+  ③ 放弃描边。
+- <code>clip-path</code> 元素内的文字也会被裁，长文本可能被切掉 → 文字放到外层，或用 <code>shape-outside</code>。
+- <strong>参考盒默认是 <code>border-box</code></strong>（不是 <code>padding-box</code>），百分比相对参考盒解析。
+  想做随元素缩放的斜切，用 <code>polygon()</code> / <code>shape()</code>，<strong>不要用 <code>path()</code></strong> —— <code>path()</code> 里是 px，不会缩放。
+- <strong>务必锁 <code>aspect-ratio</code></strong>，否则响应式下楔子的尖角角度会乱变。</p>
+<blockquote>
+<p>更完整的实测证据（BCD 版本号、坐标系陷阱、<code>fill-rule</code>）见 <a href="./05-前端技术方案.html"><code>05-前端技术方案.md</code> 第 1 节</a>。</p>
+</blockquote>
+<hr />
+<h2 id="5-misregistration">5. 套印错位（misregistration）<a class="headerlink" href="#5-misregistration" aria-hidden="true">#</a></h2>
+<p><strong>问题</strong>：廉价印刷的红版和黑版对不齐，文字边缘有 1–3px 的红色重影。这正是"印刷感"最强烈的来源。</p>
+<p><strong>解法</strong>：一个<strong>真实的</strong> <code>&lt;span aria-hidden="true"&gt;</code> 承载重影 + 偏移 + <code>mix-blend-mode: multiply</code>。</p>
+<blockquote>
+<p>🔴 <strong>重要更正</strong>：<strong>不要</strong>用伪元素 <code>content: attr(data-text)</code> 复制文字。
+部分屏幕阅读器会朗读伪元素内容 → <strong>标题被念两遍</strong>。这是本手册里最容易踩的无障碍坑，
+而网上流传的"套印错位"教程几乎全都这么写。<strong>默认请用下面的真实 span 写法。</strong></p>
+</blockquote>
+<pre><code class="language-html">&lt;h2 class=&quot;kv-misreg&quot;&gt;ПОСТРОИМ БУДУЩЕЕ&lt;span class=&quot;kv-misreg__ghost&quot; aria-hidden=&quot;true&quot;&gt;ПОСТРОИМ БУДУЩЕЕ&lt;/span&gt;&lt;/h2&gt;
+</code></pre>
+<pre><code class="language-css">.kv-misreg {
+  position: relative;
+  display: inline-block;   /* 让重影层有确定的包含块 */
+  isolation: isolate;      /* 把 multiply 锁在组件内，避免混到 body 背景 */
+  color: var(--kv-ink);
+}
+.kv-misreg__ghost {
+  position: absolute;
+  inset: 0;
+  color: var(--kv-red);
+  mix-blend-mode: multiply;
+  transform: translate(3px, -2px);   /* 偏移量就是&quot;错版量&quot; */
+  pointer-events: none;
+  user-select: none;                 /* 防止选中重影造成复制出重复文字 */
+}
+</code></pre>
+<p><strong>替代方案：<code>text-shadow</code> 三色偏移（唯一零无障碍代价的做法）</strong></p>
+<pre><code class="language-css">.kv-misreg-shadow {
+  color: var(--kv-ink);
+  text-shadow:
+     2.5px 0   0 rgba(214,43,31,.85),   /* 红版偏移 */
+    -2.5px 0   0 rgba(0,81,214,.60),    /* 蓝版偏移 */
+     0     3px 0 rgba(232,179,26,.55);  /* 黄版偏移 */
+}
+</code></pre>
+<ul>
+<li><strong>优点</strong>：<code>text-shadow</code> <strong>不被屏幕阅读器朗读</strong>，不产生重复文本节点，兼容性最好（Chrome/Safari/FF ≥10）</li>
+<li><strong>缺点</strong>：不参与混合（按 normal 合成），做不出 multiply 叠印变暗的效果</li>
+</ul>
+<p><strong>坑</strong>：
+- 偏移量 <strong>≤ 3px</strong>。超过 5px 就从"印刷错版"变成"故障艺术（glitch）"，那是另一种风格。
+- 父元素若有背景色，重影可能被盖住 → 把重影提到本体之上（<code>z-index: 1</code>，本体 <code>position: relative; z-index: 0</code>）。
+- <strong>Blink（Chrome）与 WebKit（Safari）的 <code>mix-blend-mode</code> 实现有可见差异</strong> → 错位量<strong>不要卡在临界值</strong>，留 ±1px 冗余。
+- 若必须用伪元素版本，请至少加 <code>aria-hidden</code> 的可访问性替身，并接受它只是"装饰性重复"。
+  更完整的兼容性数据与实测证据见 <a href="./05-前端技术方案.html"><code>05-前端技术方案.md</code> 第 6 节</a>。</p>
+<hr />
+<h2 id="6">6. 双色调照片（把照片变成"材料"）<a class="headerlink" href="#6" aria-hidden="true">#</a></h2>
+<p><strong>问题</strong>：原色照片太"数字"，且颜色会和红黑白打架。构成主义要的是"两色印刷的照片"。</p>
+<p><strong>解法 A：纯 CSS 双色调</strong>（推荐，零依赖）</p>
+<pre><code class="language-css">.kv-duotone {
+  position: relative;
+  display: block;
+  filter: grayscale(1) contrast(1.25);
+}
+.kv-duotone img {
+  display: block; width: 100%;
+  filter: grayscale(1) contrast(1.15) brightness(1.02);
+  mix-blend-mode: luminosity;        /* 只取原图的明度 */
+}
+.kv-duotone::after {
+  content: &quot;&quot;; position: absolute; inset: 0;
+  background: var(--kv-red);         /* 用红色当&quot;影子色&quot; */
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+/* 想要&quot;黑→红&quot;双色而不是&quot;红→红&quot;时，改用渐变映射思路： */
+.kv-duotone--ink-red::after {
+  background: linear-gradient(160deg, var(--kv-ink) 0%, var(--kv-red) 100%);
+  mix-blend-mode: lighten;
+}
+</code></pre>
+<p><strong>解法 B：SVG 滤镜做真正的渐变映射</strong>（更准，适合要精确控色的场合）</p>
+<pre><code class="language-html">&lt;svg width=&quot;0&quot; height=&quot;0&quot; aria-hidden=&quot;true&quot; style=&quot;position:absolute&quot;&gt;
+  &lt;filter id=&quot;kv-duotone&quot; color-interpolation-filters=&quot;sRGB&quot;&gt;
+    &lt;feColorMatrix type=&quot;matrix&quot;
+      values=&quot;0.299 0.587 0.114 0 0
+              0.299 0.587 0.114 0 0
+              0.299 0.587 0.114 0 0
+              0     0     0     1 0&quot;/&gt;
+    &lt;feComponentTransfer&gt;
+      &lt;feFuncR type=&quot;table&quot; tableValues=&quot;0.071 0.839&quot;/&gt;  &lt;!-- 黑 → 红 --&gt;
+      &lt;feFuncG type=&quot;table&quot; tableValues=&quot;0.063 0.157&quot;/&gt;
+      &lt;feFuncB type=&quot;table&quot; tableValues=&quot;0.055 0.122&quot;/&gt;
+    &lt;/feComponentTransfer&gt;
+  &lt;/filter&gt;
+&lt;/svg&gt;
+&lt;img src=&quot;photo.jpg&quot; style=&quot;filter: url(#kv-duotone)&quot; alt=&quot;...&quot;&gt;
+</code></pre>
+<p><strong>可直接引用的现成实现</strong>：
+- <a href="https://github.com/LukyVj/colofilter.css"><code>LukyVj/colofilter.css</code></a> — 619★，MIT，纯 CSS 双色调滤镜库
+- <a href="https://github.com/rickymetz/duotonegenerator"><code>rickymetz/duotonegenerator</code></a> — 89★，MIT，CSS 双色调生成器</p>
+<p><strong>坑</strong>：
+- <code>filter</code> 会创建新的包含块，<strong>内部的 <code>position: fixed</code> 会失效</strong>。
+- <code>mix-blend-mode: luminosity</code> 要求父元素有 <code>isolation: isolate</code>（或明确的层叠上下文），否则会混合到页面其他元素上。<strong>这是最常见的翻车点</strong>。</p>
+<hr />
+<h2 id="7-halftone">7. 半调网点（halftone）<a class="headerlink" href="#7-halftone" aria-hidden="true">#</a></h2>
+<p><strong>问题</strong>：构成主义海报的照片有印刷网点。三种做法各有取舍。</p>
+<h3 id="arepeating-radial-gradient-css">做法 A：<code>repeating-radial-gradient</code> 做网点图案（最轻，纯 CSS）<a class="headerlink" href="#arepeating-radial-gradient-css" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.kv-halftone {
+  background-image: radial-gradient(var(--kv-ink) 1.5px, transparent 1.6px);
+  background-size: 6px 6px;          /* 6px 网点间距 = 印刷网点尺度 */
+}
+/* 用 mask 让网点只出现在图片的暗部（模拟真实半调） */
+.kv-halftone-masked {
+  -webkit-mask-image: radial-gradient(var(--kv-ink) 1.5px, transparent 1.6px);
+          mask-image: radial-gradient(var(--kv-ink) 1.5px, transparent 1.6px);
+  mask-size: 6px 6px;
+}
+</code></pre>
+<h3 id="bsvg-feturbulence-fecolormatrix">做法 B：SVG <code>feTurbulence</code> + <code>feColorMatrix</code> 做有机网点（更有印刷脏感）<a class="headerlink" href="#bsvg-feturbulence-fecolormatrix" aria-hidden="true">#</a></h3>
+<pre><code class="language-html">&lt;svg width=&quot;0&quot; height=&quot;0&quot; aria-hidden=&quot;true&quot; style=&quot;position:absolute&quot;&gt;
+  &lt;filter id=&quot;kv-halftone&quot; x=&quot;0&quot; y=&quot;0&quot; width=&quot;100%&quot; height=&quot;100%&quot;&gt;
+    &lt;feTurbulence type=&quot;fractalNoise&quot; baseFrequency=&quot;0.55&quot; numOctaves=&quot;1&quot; result=&quot;noise&quot;/&gt;
+    &lt;feColorMatrix in=&quot;noise&quot; type=&quot;saturate&quot; values=&quot;0&quot; result=&quot;mono&quot;/&gt;
+    &lt;feComponentTransfer in=&quot;mono&quot; result=&quot;dots&quot;&gt;
+      &lt;feFuncA type=&quot;discrete&quot; tableValues=&quot;0 1&quot;/&gt;   &lt;!-- 硬阈值 = 网点 --&gt;
+    &lt;/feComponentTransfer&gt;
+    &lt;feComposite in=&quot;SourceGraphic&quot; in2=&quot;dots&quot; operator=&quot;in&quot;/&gt;
+  &lt;/filter&gt;
+&lt;/svg&gt;
+</code></pre>
+<h3 id="cmask">做法 C：<code>mask</code> + 位图网点（最可控，但要素材）<a class="headerlink" href="#cmask" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.kv-halftone-img {
+  -webkit-mask-image: url(&quot;halftone-tile.png&quot;);
+          mask-image: url(&quot;halftone-tile.png&quot;);
+  mask-size: 400px 400px;
+  mask-repeat: repeat;
+}
+</code></pre>
+<p><strong>坑</strong>：
+- 网点尺寸 <strong>3–6px</strong>。小于 3px 在高分屏上会摩尔纹闪烁；大于 6px 会变成"圆点装饰画"。
+- <strong>网点绝对不能覆盖正文</strong>，会严重降低可读性（对比度实测会掉到 3:1 以下）。
+- 做法 B 的 SVG 滤镜在<strong>大面积元素上性能开销明显</strong>，只用于单张图片，不要用于整页背景。
+- 用 <code>mask</code> 时记得加 <code>-webkit-</code> 前缀（老 Safari）。</p>
+<hr />
+<h2 id="8">8. 沿路径 / 绕圆排字<a class="headerlink" href="#8" aria-hidden="true">#</a></h2>
+<p><strong>问题</strong>：构成主义常把文字沿弧线或斜线排布。</p>
+<p><strong>解法</strong>：SVG <code>&lt;textPath&gt;</code>（<strong>这是唯一可靠的做法</strong>，CSS 做不到）。</p>
+<pre><code class="language-html">&lt;svg viewBox=&quot;0 0 400 400&quot; class=&quot;kv-type-circle&quot; role=&quot;img&quot; aria-label=&quot;ПРОУН&quot;&gt;
+  &lt;defs&gt;
+    &lt;path id=&quot;kv-circle&quot; d=&quot;M 200,200 m -150,0 a 150,150 0 1,1 300,0 a 150,150 0 1,1 -300,0&quot;/&gt;
+  &lt;/defs&gt;
+  &lt;circle cx=&quot;200&quot; cy=&quot;200&quot; r=&quot;150&quot; fill=&quot;none&quot; stroke=&quot;#12100E&quot; stroke-width=&quot;2&quot;/&gt;
+  &lt;text font-family=&quot;Oswald, sans-serif&quot; font-size=&quot;26&quot; fill=&quot;#12100E&quot; letter-spacing=&quot;6&quot;&gt;
+    &lt;textPath href=&quot;#kv-circle&quot; startOffset=&quot;0&quot;&gt;ПРОУН · ПОСТРОЕНИЕ · НОВОГО ·&lt;/textPath&gt;
+  &lt;/text&gt;
+&lt;/svg&gt;
+</code></pre>
+<p><strong>想让它转起来</strong>（构成主义海报里圆环常被想象成旋转的）：</p>
+<pre><code class="language-css">@keyframes kv-spin { to { transform: rotate(360deg); } }
+.kv-type-circle { animation: kv-spin 40s linear infinite; transform-origin: 50% 50%; }
+@media (prefers-reduced-motion: reduce) { .kv-type-circle { animation: none; } }
+</code></pre>
+<p><strong>坑</strong>：
+- <code>&lt;textPath&gt;</code> 的文本<strong>无法自动换行</strong>，超出路径长度会被直接截断。必须自己控制字数。
+- 路径长度要略长于文字长度，<code>startOffset</code> 用来调起点。
+- <strong>必须给 SVG 一个可访问名称</strong>（<code>role="img"</code> + <code>aria-label</code>），否则读屏用户会听到无意义的字符流，或者完全听不到。这是无障碍红线。
+- 用 <code>href</code> 而非 <code>xlink:href</code>（现代浏览器都支持；若需兼容极老浏览器再加 <code>xlink:</code>）。</p>
+<hr />
+<h2 id="9-shape-outside">9. 文字绕几何形（<code>shape-outside</code>）<a class="headerlink" href="#9-shape-outside" aria-hidden="true">#</a></h2>
+<p><strong>问题</strong>：让文字顺着一个圆形/三角形/斜边流动，而不是规规矩矩排在矩形里。</p>
+<pre><code class="language-css">.kv-shape {
+  float: left;
+  width: 240px; height: 240px;
+  margin: 0 1.5rem 1rem 0;
+  background: var(--kv-red);
+  border-radius: 50%;                              /* 视觉是圆 */
+  shape-outside: circle(50% at 50% 50%);           /* 文字绕圆形流动 */
+  clip-path: circle(50% at 50% 50%);
+}
+
+/* 三角形楔子让文字绕斜边 */
+.kv-shape--wedge {
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  shape-outside: polygon(0 0, 100% 0, 0 100%);
+}
+</code></pre>
+<p><strong>坑</strong>：
+- <strong>必须配合 <code>float</code></strong>，<code>shape-outside</code> 对非浮动元素无效。
+- <code>shape-outside</code> 只影响<strong>外部文字环绕</strong>，不裁切元素自身——所以要同时写 <code>clip-path</code>。
+- 浮动元素在 Flex/Grid 容器里<strong>会失效</strong>，必须放在普通块级流里。</p>
+<hr />
+<h2 id="10">10. 竖排文字<a class="headerlink" href="#10" aria-hidden="true">#</a></h2>
+<pre><code class="language-css">.kv-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;      /* 中文竖排用 mixed；纯西文可 upright */
+  letter-spacing: 0.12em;
+}
+</code></pre>
+<p><strong>坑</strong>：
+- 🔴 <strong><code>writing-mode</code> 会交换 inline 与 block 轴。</strong> 使用竖排的容器内部，所有 <code>margin</code> / <code>padding</code> / <code>width</code> / <code>height</code> 都必须改用<strong>逻辑属性</strong>（<code>margin-block</code> / <code>padding-inline</code> / <code>inline-size</code> / <code>block-size</code>），否则左右与上下的语义会整体错位——这是竖排最容易出的布局事故。
+- 🔴 <strong><code>text-orientation: upright</code> 会让拉丁字母变成"一堆正立字母"，几乎不可读</strong> → 只用于装饰性短标签。中文竖排是可读的，可以用于标题。
+- 竖排文本<strong>复制出来的纯文本顺序可能异常</strong>，PDF 打印也可能乱序 → 主内容请提供水平版本。
+- 屏幕阅读器一般能正确处理 <code>vertical-rl</code>，但<strong>不要用它承载主要信息层级</strong>。</p>
+<hr />
+<h2 id="11">11. 动效三件套<a class="headerlink" href="#11" aria-hidden="true">#</a></h2>
+<h3 id="111">11.1 裁切框扫过（图片揭示）<a class="headerlink" href="#111" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">@keyframes kv-reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.kv-reveal { animation: kv-reveal var(--kv-dur-slow) var(--kv-ease-mech) both; }
+</code></pre>
+<h3 id="112-staggger">11.2 逐行跳出（标题 staggger）<a class="headerlink" href="#112-staggger" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.kv-stagger &gt; * {
+  opacity: 0;
+  transform: translateY(0.6em) ;
+  animation: kv-jump var(--kv-dur-base) var(--kv-ease-mech) forwards;
+}
+.kv-stagger &gt; *:nth-child(1) { animation-delay: 0ms; }
+.kv-stagger &gt; *:nth-child(2) { animation-delay: 50ms; }
+.kv-stagger &gt; *:nth-child(3) { animation-delay: 100ms; }
+.kv-stagger &gt; *:nth-child(4) { animation-delay: 150ms; }
+@keyframes kv-jump { to { opacity: 1; transform: none; } }
+</code></pre>
+<h3 id="113-hover">11.3 色块硬切（hover）<a class="headerlink" href="#113-hover" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.kv-btn {
+  background: var(--kv-ink); color: var(--kv-paper);
+  border: 2px solid var(--kv-ink);
+  border-radius: 0;
+  min-height: 44px;                       /* 触控目标红线 */
+  padding: 0.75rem 1.5rem;
+  font-family: var(--kv-font-display);
+  font-weight: var(--kv-weight-label);
+  letter-spacing: var(--kv-track-label);
+  text-transform: uppercase;
+  transition: background-color var(--kv-dur-fast) var(--kv-ease-mech),
+              color            var(--kv-dur-fast) var(--kv-ease-mech);
+  cursor: pointer;
+}
+.kv-btn:hover  { background: var(--kv-red); border-color: var(--kv-red); color: var(--kv-paper); }
+.kv-btn:focus-visible { outline: 4px solid var(--kv-blue); outline-offset: 3px; }
+.kv-btn:active { transform: translate(2px, 2px); }
+.kv-btn[disabled] { opacity: .45; cursor: not-allowed; }
+</code></pre>
+<p><strong>注意</strong>：hover 用 <code>--kv-red</code> 底 + 纸色字 = <strong>4.15:1</strong>，按钮文字通常 ≥16px 粗体，<strong>刚好卡在 AA 大字阈值</strong>。若要严格达标，把 hover 底色改为 <code>--kv-red-ink</code>。</p>
+<hr />
+<h2 id="12">12. 极端字号与溢出防护<a class="headerlink" href="#12" aria-hidden="true">#</a></h2>
+<pre><code class="language-css">.kv-mega {
+  font-family: var(--kv-font-display);
+  font-size: var(--kv-size-mega);
+  line-height: var(--kv-leading-mega);
+  letter-spacing: var(--kv-track-mega);
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;      /* 超长单词不得撑破容器 */
+  hyphens: auto;
+}
+/* 容器必须允许裁切，否则 vw 字号会在窄屏溢出 */
+.kv-hero { overflow: clip; }
+</code></pre>
+<p><strong>坑</strong>：<code>clamp()</code> 里的 <code>vw</code> 单位<strong>不感知容器宽度</strong>，只感知视口。如果这个组件被放在一个窄侧栏里，字号会照样巨大 → <strong>该用 <code>cqw</code>（容器查询单位）</strong>：</p>
+<pre><code class="language-css">.kv-hero { container-type: inline-size; }
+.kv-mega { font-size: clamp(2rem, 14cqw, 12rem); }
+</code></pre>
+<hr />
+<h2 id="13">13. 对比度自检脚本<a class="headerlink" href="#13" aria-hidden="true">#</a></h2>
+<p>改动画板后<strong>必须重跑</strong>，不要目测。</p>
+<pre><code class="language-powershell">function Lum([string]$hex) {
+  $hex = $hex.TrimStart('#')
+  $v = @(0,2,4) | ForEach-Object {
+    $c = [Convert]::ToInt32($hex.Substring($_,2),16) / 255.0
+    if ($c -le 0.03928) { $c / 12.92 } else { [Math]::Pow((($c + 0.055) / 1.055), 2.4) }
+  }
+  0.2126*$v[0] + 0.7152*$v[1] + 0.0722*$v[2]
+}
+function Ratio([string]$a,[string]$b) {
+  $la = Lum $a; $lb = Lum $b
+  [Math]::Round(($([Math]::Max($la,$lb)) + 0.05) / ($([Math]::Min($la,$lb)) + 0.05), 2)
+}
+Ratio '#B31B12' '#EFE9DC'   # → 5.63  ✅ AA 正文
+Ratio '#D6281F' '#EFE9DC'   # → 4.15  ⚠️ 仅大字
+</code></pre>
+<p><strong>判定线</strong>：≥4.5:1 = AA 正文合格；≥3:1 = 仅限 ≥24px 或 ≥18.66px 粗体。</p>
+<hr />
+<h2 id="14">14. 印刷级排版细节（最容易被忽略、也最"显专业"的一层）<a class="headerlink" href="#14" aria-hidden="true">#</a></h2>
+<p>构成主义海报的文字是<strong>排字工手工排的</strong>，所以有大量现代浏览器默认不做的细节。这一层做好了，"像印刷品"和"像网页"的差距就出来了。</p>
+<h3 id="131">13.1 悬挂标点<a class="headerlink" href="#131" aria-hidden="true">#</a></h3>
+<p>行首的引号、破折号应当<strong>溢出到版心之外</strong>，让文本左边缘看起来对齐（视觉边距对齐）。</p>
+<pre><code class="language-css">.kv-hang { hanging-punctuation: first last; }
+</code></pre>
+<p>⚠️ <strong><code>hanging-punctuation</code> 的兼容性本环境未取到 MDN Baseline 标识，不做断言</strong>。它目前主要在 Safari 生效。<strong>可靠替代</strong>：
+- 用 <a href="https://github.com/davidmerfield/Typeset"><code>davidmerfield/Typeset</code></a>（2,680★, <strong>CC0</strong>）—— 它在构建期处理悬挂标点，无需客户端 JS，CSS &lt;1KB
+- 或对已知的少量标题手动 <code>text-indent: -0.5em</code> 微调</p>
+<h3 id="132-small-caps">13.2 小型大写（small caps）<a class="headerlink" href="#132-small-caps" aria-hidden="true">#</a></h3>
+<p>用于编号、缩写、"卷/期"这类次级信息，比缩小字号更专业。</p>
+<pre><code class="language-css">.kv-smallcaps { font-variant-caps: all-small-caps; letter-spacing: 0.06em; }
+/* 只对真实存在小 caps 字形的字体生效；否则浏览器会伪造成缩小的大写 —— 那很难看 */
+</code></pre>
+<p>⚠️ <strong>前提</strong>：字体必须真的有小 caps 字形。Oswald / Unbounded <strong>没有</strong>小 caps，所以<strong>不要在这两套字体上用 <code>all-small-caps</code></strong>。需要小 caps 就用 PT Serif 或 Inter。</p>
+<h3 id="133-opentype">13.3 OpenType 特性<a class="headerlink" href="#133-opentype" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.kv-num-tabular { font-variant-numeric: tabular-nums; }        /* 编号列对齐，必用 */
+.kv-liga-off    { font-variant-ligatures: none; }              /* 大标题常关掉连字，字距更均匀 */
+.kv-caps-alt    { font-feature-settings: &quot;ss01&quot; 1; }           /* 某些字体的单层 a / 方点 i 等 */
+</code></pre>
+<p><strong>构成主义偏好</strong>：大标题<strong>关闭连字</strong>（<code>font-variant-ligatures: none</code>）—— 手工排字时代不会为标题启用连字，关掉后字面更"机械"、更均匀。</p>
+<h3 id="134">13.4 断词与断行<a class="headerlink" href="#134" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.kv-title { text-wrap: balance;  }   /* 标题：让各行长度均衡 */
+.kv-body  { text-wrap: pretty;   }   /* 正文：避免末行孤字 */
+.kv-title, .kv-body { hyphens: auto; overflow-wrap: anywhere; }
+</code></pre>
+<p>⚠️ <strong>中文注意</strong>：<code>hyphens: auto</code> 需要标注 <code>lang</code>。中文断行依赖 <code>line-break</code> 与 <code>word-break</code>：</p>
+<pre><code class="language-css">:lang(zh) .kv-body { line-break: strict; }   /* 严格避头尾 */
+:lang(zh) .kv-title { word-break: keep-all; } /* 标题不在词内断开 */
+</code></pre>
+<p><code>text-spacing-trim</code> 可压缩中文标点间距（让行首行尾的标点不占满字宽），但<strong>该特性兼容性本次未验证</strong>，建议先不用，或加 <code>@supports</code> 保护：</p>
+<pre><code class="language-css">@supports (text-spacing-trim: trim-start) {
+  :lang(zh) .kv-body { text-spacing-trim: trim-start; }
+}
+</code></pre>
+<h3 id="135">13.5 竖排中的标点<a class="headerlink" href="#135" aria-hidden="true">#</a></h3>
+<p><code>writing-mode: vertical-rl</code> 下，中文标点会自动旋转到正确位置（浏览器的 <code>text-orientation: mixed</code> 会处理）。<strong>但西文括号和引号需要检查</strong>，必要时用 <code>text-combine-upright</code> 组合数字/短西文：</p>
+<pre><code class="language-css">.kv-vertical .kv-num { text-combine-upright: digits 2; }  /* 两位数字横排在竖排文本里 */
+</code></pre>
+<hr />
+<h2 id="15">15. 页面骨架清单<a class="headerlink" href="#15" aria-hidden="true">#</a></h2>
+<p><strong>必需</strong>（缺了就不像构成主义）：
+- [ ] 全局 <code>border-radius: 0</code>
+- [ ] 米黄纸底 + 极轻颗粒
+- [ ] 一个统一的斜轴角度（CSS 变量）
+- [ ] 极端字号对比（标题:正文 ≥ 6:1）
+- [ ] 标题全大写 + 负字距 + 紧行高
+- [ ] 大量纸白（红色面积 ≤ 15%）
+- [ ] 至少一处几何原语（楔形/圆/粗线）
+- [ ] 可见的网格线或编号系统
+- [ ] <code>prefers-reduced-motion</code> 支持</p>
+<p><strong>加分</strong>（决定是"像"还是"精"）：
+- [ ] 照片经双色调/半调加工
+- [ ] 一处套印错位
+- [ ] 一条贯穿式斜轴
+- [ ] 沿圆或沿斜线排的短文字
+- [ ] 竖排的短标签
+- [ ] 硬边偏移阴影
+- [ ] 中文字体与西文字体的视觉重量对齐</p>
+<p><strong>禁止</strong>（出现即出戏）：
+- [ ] 圆角、柔和投影、渐变
+- [ ] 紫/粉/蓝科技渐变
+- [ ] Emoji 当图标
+- [ ] 居中的对称布局（那是瑞士风格的领域）
+- [ ] 模糊背景（毛玻璃）
+- [ ] 弹性/回弹缓动动画</p>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="03-资源清单.html">← 03-资源清单</a>
+    <a href="index.html">目录</a>
+    <a href="05-前端技术方案.html">05-前端技术方案 →</a>
+  </nav>
+</div>
+
+</body>
+</html>

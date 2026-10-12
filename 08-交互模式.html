@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>交互模式：history 驱动的多级返回 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="交互模式：history 驱动的多级返回">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">08 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="08-history">08 · 交互模式：history 驱动的多级返回</h1>
+<blockquote>
+<p>提取自 <code>soviet-press</code> 的「报纸 → 海报 → 文章抽屉」两级返回。
+这套模式解决的是一个很常见、但多数实现都会做错的问题：
+<strong>点击驱动的状态机，返回键和 ESC 行为对不上。</strong></p>
+</blockquote>
+<hr />
+<h2 id="1">1. 症状：为什么"点击驱动"会出问题<a class="headerlink" href="#1" aria-hidden="true">#</a></h2>
+<p>典型写法是让点击直接改状态：</p>
+<pre><code class="language-js">btn.onclick = () =&gt; { state.drawer = true; render(); };   // ❌
+</code></pre>
+<p>于是：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>返回键不知道有"抽屉展开"这个层级</td>
+<td>用户按后退 → <strong>直接退出站点</strong>，而不是收回抽屉</td>
+</tr>
+<tr>
+<td>ESC 需要单独写一套判断逻辑</td>
+<td>ESC 和返回键<strong>两套逻辑，早晚不一致</strong></td>
+</tr>
+<tr>
+<td>URL 不反映状态</td>
+<td>无法分享"海报 2 + 文章展开"这个具体状态，刷新即丢</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>根因：状态的所有者错了。</strong> 让 history 当唯一事实来源，点击只是"请求一个新状态"。</p>
+<hr />
+<h2 id="2-history-esc-historyback">2. 模式：状态由 history 驱动，ESC 就是 <code>history.back()</code><a class="headerlink" href="#2-history-esc-historyback" aria-hidden="true">#</a></h2>
+<pre><code class="language-js">// 状态形状
+// { view: 'paper' | 'poster', index: number|null, drawer: boolean }
+const hashFor = (s) =&gt; (s.view !== 'poster' ? '#/' : `#/p/${s.index}${s.drawer ? '/a' : ''}`);
+
+// ESC 与浏览器后退键走同一条路径
+document.addEventListener('keydown', (e) =&gt; {
+  if (e.key !== 'Escape') return;
+  if ((desired || state).view === 'paper') return;   // 顶层不再后退
+  e.preventDefault();
+  history.back();                                    // ← 关键：不自己实现&quot;返回&quot;
+});
+
+window.addEventListener('popstate', (e) =&gt; {
+  transitionTo(e.state ?? stateFromHash(location.hash));
+});
+</code></pre>
+<p><strong>一旦这样写，ESC 与返回键的一致性是被结构保证的，不靠人去同步两套逻辑。</strong></p>
+<h3 id="21">2.1 顶层必须有"底"<a class="headerlink" href="#21" aria-hidden="true">#</a></h3>
+<p>如果用户直接打开 <code>#/p/1/a</code>，此时 history 里只有一条记录，按返回会<strong>离开站点</strong>。所以初始化时要在栈底压一层：</p>
+<pre><code class="language-js">if (initial.view !== 'paper') {
+  history.replaceState(PAPER, '', '#/');                    // 栈底：报纸
+  if (initial.drawer) {
+    history.pushState({ ...initial, drawer: false }, '', '...'); // 中间层：海报
+  }
+  history.pushState(initial, '', hashFor(initial));         // 顶层：文章展开
+}
+</code></pre>
+<p>这样从任意深链接进来，<strong>ESC / 返回都是一级一级退</strong>，而不是一步跳出。</p>
+<hr />
+<h2 id="3">3. 转场循环：用「最新状态胜出」，不要用「忙就丢弃」<a class="headerlink" href="#3" aria-hidden="true">#</a></h2>
+<p><strong>这是最容易写错的地方。</strong> 直觉写法：</p>
+<pre><code class="language-js">if (busy) return;        // ❌ history 已经 push 了，但 DOM 没跟着变 → 状态与视图脱节
+busy = true;
+</code></pre>
+<p>用户连点两下，就会永久对不上。正确做法是让循环消费最新的 pending：</p>
+<pre><code class="language-js">let pending = null, running = false, desired = null;
+
+async function transitionTo(next) {
+  desired = next;            // 立刻记录&quot;期望状态&quot;，供 ESC / 点击判断用
+  pending = next;
+  if (running) return;       // 已有转场在跑，它会消费新的 pending
+
+  running = true;
+  try {
+    while (pending) {
+      const target = pending;
+      pending = null;
+
+      if (reduceMQ.matches) { apply(target); focusView(target); continue; }  // 降级：不做动画
+
+      overlay.classList.add('is-in');
+      await afterOverlayTransition(overlay);   // 覆盖屏
+      apply(target);                            // ← 在&quot;遮住&quot;的瞬间换视图，看不到闪
+      focusView(target);
+      overlay.classList.remove('is-in');
+      await afterOverlayTransition(overlay);   // 收场
+    }
+  } finally {
+    running = false;
+  }
+}
+</code></pre>
+<p><strong>两个要点</strong>：
+1. <code>desired</code> 在函数<strong>开头</strong>赋值，而不是等 <code>apply</code> 之后 —— 否则转场途中用户的点击会读到过期状态。
+2. <code>while (pending)</code> 让最新的状态一定被消费，<strong>不会丢</strong>。</p>
+<hr />
+<h2 id="4">4. 等待动画结束：必须有兜底定时器<a class="headerlink" href="#4" aria-hidden="true">#</a></h2>
+<pre><code class="language-js">function afterOverlayTransition(el, fallbackMs = 700) {
+  return new Promise((resolve) =&gt; {
+    let done = false;
+    const finish = () =&gt; { if (!done) { done = true; el.removeEventListener('transitionend', onEnd); resolve(); } };
+    const onEnd = (e) =&gt; { if (e.target === el &amp;&amp; e.propertyName === 'clip-path') finish(); };
+    el.addEventListener('transitionend', onEnd);
+    setTimeout(finish, fallbackMs);   // ← 标签页不可见时 transitionend 可能永不触发
+  });
+}
+</code></pre>
+<p>🔴 <strong><code>setTimeout</code> 兜底不是可选项。</strong> 标签页在后台、或用户开了 <code>prefers-reduced-motion</code> 之外的其他省电策略时，<code>transitionend</code> 可能不触发，此时<strong>整个状态机会永久卡住</strong>（<code>running</code> 永远是 true）。</p>
+<p>另外 <code>propertyName</code> 必须和你实际动的属性一致：动 <code>transform</code> 就判 <code>'transform'</code>，动 <code>clip-path</code> 就判 <code>'clip-path'</code>。<strong>换动画实现时最容易忘改这一处。</strong></p>
+<hr />
+<h2 id="5">5. 焦点管理（多数实现直接不做）<a class="headerlink" href="#5" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>时机</th>
+<th>焦点去哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>进入子视图</td>
+<td>子视图容器（给它 <code>tabindex="-1"</code>，配 <code>aria-label</code> 让读屏播报）</td>
+</tr>
+<tr>
+<td>返回父视图</td>
+<td><strong>回到当初触发进来的那个元素</strong>（存起来）</td>
+</tr>
+<tr>
+<td>展开一个 disclosure（抽屉/折叠）</td>
+<td><strong>留在切换按钮上</strong>，不要跳进内容里</td>
+</tr>
+<tr>
+<td>视图隐藏</td>
+<td>用 <code>hidden</code> 属性，一次性移出 a11y 树与 Tab 序</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-js">let returnFocusEl = null;
+// 点击进子视图前：returnFocusEl = a;
+// 返回父视图时：
+const t = (returnFocusEl &amp;&amp; document.contains(returnFocusEl))
+  ? returnFocusEl : document.querySelector('.fallback-focusable');
+t?.focus();
+</code></pre>
+<blockquote>
+<p><code>hidden</code> 属性比 <code>visibility: hidden</code> / <code>aria-hidden</code> 更省事：它同时移出 Tab 序、a11y 树和渲染。<strong>但要注意作者 CSS 里的 <code>display</code> 声明会覆盖它</strong>，所以显式写一条 <code>.view[hidden] { display: none; }</code>。</p>
+</blockquote>
+<hr />
+<h2 id="6">6. 状态播报<a class="headerlink" href="#6" aria-hidden="true">#</a></h2>
+<p>视图切换是纯视觉的，读屏用户完全无感。加一个 live region：</p>
+<pre><code class="language-html">&lt;p class=&quot;sr-only&quot; role=&quot;status&quot; aria-live=&quot;polite&quot;&gt;&lt;/p&gt;
+</code></pre>
+<pre><code class="language-js">liveEl.textContent = s.drawer
+  ? `已展开文章：${title}。按 Escape 收回文章。`
+  : `已进入海报：${title}。按 Escape 退回报纸首页。`;
+</code></pre>
+<p><strong>把"下一步能按什么键"念出来</strong>，比只念"已进入 X"有用得多。</p>
+<hr />
+<h2 id="7-js">7. 无 JS 兜底<a class="headerlink" href="#7-js" aria-hidden="true">#</a></h2>
+<p>多级状态机天然依赖 JS。不要留一个"点了没反应的死链接"，而是<strong>诚实告诉用户</strong>：</p>
+<pre><code class="language-html">&lt;noscript&gt;
+  &lt;p&gt;本页的交互（进入海报、展开文章、ESC 返回）需要 JavaScript。
+     报纸首页与海报的静态排版不依赖脚本，但抽屉无法展开。&lt;/p&gt;
+&lt;/noscript&gt;
+</code></pre>
+<hr />
+<h2 id="8">8. 可直接抄的结构<a class="headerlink" href="#8" aria-hidden="true">#</a></h2>
+<pre><code class="language-html">&lt;body data-view=&quot;paper&quot; data-drawer=&quot;closed&quot;&gt;
+  &lt;div class=&quot;overlay&quot; id=&quot;overlay&quot; aria-hidden=&quot;true&quot;&gt;&lt;/div&gt;
+
+  &lt;main id=&quot;main&quot; tabindex=&quot;-1&quot;&gt;
+    &lt;section class=&quot;view&quot; id=&quot;view-paper&quot; aria-label=&quot;首页&quot;&gt;…&lt;/section&gt;
+
+    &lt;section class=&quot;view view--sub&quot; id=&quot;view-p0&quot; data-index=&quot;0&quot; tabindex=&quot;-1&quot;
+             aria-label=&quot;子视图&quot; hidden&gt;
+      &lt;div class=&quot;sub-content&quot;&gt;…&lt;/div&gt;
+
+      &lt;section class=&quot;drawer&quot; aria-label=&quot;文章&quot;&gt;
+        &lt;button class=&quot;drawer__bar&quot; type=&quot;button&quot;
+                aria-expanded=&quot;false&quot; aria-controls=&quot;p0-body&quot;&gt;…&lt;/button&gt;
+        &lt;div class=&quot;drawer__body&quot; id=&quot;p0-body&quot;&gt;…&lt;/div&gt;
+      &lt;/section&gt;
+    &lt;/section&gt;
+  &lt;/main&gt;
+
+  &lt;p class=&quot;sr-only&quot; id=&quot;live&quot; role=&quot;status&quot; aria-live=&quot;polite&quot;&gt;&lt;/p&gt;
+  &lt;script src=&quot;app.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+</code></pre>
+<p><strong>把抽屉放进子视图内部</strong>（而不是全局一个），这样每个视图天然拥有自己的抽屉内容，切换视图时不需要手动清空/重填内容。</p>
+<h3 id="css">抽屉的 CSS 要点<a class="headerlink" href="#css" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.drawer {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  transform: translateY(calc(100% - var(--peek)));   /* 收起时只露出一条 */
+  transition: transform var(--dur) var(--ease);
+}
+body[data-drawer=&quot;open&quot;] .drawer { transform: translateY(0); }
+body[data-drawer=&quot;open&quot;] { overflow: hidden; }        /* 锁背景滚动 */
+
+/* 收起时正文必须移出 Tab 序 —— 用 visibility，而不是 display:none
+   （display:none 会让高度塌掉，translateY(calc(100% - peek)) 就算错了） */
+.drawer__body { visibility: hidden; transition: visibility 0s linear var(--dur); }
+body[data-drawer=&quot;open&quot;] .drawer__body { visibility: visible; transition-delay: 0s; }
+</code></pre>
+<p><strong>用 <code>max-height</code> 而不是固定 <code>height</code></strong>：内容短时抽屉跟着变矮，不会在底部留一大片死白。真想让它"占屏大"，正确做法是<strong>把内容做大</strong>（字号、行高、留白），不是把面板拉高。</p>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="07-设计规则速查.html">← 07-设计规则速查</a>
+    <a href="index.html">目录</a>
+    <a href="09-踩坑清单.html">09-踩坑清单 →</a>
+  </nav>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>构成主义设计系统规格 v0.1 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="构成主义设计系统规格 v0.1">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">02 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="v01">构成主义设计系统规格 v0.1</h1>
+<blockquote>
+<p>这是一份<strong>可直接翻译成 CSS 变量</strong>的规格书。所有色值都经过 WCAG 对比度实测，所有字体都经过西里尔覆盖核实——不是凭感觉挑的。
+实测方法与版本见文末"数据来源与验证状态"。</p>
+</blockquote>
+<hr />
+<h2 id="1">1. 色彩系统<a class="headerlink" href="#1" aria-hidden="true">#</a></h2>
+<h3 id="11">1.1 设计前提<a class="headerlink" href="#11" aria-hidden="true">#</a></h3>
+<p>构成主义海报是<strong>双色油墨印在廉价纸上</strong>：纸本身是米黄偏灰的（不是纯白），墨只有黑和红。所以色板要以"纸"为基准，而不是以"白"为基准。</p>
+<p><strong>面积配比是硬约束</strong>（这是最容易做错的地方）：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>颜色</th>
+<th>面积占比</th>
+<th>角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>纸（米黄）</td>
+<td><strong>60–75%</strong></td>
+<td>基底，呼吸，可读性保障</td>
+</tr>
+<tr>
+<td>墨黑</td>
+<td><strong>20–30%</strong></td>
+<td>结构、正文、分隔、压重</td>
+</tr>
+<tr>
+<td>朱红</td>
+<td><strong>5–15%</strong></td>
+<td>引爆点。只出现在最关键的一两处</td>
+</tr>
+<tr>
+<td>蓝 / 黄（至上主义点缀）</td>
+<td><strong>0–3%</strong></td>
+<td>可选。用于单调处破局，不可参与主结构</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="12">1.2 色板令牌（含实测对比度）<a class="headerlink" href="#12" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">:root {
+  /* ---- 纸 ---- */
+  --kv-paper:      #EFE9DC;  /* 主纸色：廉价胶版纸 */
+  --kv-paper-dim:  #E3DBC9;  /* 纸的暗面：分层、凹陷、次级区块 */
+  --kv-paper-lift: #F7F3EA;  /* 纸的亮面：极少量用于提升 */
+
+  /* ---- 墨 ---- */
+  --kv-ink:        #12100E;  /* 油墨黑（不用纯黑 #000，纯黑太屏幕感） */
+  --kv-ink-soft:   #3A352E;  /* 次级文字 */
+  --kv-rule:       #12100E;  /* 分隔线用纯墨，1–6px 粗线 */
+
+  /* ---- 朱红（两个变体，用途不同！见下表） ---- */
+  --kv-red:        #D6281F;  /* 印刷朱红 —— 图形/大面积/大字号 */
+  --kv-red-ink:    #B31B12;  /* 深红 —— 小字号文字专用（通过 AA） */
+  --kv-red-deep:   #8E1B14;  /* 圧印/阴影/套印底层 */
+
+  /* ---- 至上主义点缀（慎用） ---- */
+  --kv-blue:       #16407A;
+  --kv-yellow:     #E8B31A;
+
+  /* ---- 半调/网点灰 ---- */
+  --kv-gray:       #8A8377;
+}
+</code></pre>
+<h3 id="13">1.3 实测对比度与使用授权（<strong>这是本节最重要的表</strong>）<a class="headerlink" href="#13" aria-hidden="true">#</a></h3>
+<p>用 WCAG 2.x 相对亮度公式精算（脚本见 <code>04-技术实现手册.md</code>）：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>前景</th>
+<th>背景</th>
+<th>对比度</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--kv-ink</code> 墨黑</td>
+<td><code>--kv-paper</code> 纸</td>
+<td><strong>15.69 : 1</strong></td>
+<td>✅ AA 正文可用</td>
+</tr>
+<tr>
+<td><code>--kv-paper</code> 纸</td>
+<td><code>--kv-ink</code> 墨底</td>
+<td><strong>15.69 : 1</strong></td>
+<td>✅ AA 正文可用</td>
+</tr>
+<tr>
+<td><code>--kv-yellow</code> 黄</td>
+<td><code>--kv-ink</code> 墨底</td>
+<td><strong>9.85 : 1</strong></td>
+<td>✅ AA 正文可用</td>
+</tr>
+<tr>
+<td><code>--kv-blue</code> 蓝</td>
+<td><code>--kv-paper</code> 纸</td>
+<td><strong>8.47 : 1</strong></td>
+<td>✅ AA 正文可用</td>
+</tr>
+<tr>
+<td><code>--kv-red-ink</code> 深红</td>
+<td><code>--kv-paper</code> 纸</td>
+<td><strong>5.63 : 1</strong></td>
+<td>✅ AA 正文可用</td>
+</tr>
+<tr>
+<td><code>--kv-paper</code> 纸</td>
+<td><code>--kv-red-ink</code> 深红底</td>
+<td><strong>5.63 : 1</strong></td>
+<td>✅ AA 正文可用</td>
+</tr>
+<tr>
+<td><code>--kv-red</code> 朱红</td>
+<td><code>--kv-paper</code> 纸</td>
+<td><strong>4.15 : 1</strong></td>
+<td>⚠️ <strong>仅 ≥24px 或 ≥18.66px 粗体</strong></td>
+</tr>
+<tr>
+<td><code>--kv-paper</code> 纸</td>
+<td><code>--kv-red</code> 朱红底</td>
+<td><strong>4.15 : 1</strong></td>
+<td>⚠️ <strong>仅 ≥24px 或 ≥18.66px 粗体</strong></td>
+</tr>
+<tr>
+<td><code>--kv-red</code> 朱红</td>
+<td><code>--kv-ink</code> 墨底</td>
+<td><strong>3.78 : 1</strong></td>
+<td>⚠️ 仅大字</td>
+</tr>
+<tr>
+<td><code>--kv-gray</code> 灰</td>
+<td><code>--kv-paper</code> 纸</td>
+<td><strong>3.10 : 1</strong></td>
+<td>⚠️ 仅大字 / 装饰性</td>
+</tr>
+<tr>
+<td><code>--kv-red-deep</code> 暗红</td>
+<td><code>--kv-ink</code> 墨底</td>
+<td><strong>2.79 : 1</strong></td>
+<td>❌ <strong>任何字号都不合格，禁止使用</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>由此得出的硬规则</strong>：</p>
+<ol>
+<li><strong>需要正文字号的红字 → 必须用 <code>--kv-red-ink</code>（#B31B12），不能用 <code>--kv-red</code>。</strong></li>
+<li>朱红 <code>--kv-red</code> 只用于：大面积色块、几何图形、≥24px 的标题。</li>
+<li>灰 <code>--kv-gray</code> 只能做装饰性网点/网纹，不能承载文字。</li>
+<li><strong><code>--kv-red-deep</code> 禁止出现在墨底上</strong>（这条是精算才发现的坑）。</li>
+<li>不要用 <code>opacity</code> 制造"浅色文字"——那会绕过上面的全部结论。需要浅色就加色板令牌。</li>
+<li>🔴 <strong>绝对不要用纯红 <code>#FF0000</code> 做白底正文</strong>：它在白底只有 <strong>4.00 : 1</strong>，<strong>连 AA 正常字号都不过</strong>。这是最常见的"看起来够红"的错误用色。</li>
+</ol>
+<p><strong>替代方案：如果你希望"红色只有一枚、且正文字号也能用"</strong>，可以用印刷油墨红 <strong><code>#C8102E</code></strong>（在白底上 <strong>5.88 : 1</strong>，过 AA 正文）。它的饱和度比朱红略低，但一次解决所有字号问题：</p>
+<pre><code class="language-css">/* 单红方案（牺牲一点&quot;朱红感&quot;，换来全字号合规） */
+--kv-red:     #C8102E;   /* 5.88:1 on #fff，图形与大字 */
+--kv-red-ink: #C8102E;   /* 同一枚，正文也能用 */
+</code></pre>
+<p><strong>另一种更沉的印刷红</strong>：<code>#AD2A07</code>（白底 <strong>6.75 : 1</strong>，是白底上最优的红）。代价是偏砖红，离"苏联海报朱红"远了一点。</p>
+<h3 id="14">1.4 深色模式（可选）<a class="headerlink" href="#14" aria-hidden="true">#</a></h3>
+<p>构成主义没有"深色模式"这个概念。如果必须做，<strong>应该理解成"反相印刷"</strong>：墨色当纸、纸色当墨，红色保持不变（但红底白字同样受 4.15:1 限制）。</p>
+<hr />
+<h2 id="2">2. 字体系统<a class="headerlink" href="#2" aria-hidden="true">#</a></h2>
+<h3 id="21">2.1 选字原则<a class="headerlink" href="#21" aria-hidden="true">#</a></h3>
+<p>构成主义的字体气质：<strong>窄、重、几何、全大写、工业怪诞体（grotesque）</strong>。当年用的是木活字和手工铅字，特征是<strong>字面窄、笔画均匀、无衬线、字距可压到极紧</strong>。</p>
+<h3 id="22-cyrillic">2.2 西里尔（Cyrillic）覆盖核实结果 ⚠️<a class="headerlink" href="#22-cyrillic" aria-hidden="true">#</a></h3>
+<p><strong>这是本次调研最有价值的发现之一。</strong> 很多设计稿惯用的"海报字体"其实<strong>不支持西里尔字母</strong>，如果页面要出现俄文（构成主义主题下很常见）会直接掉字体。</p>
+<p>数据来源：Google Fonts 官方元数据 <code>fonts.google.com/metadata/fonts</code>（共 1950 个字族）。</p>
+<p><strong>✅ 支持西里尔（可放心用）：</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字体</th>
+<th>类别</th>
+<th>字重轴</th>
+<th>气质</th>
+<th>建议角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Oswald</strong></td>
+<td>Sans</td>
+<td>200–700</td>
+<td>窄体工业怪诞体，最贴近构成主义铅字</td>
+<td><strong>主力标题</strong>（全大写）</td>
+</tr>
+<tr>
+<td><strong>Unbounded</strong></td>
+<td>Sans</td>
+<td>200–900 可变</td>
+<td>几何、方正、当代感、有先锋气</td>
+<td>Hero 超大标题（次选主力）</td>
+</tr>
+<tr>
+<td><strong>Russo One</strong></td>
+<td>Sans</td>
+<td>400</td>
+<td>极粗、方正、机械</td>
+<td>单字重标题、Logo</td>
+</tr>
+<tr>
+<td><strong>Rubik Mono One</strong></td>
+<td>Sans</td>
+<td>400</td>
+<td>等宽超粗，块状</td>
+<td>数据/编号/印章式文字</td>
+</tr>
+<tr>
+<td><strong>Jost</strong></td>
+<td>Sans</td>
+<td>100–900 + 斜体</td>
+<td><strong>几何无衬线，Futura 的免费近亲</strong>（Futura 正是构成主义时期的产物）</td>
+<td>副标题、几何感正文</td>
+</tr>
+<tr>
+<td><strong>Play</strong></td>
+<td>Sans</td>
+<td>400/700</td>
+<td>方正、略窄</td>
+<td>次级标题</td>
+</tr>
+<tr>
+<td><strong>PT Sans / PT Serif / PT Mono</strong></td>
+<td>Sans/Serif/Mono</td>
+<td>各 400/700</td>
+<td><strong>俄罗斯本土设计</strong>（ParaType），与主题同源</td>
+<td>正文、注释</td>
+</tr>
+<tr>
+<td><strong>Roboto Condensed</strong></td>
+<td>Sans</td>
+<td>100–900 + 斜体</td>
+<td>窄体、中性偏工业</td>
+<td>大段窄栏正文</td>
+</tr>
+<tr>
+<td><strong>Alumni Sans</strong></td>
+<td>Sans</td>
+<td>100–900 + 斜体</td>
+<td>极窄、高瘦</td>
+<td>超大单行标题、竖排</td>
+</tr>
+<tr>
+<td><strong>Manrope / Onest / Golos Text / Commissioner</strong></td>
+<td>Sans</td>
+<td>200–900 可变</td>
+<td>当代几何，可选正文</td>
+<td>正文（需要现代感时）</td>
+</tr>
+<tr>
+<td><strong>Noto Sans / Noto Serif / Source Serif 4</strong></td>
+<td>Sans/Serif</td>
+<td>可变</td>
+<td>覆盖面最广，兜底</td>
+<td>兜底与长文</td>
+</tr>
+<tr>
+<td><strong>Yeseva One / Prata / Podkova / Oranienbaum</strong></td>
+<td>Display/Serif</td>
+<td>—</td>
+<td>俄式装饰衬线</td>
+<td>反差点缀（非主用）</td>
+</tr>
+<tr>
+<td><strong>Ruslan Display / Prosto One / Kelly Slab / Iceberg / Marmelad</strong></td>
+<td>Display</td>
+<td>—</td>
+<td>俄式装饰/粗黑</td>
+<td>极少量点缀</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>❌ 不支持西里尔（页面出现俄文会掉字体）：</strong></p>
+<blockquote>
+<p><strong>Anton、Bebas Neue、Archivo、Archivo Black、Barlow、Barlow Condensed、Bricolage Grotesque、Chivo、Space Grotesk、Syne、Teko、Saira Condensed、Fjalla One（无基础西里尔）</strong></p>
+</blockquote>
+<p>其中 <strong>Anton / Bebas Neue / Archivo Black / Barlow Condensed</strong> 是最容易被设计师顺手拿去做"海报标题"的四个——如果确定不需要俄文可以用，<strong>但只要有一处俄文就会露馅</strong>。</p>
+<h3 id="23">2.3 中文选字（已核实许可证）<a class="headerlink" href="#23" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字体</th>
+<th>仓库</th>
+<th>Star</th>
+<th>许可证</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>得意黑 Smiley Sans</strong></td>
+<td><code>atelier-anchor/smiley-sans</code></td>
+<td>14,905</td>
+<td><strong>OFL-1.1</strong></td>
+<td>⭐ <strong>中文标题首选</strong>——窄体+斜体骨架，气质与构成主义高度契合，是中文里少见的"海报字"</td>
+</tr>
+<tr>
+<td><strong>霞鹜文楷 LXGW WenKai</strong></td>
+<td><code>lxgw/LxgwWenKai</code></td>
+<td>26,243</td>
+<td><strong>OFL-1.1</strong></td>
+<td>正文/引文（楷体，气质偏温，做对比用）</td>
+</tr>
+<tr>
+<td><strong>思源黑体 Source Han Sans</strong></td>
+<td><code>adobe-fonts/source-han-sans</code></td>
+<td>17,331</td>
+<td>OFL-1.1（仓库标注 NOASSERTION，实为 OFL）</td>
+<td>中文正文兜底，多字重</td>
+</tr>
+<tr>
+<td><strong>Noto CJK</strong></td>
+<td><code>notofonts/noto-cjk</code></td>
+<td>4,093</td>
+<td>OFL-1.1</td>
+<td>兜底</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="24">2.4 推荐字体栈（三套，按场景选）<a class="headerlink" href="#24" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">/* A 套：默认（中英混排，最稳） */
+--kv-font-display: &quot;Oswald&quot;, &quot;得意黑 Smiley Sans&quot;, &quot;Noto Sans SC&quot;, sans-serif;
+--kv-font-body:    &quot;PT Sans&quot;, &quot;Noto Sans SC&quot;, &quot;Source Han Sans SC&quot;, sans-serif;
+--kv-font-mono:    &quot;JetBrains Mono&quot;, &quot;PT Mono&quot;, ui-monospace, monospace;
+
+/* B 套：更当代、更&quot;先锋派&quot;（几何感更强） */
+--kv-font-display: &quot;Unbounded&quot;, &quot;得意黑 Smiley Sans&quot;, sans-serif;
+--kv-font-body:    &quot;Jost&quot;, &quot;Noto Sans SC&quot;, sans-serif;
+--kv-font-mono:    &quot;IBM Plex Mono&quot;, &quot;PT Mono&quot;, monospace;
+
+/* C 套：更贴近&quot;俄罗斯印刷所&quot;（同源感强） */
+--kv-font-display: &quot;Russo One&quot;, &quot;Oswald&quot;, &quot;得意黑 Smiley Sans&quot;, sans-serif;
+--kv-font-body:    &quot;PT Serif&quot;, &quot;Noto Serif SC&quot;, serif;
+--kv-font-mono:    &quot;PT Mono&quot;, monospace;
+</code></pre>
+<blockquote>
+<p><strong>中文必须放在西文之后</strong>，且中文标题要用 <code>font-weight</code> 与西文的视觉重量对齐（Oswald 700 ≈ 思源黑体 Heavy ≈ 得意黑只有一个字重但字面重）。</p>
+</blockquote>
+<h3 id="25">2.5 字号与排版参数<a class="headerlink" href="#25" aria-hidden="true">#</a></h3>
+<p><strong>核心是极端对比。</strong> 标题:正文 ≥ 6:1（瑞士风格约 2.5–3:1）。</p>
+<pre><code class="language-css">:root {
+  /* 阶梯（fluid，基于 clamp） */
+  --kv-size-mega:  clamp(4rem, 15vw, 16rem);   /* Hero 单字/单词，占满屏宽 */
+  --kv-size-h1:    clamp(2.75rem, 8vw, 7rem);  /* 章节主标题 */
+  --kv-size-h2:    clamp(1.75rem, 3.6vw, 3rem);
+  --kv-size-h3:    clamp(1.25rem, 2vw, 1.75rem);
+  --kv-size-body:  clamp(1rem, 1.05vw, 1.125rem);   /* 16–18px 起 */
+  --kv-size-label: 0.75rem;    /* 标签/编号，全大写+宽字距 */
+  --kv-size-quote: clamp(1.5rem, 3vw, 2.5rem);
+
+  /* 字距：大标题收紧，小标签放开 —— 这是构成主义的&quot;呼吸&quot; */
+  --kv-track-mega:  -0.04em;
+  --kv-track-h:     -0.02em;
+  --kv-track-body:   0;
+  --kv-track-label:  0.18em;   /* 小字必须放开，否则挤成一团 */
+
+  /* 行高：标题极紧，正文正常 */
+  --kv-leading-mega: 0.82;
+  --kv-leading-h:    0.95;
+  --kv-leading-body: 1.55;
+
+  /* 字重 */
+  --kv-weight-display: 700;
+  --kv-weight-body:    400;
+  --kv-weight-label:   600;
+}
+</code></pre>
+<p><strong>排版硬规则</strong>：
+1. 标题<strong>一律全大写</strong>（<code>text-transform: uppercase</code>）——西文。中文不做强制大写，改用字重+字距。
+2. 标题<strong>永远 <code>text-wrap: balance</code></strong>，正文 <code>text-wrap: pretty</code>。
+3. <strong>斜排只允许短标签/短标题</strong>（≤ 3 个词），正文永远水平。原因见无障碍一节。
+4. 数字用 <code>font-variant-numeric: tabular-nums</code>，编号列要对齐。</p>
+<hr />
+<h2 id="3">3. 网格与间距<a class="headerlink" href="#3" aria-hidden="true">#</a></h2>
+<h3 id="31">3.1 网格<a class="headerlink" href="#31" aria-hidden="true">#</a></h3>
+<p><strong>12 栏 + 可见轴线</strong>，但<strong>允许被冲破</strong>。</p>
+<pre><code class="language-css">:root {
+  --kv-cols: 12;
+  --kv-gutter: 1.5rem;     /* 栏间距 */
+  --kv-margin: clamp(1rem, 4vw, 4rem);  /* 页边距 */
+  --kv-hairline: 1px;      /* 细线/网格线 */
+  --kv-rule: 6px;          /* 粗分隔线（构成主义特征） */
+  --kv-axis-angle: -15deg; /* 主斜轴角度，全站统一 */
+}
+</code></pre>
+<p><strong>用法规则</strong>：
+- 内容区默认占 <strong>1–7 栏</strong>（不对称），<strong>不要居中</strong>。居中=瑞士风格。
+- 每页/每屏至少有一处<strong>跨满 12 栏</strong>的元素（贯穿式色块或斜轴）。
+- 网格线<strong>可以显示出来</strong>（用 <code>repeating-linear-gradient</code> 做底纹，透明度 6–10%）。
+- 全局 <code>--kv-axis-angle</code> 是"主梁"角度，<strong>全站统一一个角度</strong>，不要每块换角度——否则会散。</p>
+<h3 id="32">3.2 间距阶梯<a class="headerlink" href="#32" aria-hidden="true">#</a></h3>
+<p>8pt 基准，但构成主义偏爱<strong>突兀的大间距 + 紧密的小间距</strong>并存（对比原则在空间上同样成立）。</p>
+<pre><code class="language-css">:root {
+  --kv-space-1: 0.25rem;   /* 4  */
+  --kv-space-2: 0.5rem;    /* 8  */
+  --kv-space-3: 1rem;      /* 16 */
+  --kv-space-4: 1.5rem;    /* 24 */
+  --kv-space-5: 2.5rem;    /* 40 */
+  --kv-space-6: 4rem;      /* 64 */
+  --kv-space-7: 7rem;      /* 112 */
+  --kv-space-8: 12rem;     /* 192 — 用于制造&quot;空&quot;的冲击 */
+}
+</code></pre>
+<hr />
+<h2 id="4">4. 形状、边线与阴影<a class="headerlink" href="#4" aria-hidden="true">#</a></h2>
+<pre><code class="language-css">:root {
+  --kv-radius: 0;          /* 全局零圆角，不可协商 */
+  --kv-border: 2px solid var(--kv-ink);
+  --kv-border-thick: 6px solid var(--kv-ink);
+
+  /* 只有两种&quot;阴影&quot;，都不是柔和投影 */
+  --kv-shadow-hard: 8px 8px 0 var(--kv-ink);      /* 硬边偏移（拟印刷/拟立体） */
+  --kv-shadow-red:  8px 8px 0 var(--kv-red);      /* 红色硬边，克制使用 */
+}
+</code></pre>
+<p><strong>禁止清单</strong>：<code>border-radius</code>、<code>box-shadow</code> 模糊值（blur &gt; 0）、<code>linear-gradient</code> 装饰性渐变、<code>backdrop-filter</code> 毛玻璃。</p>
+<p><strong>允许的例外</strong>：<code>drop-shadow()</code> 用于 SVG 几何形（保持硬边），<code>mix-blend-mode</code> 用于叠印。</p>
+<hr />
+<h2 id="5">5. 质感系统（"印刷感"三件套）<a class="headerlink" href="#5" aria-hidden="true">#</a></h2>
+<p>必须<strong>极轻</strong>。目标是"这是印出来的"，不是"这是做旧滤镜"。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>效果</th>
+<th>手段</th>
+<th>强度上限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>纸张纤维颗粒</strong></td>
+<td>SVG <code>feTurbulence</code> 内联 data-URI 背景</td>
+<td><code>opacity: 0.04–0.08</code></td>
+</tr>
+<tr>
+<td><strong>半调网点</strong></td>
+<td>SVG pattern / <code>radial-gradient</code> 重复 / <code>mask</code></td>
+<td>网点尺寸 3–6px，只在图片上</td>
+</tr>
+<tr>
+<td><strong>套印错位</strong></td>
+<td>伪元素复制文字，偏移 1–3px，<code>mix-blend-mode: multiply</code></td>
+<td>偏移 ≤ 3px</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>阈值判断：把页面缩到 50% 看——如果颗粒/网点<strong>依然明显</strong>，就是太重了；正确的强度是缩小时几乎看不见、原尺寸下能感觉到"不干净"。</p>
+</blockquote>
+<hr />
+<h2 id="6">6. 动效系统<a class="headerlink" href="#6" aria-hidden="true">#</a></h2>
+<pre><code class="language-css">:root {
+  --kv-ease-mech: cubic-bezier(0.85, 0, 0.15, 1);  /* 机械、果断 */
+  --kv-dur-fast: 120ms;
+  --kv-dur-base: 200ms;
+  --kv-dur-slow: 320ms;
+}
+</code></pre>
+<p><strong>动效语汇（只允许这几种）</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>动作</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>硬切入场</strong></td>
+<td>元素从侧向/斜向平移进入，无淡入，或淡入极快</td>
+</tr>
+<tr>
+<td><strong>裁切框扫过</strong></td>
+<td><code>clip-path</code> 从 0 到 100% 揭示图片</td>
+</tr>
+<tr>
+<td><strong>逐行跳出</strong></td>
+<td>标题按行 stagger 出现，每行延迟 40–60ms</td>
+</tr>
+<tr>
+<td><strong>色块翻转</strong></td>
+<td>背景色在 hover 时硬切（无过渡或极短过渡）</td>
+</tr>
+<tr>
+<td><strong>编号跳变</strong></td>
+<td>数字直接替换，不做滚动计数</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>禁止</strong>：弹性/回弹缓动、视差滚动叠加多层、超过 400ms 的动画、任何 <code>ease-in-out</code> 默认缓动。</p>
+<pre><code class="language-css">@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</code></pre>
+<hr />
+<h2 id="7">7. 无障碍红线（这套风格的固有风险）<a class="headerlink" href="#7" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>风险</th>
+<th>具体问题</th>
+<th>对策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>斜排文字</strong></td>
+<td>旋转后的文字对屏幕阅读器无影响（DOM 顺序不变），但<strong>视觉阅读效率</strong>大幅下降，且长文本旋转后行宽变化导致难读</td>
+<td>斜排只用于 ≤3 词短标签；正文永远水平</td>
+</tr>
+<tr>
+<td><strong>红字对比度</strong></td>
+<td>朱红在纸上仅 4.15:1，小字不合格</td>
+<td>小字红用 <code>--kv-red-ink</code></td>
+</tr>
+<tr>
+<td><strong>极端字号</strong></td>
+<td><code>clamp(..., 15vw, ...)</code> 在窄屏可能溢出</td>
+<td>必须配 <code>overflow-wrap: anywhere</code> + 容器 <code>overflow: clip</code></td>
+</tr>
+<tr>
+<td><strong>全大写</strong></td>
+<td>屏幕阅读器对全大写词的朗读可能逐字母拼读</td>
+<td>用 <code>text-transform: uppercase</code>（视觉大写，DOM 保持正常大小写），<strong>不要</strong>在 HTML 里直接写全大写</td>
+</tr>
+<tr>
+<td><strong>质感叠加</strong></td>
+<td>颗粒/网点降低文字清晰度</td>
+<td>质感层加 <code>pointer-events: none</code> 且不得覆盖正文区域</td>
+</tr>
+<tr>
+<td><strong>动效</strong></td>
+<td>硬切+闪动可能触发前庭不适</td>
+<td>遵守 <code>prefers-reduced-motion</code></td>
+</tr>
+<tr>
+<td><strong>零圆角按钮</strong></td>
+<td>触控目标易过小</td>
+<td>触控目标 ≥ 44×44px</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="8-stylekit-constructivism">8. 现行规则来源：StyleKit「构成主义 Constructivism」<a class="headerlink" href="#8-stylekit-constructivism" aria-hidden="true">#</a></h2>
+<blockquote>
+<p><strong>状态</strong>：由用户提供并声明已实际抓取确认（本环境搜索接口当时限流，<strong>未由我二次核验原文</strong>，故记为「用户实测来源」而非「我实测来源」）。</p>
+</blockquote>
+<p>本位规则<strong>优先于本文档前面章节中的自拟取值</strong>。下表是 StyleKit 规则与它的落地结果：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>StyleKit 规则</th>
+<th>取值</th>
+<th>落地位置</th>
+<th>精算结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>苏维埃红</td>
+<td><code>#cc0000</code></td>
+<td><code>--red</code></td>
+<td><strong>on 纸 4.84:1 —— 过 AA 正文线</strong>，比自拟的 <code>#D6281F</code>（4.15，仅大字）更合规</td>
+</tr>
+<tr>
+<td>纯黑</td>
+<td><code>#1a1a1a</code></td>
+<td><code>--ink</code></td>
+<td>on 纸 <strong>14.32:1</strong></td>
+</tr>
+<tr>
+<td>泛黄纸</td>
+<td><code>#f2e8d5</code></td>
+<td><code>--paper</code></td>
+<td>基准底色</td>
+</tr>
+<tr>
+<td>金星</td>
+<td><code>#d4a843</code></td>
+<td><code>--gold</code></td>
+<td>⚠️ <strong>on 纸仅 1.82:1 → 只能做图形</strong>；on 黑 7.86:1 可做文字</td>
+</tr>
+<tr>
+<td>棕</td>
+<td><code>#8b4513</code></td>
+<td><code>--brown</code></td>
+<td>on 纸 <strong>5.84:1</strong> ✅；⚠️ on 黑 2.45:1 禁用</td>
+</tr>
+<tr>
+<td><code>rounded-none</code></td>
+<td>硬直角</td>
+<td>全局 <code>border-radius: 0</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>shadow-[4px_4px_0]</code></td>
+<td>版画硬阴影</td>
+<td><code>--shadow-hard: 4px 4px 0 0 var(--ink)</code></td>
+<td>模糊值恒为 0</td>
+</tr>
+<tr>
+<td>对角倾斜 <code>-rotate-6</code> / <code>skew-x-3</code></td>
+<td><code>-6deg</code> / <code>3deg</code></td>
+<td><code>--tilt</code> / <code>--skew</code></td>
+<td>全站统一一个角度</td>
+</tr>
+<tr>
+<td><code>font-black uppercase</code></td>
+<td>900 + 全大写</td>
+<td>巨型标题改用 <strong>Unbounded 900</strong></td>
+<td>Oswald 最重只有 700，没有真 900</td>
+</tr>
+<tr>
+<td><strong>Mechanical Easing</strong></td>
+<td>只准 <code>linear</code> + <code>75ms</code>/<code>100ms</code>，禁 <code>ease-in-out</code></td>
+<td><code>--ease-mech: linear</code>，<code>--dur-fast: 75ms</code>，其余 100ms</td>
+<td>微交互全部合规；<strong>页面转场为有意例外</strong>（见下）</td>
+</tr>
+<tr>
+<td><strong>Block Invasion</strong></td>
+<td>黑块从左横扫</td>
+<td>曾实装为 <code>.wipe</code> 的 <code>translateX</code> 100ms linear</td>
+<td>⚠️ <strong>已按要求回退</strong>，见下</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>StyleKit 动效语汇的落地状态</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>语汇</th>
+<th>本项目实现</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Diagonal Aggression</strong></td>
+<td>报纸板块与文章侧栏卡片：<code>translate(-4px,-4px) skewX(-3deg)</code> + 硬阴影同步拉开</td>
+<td>✅ 采用</td>
+</tr>
+<tr>
+<td><strong>Soviet Reversal</strong></td>
+<td>板块 <code>:active</code> 变墨底纸字；文章条 <code>:active</code> 翻成纸底黑字</td>
+<td>✅ 采用</td>
+</tr>
+<tr>
+<td><strong>Mechanical Easing</strong></td>
+<td>微交互 <code>linear</code> + 75/100ms</td>
+<td>✅ 采用</td>
+</tr>
+<tr>
+<td><strong>Block Invasion</strong></td>
+<td>曾实装为黑块从左横扫（<code>translateX</code>，100ms linear）</td>
+<td>⚠️ <strong>已回退</strong>——用户认为此前的「红色幕布下坠」更有力量，故改回</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>有意偏离记录（用户决定）</strong>：页面转场用 <strong>红色幕布下坠</strong> —— 满屏
+<code>--red</code> 的 <code>clip-path</code> 自上而下压满 → 换视图 → 再向下收拢退场，
+<strong>280ms + <code>cubic-bezier(.85, 0, .15, 1)</code></strong>。
+这偏离了 StyleKit「只准 linear + 75/100ms」的规则，<strong>影响范围仅 <code>.wipe</code> 一处</strong>，
+其余所有过渡仍严格走 Mechanical Easing。
+缓动值不是 <code>ease-in-out</code>（规则明令禁止的那个），而是一条前快后慢的机械曲线。
+2026-10-13 实测：真实动画路径端到端 6/6 通过，幕布退场后正确归位为
+<code>polygon(0px 0%, 100% 0%, 100% 0%, 0px 0%)</code>（零面积，不会卡在屏幕上）。</p>
+</blockquote>
+<p><strong>从这套色板精算出来的三条硬约束</strong>（写进 CSS 注释，防止后来者踩）：
+1. <strong>苏维埃红 on 纯黑 = 2.96:1 → 禁止在黑底上用红字</strong>
+2. 金星 on 纸 = 1.82:1 → 金星只能做图形或黑底文字
+3. 棕 on 纯黑 = 2.45:1 → 禁止</p>
+<p><strong>已知未采用的规则</strong>：StyleKit 可导出 Figma tokens / Tailwind preset / SKILL.md；本项目是手写 CSS（无 Tailwind），未使用其导出产物。另有一个「动力学构成主义」变体，本页未使用。</p>
+<hr />
+<h2 id="9">9. 数据来源与验证状态<a class="headerlink" href="#9" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>数据</th>
+<th>来源</th>
+<th>验证方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>字体西里尔覆盖</td>
+<td>Google Fonts 官方元数据 <code>https://fonts.google.com/metadata/fonts</code>（1950 个字族）</td>
+<td>程序化查询 <code>subsets</code> 字段，逐字族判定</td>
+</tr>
+<tr>
+<td>字体字重轴</td>
+<td>同上</td>
+<td>程序化读取 <code>fonts</code> 对象的字重键</td>
+</tr>
+<tr>
+<td>色值对比度</td>
+<td>WCAG 2.x 相对亮度公式</td>
+<td>PowerShell 脚本精算（脚本见 <code>04-技术实现手册.md</code> 附录），非目测</td>
+</tr>
+<tr>
+<td>中文/开源字体许可证</td>
+<td>GitHub REST API <code>api.github.com/repos/{owner}/{repo}</code></td>
+<td>读取 <code>license.spdx_id</code> 与 <code>stargazers_count</code> 实际返回</td>
+</tr>
+<tr>
+<td>构成主义史料</td>
+<td>Tate、TheArtStory、MoMA、V&amp;A</td>
+<td>直接抓取页面原文</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠️ <strong>未验证项</strong>：本环境 <code>web_fetch</code> 无法访问 Wikimedia Commons / MoMA / V&amp;A 的图片下载页（403 或不可达），因此<strong>公有领域图像素材的具体下载链接未经我直接验证</strong>，见 <code>03-资源清单.md</code> 中的明确标注。</p>
+</blockquote>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="01-美学谱系与形式法则.html">← 01-美学谱系与形式法则</a>
+    <a href="index.html">目录</a>
+    <a href="03-资源清单.html">03-资源清单 →</a>
+  </nav>
+</div>
+
+</body>
+</html>

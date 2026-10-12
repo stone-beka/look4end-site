@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>构成主义 Web 设计 · 资源清单 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="构成主义 Web 设计 · 资源清单">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">03 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="web">构成主义 Web 设计 · 资源清单</h1>
+<blockquote>
+<p><strong>验证规则</strong>：本清单中每一条都标注了<strong>验证方式</strong>。星数与许可证来自 <code>api.github.com</code> 的实际返回（不是搜索结果摘要），字体西里尔覆盖来自 Google Fonts 官方元数据（1950 个字族逐族查询），CSS 兼容性来自 MDN 页面上的 Baseline 标识。
+<strong>未验证的会明确标注「未验证」</strong>——请勿把未验证条目当作已确认事实使用。</p>
+</blockquote>
+<hr />
+<h2 id="1">1. 核心结论（先看这个）<a class="headerlink" href="#1" aria-hidden="true">#</a></h2>
+<p><strong>要开始一个构成主义网页项目，真正需要装的其实只有 6 样东西：</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>需要什么</th>
+<th>用什么</th>
+<th>为什么是它</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>一个现成的构成主义站点源码当起点</strong></td>
+<td><a href="https://github.com/lsqkk/gallery"><code>lsqkk/gallery</code></a>（4★, MIT）</td>
+<td>⭐ 全清单风格吻合度最高。Astro 构建，含 feTurbulence 噪点 multiply 叠层 + 印刷裁切线 + 西里尔水印。星数极低但<strong>风格与授权都最干净</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>一套 token 骨架</strong></td>
+<td><a href="https://github.com/argyleink/open-props"><code>argyleink/open-props</code></a>（5,539★, MIT）</td>
+<td>把 <code>--radius-*</code> 全部覆写为 0、只用粗描边 + 固定间距阶梯，就得到构成主义 token 体系</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>一套字体</strong></td>
+<td><strong>Oswald</strong>（标题）+ <strong>PT Sans</strong>（正文）+ <strong>JetBrains Mono</strong>（标签）+ <strong>得意黑</strong>（中文标题）</td>
+<td>全部实测支持西里尔；得意黑是中文里少见的窄斜海报字（OFL-1.1）</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>半调网点 + 纸颗粒</strong></td>
+<td><a href="https://github.com/paper-design/shaders"><code>paper-design/shaders</code></a>（3,589★, Apache-2.0）</td>
+<td>含 <code>dithering</code> / <code>dot-grid</code> / <code>grain-gradient</code> / <code>perlin-noise</code>，正是印刷质感的全部所需</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>印刷级排版细节</strong></td>
+<td><a href="https://github.com/davidmerfield/Typeset"><code>davidmerfield/Typeset</code></a>（2,680★, <strong>CC0</strong>）</td>
+<td>悬挂标点、小型大写、视觉边距对齐——浏览器至今没实现，它用 &lt;1KB CSS 补齐。<strong>CC0 = 无条件商用</strong></td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>基础层 + 生成式几何</strong></td>
+<td><a href="https://github.com/csstools/sanitize.css"><code>csstools/sanitize.css</code></a>（CC0）+ <a href="https://github.com/css-doodle/css-doodle"><code>css-doodle/css-doodle</code></a>（6,060★, MIT）</td>
+<td>sanitize 是 CC0 最佳基础层；css-doodle 用几十行生成整版至上主义几何构图</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>其余都是"锦上添花"或"仅作参考，不要抄代码"。</strong></p>
+<hr />
+<h2 id="2-github">2. GitHub 资源<a class="headerlink" href="#2-github" aria-hidden="true">#</a></h2>
+<h3 id="21">2.1 ⭐ 最值得先拿的（实测星数 + 许可证，全部已验证）<a class="headerlink" href="#21" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>Star</th>
+<th>许可证</th>
+<th>作用</th>
+<th>本项目怎么用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/lsqkk/gallery"><code>lsqkk/gallery</code></a></td>
+<td>4</td>
+<td><strong>MIT</strong> ✅</td>
+<td><strong>俄国至上主义/苏联构成主义整站源码</strong>（Astro）</td>
+<td>⭐ <strong>建议作为项目视觉与代码起点</strong>。实测含 <code>src/styles/global.css</code>（186 行），其中两段关键代码：①噪点纸纹 = 内联 data-URI SVG <code>feTurbulence</code>（<code>baseFrequency 0.85</code>, <code>numOctaves 4</code>）+ <code>mix-blend-mode: multiply</code>；②印刷裁切线（四角 28×28 border 角标）与西里尔 watermark（<code>font-size: clamp(6rem,18vw,16rem)</code>, <code>color: rgba(17,17,17,.035)</code>）</td>
+</tr>
+<tr>
+<td><a href="https://github.com/argyleink/open-props"><code>argyleink/open-props</code></a></td>
+<td>5,539</td>
+<td><strong>MIT</strong> ✅</td>
+<td>一整套 CSS 自定义属性 token</td>
+<td>覆写 <code>--radius-*</code> 为 0，用 <code>--border-size-1..5</code>（1px→25px）做粗描边，<code>--size-000..10</code> 做严格间距阶梯</td>
+</tr>
+<tr>
+<td><a href="https://github.com/edwardtufte/tufte-css"><code>edwardtufte/tufte-css</code></a></td>
+<td>6,575</td>
+<td><strong>MIT</strong> ✅</td>
+<td>印刷编辑版式（边注 sidenotes / 宽栏 / 图注）</td>
+<td>构成主义海报的"窄栏正文 + 旁注 + 图注"结构可直接复用；配色需换成红/黑</td>
+</tr>
+<tr>
+<td><a href="https://github.com/paper-design/shaders"><code>paper-design/shaders</code></a></td>
+<td>3,589</td>
+<td><strong>Apache-2.0</strong> ✅</td>
+<td>零依赖 canvas/WebGL shader 集合</td>
+<td>⭐ 实测存在 <code>packages/shaders/src/shaders/</code> 下的 <code>dithering.ts</code> / <code>dot-grid.ts</code> / <code>grain-gradient.ts</code> / <code>perlin-noise.ts</code> —— <strong>半调网点 + 纸张颗粒的合规终极方案</strong>（Apache-2.0 含专利授权，商用友好）</td>
+</tr>
+<tr>
+<td><a href="https://github.com/davidmerfield/Typeset"><code>davidmerfield/Typeset</code></a></td>
+<td>2,680</td>
+<td><strong>CC0-1.0</strong> ✅</td>
+<td>HTML 预处理器，补齐精细印刷特性</td>
+<td>⭐ 提供悬挂标点、连字、视觉边距对齐、小型大写、软连字符。<strong>无需客户端 JS，CSS &lt;1KB</strong>。构成主义排版的"齐头/悬挂引号/小 caps"正是它的强项</td>
+</tr>
+<tr>
+<td><a href="https://github.com/css-doodle/css-doodle"><code>css-doodle/css-doodle</code></a></td>
+<td>6,060</td>
+<td><strong>MIT</strong> ✅</td>
+<td>用 CSS 做视觉艺术与创意编程的 Web Component</td>
+<td>内建图案生成、随机种子、噪声与 SVG 形状导出 → <strong>用几十行生成整版至上主义几何构图</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/yanliudesign/mono-color-skill"><code>yanliudesign/mono-color-skill</code></a></td>
+<td>3,410</td>
+<td><strong>MIT</strong> ✅</td>
+<td>"单墨印刷"图像编辑规范</td>
+<td>⭐ 暖纸底、半调网点照片、主动留白、克制排版 —— <strong>可直接当图像处理规范读</strong>（与构成主义同源）</td>
+</tr>
+<tr>
+<td><a href="https://github.com/wintermute-cell/magick.css"><code>wintermute-cell/magick.css</code></a></td>
+<td>1,039</td>
+<td><strong>MIT</strong> ✅</td>
+<td>单文件 classless CSS，气质介于 LaTeX 与老派规则书</td>
+<td>作者自陈师承 <code>concrete.css</code> 与 Tufte CSS，以及粗野主义的"可用性即设计"伦理。适合长文档/宣言页</td>
+</tr>
+<tr>
+<td><a href="https://github.com/pagedjs/pagedjs"><code>pagedjs/pagedjs</code></a></td>
+<td>1,530</td>
+<td><strong>MIT</strong> ✅</td>
+<td>浏览器内实现 CSS Paged Media（真实分页/页眉页脚/页码）</td>
+<td>若项目要"网页 + 可打印海报/小册子"双形态，这是唯一成熟方案。<code>@page</code> 规则可直接写 A3/A2 海报规格</td>
+</tr>
+<tr>
+<td><a href="https://github.com/LukyVj/colofilter.css"><code>LukyVj/colofilter.css</code></a></td>
+<td>619</td>
+<td><strong>MIT</strong> ✅</td>
+<td>纯 CSS 双色调滤镜库</td>
+<td>把照片变成"双色油墨印刷"</td>
+</tr>
+<tr>
+<td><a href="https://github.com/louismerlin/concrete.css"><code>louismerlin/concrete.css</code></a></td>
+<td>635</td>
+<td><strong>MIT</strong> ✅</td>
+<td>classless CSS 框架，<strong><code>--radius</code> 默认就是 <code>0px</code></strong></td>
+<td>天生硬边，6 个变量（<code>--fg</code>/<code>--bg</code>/<code>--font</code>/<code>--font-h</code>/<code>--main-width</code>/<code>--radius</code>）就能重设</td>
+</tr>
+<tr>
+<td><a href="https://github.com/rickymetz/duotonegenerator"><code>rickymetz/duotonegenerator</code></a></td>
+<td>89</td>
+<td><strong>MIT</strong> ✅</td>
+<td>CSS 双色调生成器</td>
+<td>调红色/黑色双色调的具体色值</td>
+</tr>
+<tr>
+<td><a href="https://github.com/dirkweber/svg-filter-typeeffects"><code>dirkweber/svg-filter-typeeffects</code></a></td>
+<td>99</td>
+<td><strong>MIT</strong> ✅</td>
+<td>SVG 滤镜做字体特效</td>
+<td>套印错位/字体质感的进阶做法</td>
+</tr>
+<tr>
+<td><a href="https://github.com/evestera/svg-halftone"><code>evestera/svg-halftone</code></a></td>
+<td>69</td>
+<td><strong>MIT</strong> ✅</td>
+<td>把位图转成 SVG 半调图案</td>
+<td><strong>适合离线预生成网点素材</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sahilsaini5/ditherwave"><code>sahilsaini5/ditherwave</code></a></td>
+<td>85</td>
+<td><strong>MIT</strong> ✅</td>
+<td>极小 WebGL2 抖动原语（React），Bayer/halftone/ASCII/误差扩散，&lt;8kb gz</td>
+<td>需要动态抖动时用</td>
+</tr>
+<tr>
+<td><a href="https://github.com/codrops/UnrevealEffects"><code>codrops/UnrevealEffects</code></a></td>
+<td>74</td>
+<td><strong>MIT</strong> ✅</td>
+<td>覆盖元素 + <code>clip-path</code> 做页面转场</td>
+<td><strong>Codrops 中少见的 MIT 授权</strong>，优先用它而不是其他 Codrops 仓库</td>
+</tr>
+<tr>
+<td><a href="https://github.com/bennettfeely/clippy"><code>bennettfeely/clippy</code></a></td>
+<td>~942</td>
+<td>⚠️ 无许可证</td>
+<td><code>clip-path</code> 形状可视化生成器</td>
+<td><strong>手搓构成主义斜切多边形（三角/斜条/箭头）最快</strong>。但无授权 → 只用它的可视化结果，不用它的代码</td>
+</tr>
+<tr>
+<td><a href="https://github.com/boguz/bauhaus-illustration-generator"><code>boguz/bauhaus-illustration-generator</code></a></td>
+<td>5</td>
+<td><strong>MIT</strong> ✅</td>
+<td>交互式包豪斯插画生成器</td>
+<td>图形素材参考</td>
+</tr>
+<tr>
+<td><a href="https://github.com/howardz27/poster-generator-skill"><code>howardz27/poster-generator-skill</code></a></td>
+<td>11</td>
+<td><strong>MIT</strong> ✅</td>
+<td>20 种海报风格的 Agent Skill，含 <code>constructivist-impact</code> 风格文件</td>
+<td>参考它对"构成主义冲击力"的拆解方式</td>
+</tr>
+<tr>
+<td><a href="https://github.com/luckdvr/photo-riso-poster"><code>luckdvr/photo-riso-poster</code></a></td>
+<td>52</td>
+<td><strong>MIT</strong> ✅</td>
+<td>把照片/文字做成 riso 印刷风海报</td>
+<td>riso 与构成主义同源（少色套印），可借鉴</td>
+</tr>
+<tr>
+<td><a href="https://github.com/jgfall/inkdrum"><code>jgfall/inkdrum</code></a></td>
+<td>3</td>
+<td><strong>MIT</strong> ✅</td>
+<td>浏览器端 risograph 印刷模拟（最多 6 个墨鼓）</td>
+<td>找配色的实验工具</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="22">2.2 快速试风格 / 原型比稿<a class="headerlink" href="#22" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>Star</th>
+<th>许可证</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/dohliam/dropin-minimal-css"><code>dohliam/dropin-minimal-css</code></a></td>
+<td>1,832</td>
+<td><strong>MIT</strong> ✅</td>
+<td>一键切换预览几十种极简 CSS 框架，<strong>快速比风格</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/Luispitik/ux-ui-premium-direction-style-selector"><code>Luispitik/ux-ui-premium-direction-style-selector</code></a></td>
+<td>26–30</td>
+<td><strong>MIT</strong> ✅</td>
+<td>在 Next.js+Tailwind 项目里并排部署 8 种视觉方向（Swiss Minimal → Neo-Brutalist），选中后导出 Tailwind config / CSS 变量 / 基础组件 → <strong>方向比稿阶段直接可用</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/5777-wq/design-styles"><code>5777-wq/design-styles</code></a></td>
+<td>0</td>
+<td><strong>MIT</strong> ✅</td>
+<td>7 套完整设计语言（Swiss / Bauhaus / Neubrutalism 等），含"铁律"、design token、研究笔记与零构建模板</td>
+</tr>
+<tr>
+<td><a href="https://github.com/xz/new.css"><code>zx/new.css</code></a></td>
+<td>4,050</td>
+<td><strong>MIT</strong> ✅</td>
+<td>classless CSS 框架</td>
+</tr>
+<tr>
+<td><a href="https://github.com/oxalorg/sakura"><code>oxalorg/sakura</code></a></td>
+<td>4,386</td>
+<td><strong>MIT</strong> ✅</td>
+<td>极简 CSS 框架/主题</td>
+</tr>
+<tr>
+<td><a href="https://github.com/pruger/tiny-brutalism-css"><code>pruger/tiny-brutalism-css</code></a></td>
+<td>157</td>
+<td><strong>MIT</strong> ✅</td>
+<td>&lt;4KB 粗野主义组件框架（单色 + 硬边 + 强投影）。作者自称 Ostblockromantik 风格</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ecgang/halftone-ui"><code>ecgang/halftone-ui</code></a></td>
+<td>5</td>
+<td><strong>MIT</strong> ✅</td>
+<td>半调网点组件库</td>
+</tr>
+<tr>
+<td><a href="https://github.com/emineugurlu/ASIA"><code>emineugurlu/ASIA</code></a></td>
+<td>4</td>
+<td><strong>MIT</strong> ✅</td>
+<td>探索高级 CSS 合成（compositing）的高冲击力落地页 —— 少数<strong>有 MIT 许可</strong>的混合模式实战案例</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="23-agent-skill-brief">2.3 风格相近的 Agent Skill（可读其"设计原则"章节当 brief）<a class="headerlink" href="#23-agent-skill-brief" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>Star</th>
+<th>许可证</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/adewale/swiss-poster-skill"><code>adewale/swiss-poster-skill</code></a></td>
+<td>4</td>
+<td>MIT ✅</td>
+<td>瑞士海报设计系统：表现性排版、破格构图、叠印、出血、几何张力</td>
+</tr>
+<tr>
+<td><a href="https://github.com/peterhadorn/swiss-design-skill"><code>peterhadorn/swiss-design-skill</code></a></td>
+<td>1</td>
+<td>MIT ✅</td>
+<td>瑞士设计传统建站</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Ygria/poster-grid-inspector"><code>Ygria/poster-grid-inspector</code></a></td>
+<td>11</td>
+<td>MIT ✅</td>
+<td>用视觉模型<strong>反推海报的网格系统</strong> —— 很适合用来拆解构成主义海报</td>
+</tr>
+<tr>
+<td>⚠️ <a href="https://github.com/op7418/guizang-ppt-skill"><code>op7418/guizang-ppt-skill</code></a></td>
+<td>~25,900</td>
+<td>❌ <strong>AGPL-3.0</strong></td>
+<td>内容对口（杂志编辑风/瑞士排版），但 <strong>AGPL 对网络服务有传染性</strong>，闭源商用需谨慎</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="24">2.4 与构成主义直接相关的作品复刻（个人项目，作参考）<a class="headerlink" href="#24" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>Star</th>
+<th>许可证</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/coftob/Lissitzkys-Roter-Keil"><code>coftob/Lissitzkys-Roter-Keil</code></a></td>
+<td>0</td>
+<td><strong>MIT</strong> ✅</td>
+<td>研究《红色楔子》的语义形式语言。<strong>有 MIT 授权，可安全取用</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/oziomarc/poster-recreation"><code>oziomarc/poster-recreation</code></a></td>
+<td>0</td>
+<td>⚠️ 无许可证</td>
+<td>纯 HTML+CSS 复刻李西茨基海报。<strong>独立核实未成功（API 限流），仅搜索结果显示存在</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/reyrove/Deconstructed-Stage-Generative-Art"><code>reyrove/Deconstructed-Stage-Generative-Art</code></a></td>
+<td>—</td>
+<td>—</td>
+<td>⚠️ <strong>未能独立核实</strong>。检索结果可见（种子生成式至上主义平面），但独立核实返回 404/不可确认 → <strong>标记为未验证</strong></td>
+</tr>
+<tr>
+<td><a href="https://github.com/josiebb/about2squares"><code>josiebb/about2squares</code></a></td>
+<td>—</td>
+<td>—</td>
+<td>⚠️ <strong>未能独立核实</strong>（同上），标记为未验证</td>
+</tr>
+<tr>
+<td><a href="https://github.com/patlakh-dev/black-square-dapp"><code>patlakh-dev/black-square-dapp</code></a></td>
+<td>0–1</td>
+<td>⚠️ 无许可证</td>
+<td>至上主义启发的 Web3 dApp，看"单一色块 + 极端负空间"的处理</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>提醒</strong>：这些都是 0–5 星的小项目，<strong>未经生产验证</strong>。参考做法可以，不要指望代码质量。</p>
+</blockquote>
+<h3 id="25-css">2.5 为什么没有现成的「构成主义 CSS 框架」<a class="headerlink" href="#25-css" aria-hidden="true">#</a></h3>
+<p>实测：以 <code>constructivist</code> 搜索 GitHub 全站，<strong>总共只有 78 个仓库</strong>，排在前面的全是机器学习/教育学（"constructivism" 在教育学里是"建构主义"）——<strong>与视觉设计无关</strong>。</p>
+<p><strong>结论：这个风格的 CSS 框架生态是空白的。</strong> GitHub 上<strong>不存在</strong>高星、在维护的"构成主义 CSS 框架"，也<strong>不存在</strong>独立的、维护中的"印刷套印错位（misregistration）CSS 库"（<code>css+overprint</code> 搜索仅 1 个 0 星无许可证仓库）。</p>
+<p>这不是坏事——意味着你做出来的东西不会像某个模板。本项目的 <code>constructivism-kit/kv.css</code> 就是为填补这个空白写的。</p>
+<hr />
+<h2 id="3">3. ⚠️ 许可证红灯清单（无许可证 = 默认保留所有权利）<a class="headerlink" href="#3" aria-hidden="true">#</a></h2>
+<p><strong>"没有 LICENSE 文件"不等于"可以随便用"。</strong> 以下仓库经实测<strong>确认没有许可证文件</strong>，<strong>不可直接复制代码进项目</strong>，只可阅读借鉴思路：</p>
+<p><code>yoksel/svg-filters</code>（最全的 SVG 滤镜配方，含 paper/dust/zebra/contour preset）、<code>cjimmy/grainy-gradients</code>（最好的 CSS 噪点配方）、<code>tomren1/dither-with-css</code>（Bayer 抖动算法）、<code>bennettfeely/clippy</code>、<code>yoksel/relative-clip-path</code>、<code>davetron5000/brutalist-web-design</code>、<code>codrops/PageTransitions</code>、<code>codrops/DistortedButtonEffects</code>、<code>Volorf/Processing-Posters</code>、<code>gsbm/web-avant-gardes</code>、<code>desandro/breathing-halftone</code>、<code>stewdio/stereoscopic</code>、<code>Kyles-World/Futura-Font</code></p>
+<p><strong>特别点名两个高价值但高风险</strong>：
+- <code>yoksel/svg-filters</code> —— 最全的 SVG 滤镜配方库，但无授权
+- <code>cjimmy/grainy-gradients</code> —— 最好的纯 CSS 噪点渐变配方，但无授权</p>
+<blockquote>
+<p><strong>替代方案</strong>：这两者的效果都可用 <strong>MIT 的 <code>lsqkk/gallery</code> 写法</strong> 或 <strong>Apache-2.0 的 <code>paper-design/shaders</code></strong> 等价实现，授权干净。</p>
+</blockquote>
+<p><strong>非标准/易误读许可证（用前必须读原文）</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/codrops/CSSGlitchEffect"><code>codrops/CSSGlitchEffect</code></a></td>
+<td>自定义条款：可整合进商业项目，但<strong>禁止 as-is 转售/再分发/sell pluginized；免费插件必须可见署名并链接原作</strong>（而 <code>codrops/UnrevealEffects</code> 是 MIT，优先用它）</td>
+</tr>
+<tr>
+<td><a href="https://github.com/pinecreativelabs/Brutalist-Framework"><code>pinecreativelabs/Brutalist-Framework</code></a></td>
+<td>437★，SPDX <code>NOASSERTION</code>（有 <code>LICENSE.txt</code> 但非标准）→ 商用前人工审阅</td>
+</tr>
+<tr>
+<td><a href="https://github.com/IanLunn/Hover"><code>IanLunn/Hover</code></a></td>
+<td>29,399★，SPDX <code>NOASSERTION</code> → 人工审阅；<strong>替代品</strong>：<a href="https://github.com/argyleink/transition.css"><code>argyleink/transition.css</code></a>（Apache-2.0）</td>
+</tr>
+<tr>
+<td><a href="https://github.com/inuitcss/inuitcss"><code>inuitcss/inuitcss</code></a></td>
+<td>NOASSERTION，且更新停滞（2023）</td>
+</tr>
+<tr>
+<td><a href="https://github.com/notofonts/noto-cjk"><code>notofonts/noto-cjk</code></a></td>
+<td>API 未检测到许可证文件 → 请自行在仓库确认（Noto 系列实际为 OFL-1.1）</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Kyles-World/Futura-Font"><code>Kyles-World/Futura-Font</code></a></td>
+<td>无许可证。<strong>Futura 属商业字体体系（Bauer/Neufville），几乎不可能合法再分发 → 弃用，改用 OFL 的 Jost</strong>（Jost 实测含西里尔）</td>
+</tr>
+<tr>
+<td><code>BSoDium/SVG-gradients</code></td>
+<td><strong>GPL-2.0</strong>（传染性）</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>已归档/停止维护（可读不可依赖）</strong>：
+<a href="https://github.com/picocss/pico"><code>picocss/pico</code></a>（16,847★，<strong>API 实测 <code>archived: true</code></strong>）、<code>zichy/vicco</code>、<code>imperavi/kube</code>、<code>gsbm/web-avant-gardes</code>（已归档）、<code>kristoferjoseph/flexboxgrid</code>（2020）、<code>desandro/breathing-halftone</code>（<strong>2015</strong>）、<code>stewdio/stereoscopic</code>（<strong>2014</strong>）、<code>grsmv/bauhaus.css</code>（2015）</p>
+<hr />
+<h2 id="4">4. 字体资源<a class="headerlink" href="#4" aria-hidden="true">#</a></h2>
+<h3 id="41">4.1 结论速查（全部实测西里尔覆盖）<a class="headerlink" href="#41" aria-hidden="true">#</a></h3>
+<blockquote>
+<p>数据来源：<code>https://fonts.google.com/metadata/fonts</code>（1950 个字族逐族查询 <code>subsets</code> 字段），非凭印象。</p>
+</blockquote>
+<p>✅ <strong>支持西里尔</strong>：<strong>Oswald</strong>、<strong>Unbounded</strong>、<strong>Russo One</strong>、<strong>Rubik Mono One</strong>、<strong>Jost</strong>、<strong>Play</strong>、<strong>PT Sans / PT Serif / PT Mono</strong>、<strong>PT Sans Narrow</strong>、<strong>Roboto Condensed</strong>、<strong>Alumni Sans</strong>、<strong>Manrope</strong>、<strong>Onest</strong>、<strong>Golos Text</strong>、<strong>Commissioner</strong>、<strong>Noto Sans / Serif</strong>、<strong>Source Serif 4</strong>、<strong>IBM Plex Sans / Mono</strong>、<strong>JetBrains Mono</strong>、<strong>Fira Sans</strong>、<strong>Alegreya Sans</strong>、<strong>Comfortaa</strong>、<strong>Prata</strong>、<strong>Podkova</strong>、<strong>Oranienbaum</strong>、<strong>Yeseva One</strong>、<strong>Ruslan Display</strong>、<strong>Prosto One</strong>、<strong>Kelly Slab</strong>、<strong>Iceberg</strong>、<strong>Marmelad</strong>、<strong>Inter</strong>、<strong>Geist / Geist Mono</strong></p>
+<p>❌ <strong>不支持西里尔</strong>（页面出现俄文即掉字体）：<strong>Anton、Bebas Neue、Archivo、Archivo Black、Barlow、Barlow Condensed、Bricolage Grotesque、Anybody、Chivo、Space Grotesk、Syne、Teko、Saira Condensed、Fjalla One、League Gothic、League Spartan、Big Shoulders、Alfa Slab One、Ultra、Rye、Bevan、Rozha One、Chonburi、Michroma、Orbitron、Syncopate、Bodoni Moda</strong></p>
+<blockquote>
+<p>🔴 <strong>这是本次调研最有价值的单条信息。</strong>
+- <strong>Anton / Bebas Neue / Archivo Black / Barlow Condensed</strong> 是设计师做"海报标题"时最顺手的四个选择 —— <strong>全都没有西里尔支持</strong>。
+- <strong><code>League Gothic</code> 是"窄体大写"的最佳选手之一，可惜不能上西里尔。</strong>
+- <strong>所有开源"工业木活字 / slab"字体（Alfa Slab One / Ultra / Rye / Bevan / Rozha One / Chonburi）全部无西里尔。</strong> 该气质只能靠 Oswald / Russo One / Ruslan Display / PT Sans Narrow 近似。</p>
+</blockquote>
+<p><strong>⚠️ 未找到</strong>：<code>Molot</code>（常被推荐用于构成主义海报的西里尔展示体）在 Google Fonts 元数据中 <strong>NOT-IN-GF</strong>，也未定位到可信的开源仓库 → <strong>不要使用来路不明的副本</strong>。</p>
+<h3 id="42-github-api">4.2 中文字体（GitHub API 实测星数与许可证）<a class="headerlink" href="#42-github-api" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字体</th>
+<th>仓库</th>
+<th>Star</th>
+<th>许可证</th>
+<th>定位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>得意黑 Smiley Sans</strong></td>
+<td><a href="https://github.com/atelier-anchor/smiley-sans"><code>atelier-anchor/smiley-sans</code></a></td>
+<td><strong>14,905</strong></td>
+<td><strong>OFL-1.1</strong> ✅（GitHub License API + Debian 版权文件双重核验）</td>
+<td>⭐ 中文标题首选。窄体+斜骨架，中文里极少数能当"海报字"的开源字体。倾斜、硬朗，天生带速度感与斜切气质</td>
+</tr>
+<tr>
+<td><strong>霞鹜文楷</strong></td>
+<td><a href="https://github.com/lxgw/LxgwWenKai"><code>lxgw/LxgwWenKai</code></a></td>
+<td><strong>26,243</strong></td>
+<td><strong>OFL-1.1</strong> ✅（保留字体名 "霞鹜" 与 "LXGW"）</td>
+<td>正文/引文，楷体，气质偏温 → 适合当"引文/档案/批注"的<strong>对比层</strong>（报纸拼贴感），<strong>不要做大标题</strong></td>
+</tr>
+<tr>
+<td><strong>思源黑体 Source Han Sans</strong></td>
+<td><a href="https://github.com/adobe-fonts/source-han-sans"><code>adobe-fonts/source-han-sans</code></a></td>
+<td><strong>17,331</strong></td>
+<td><strong>OFL-1.1</strong> ✅（实测 LICENSE.txt 原文确认）</td>
+<td>⭐ <strong>首选中文正文/标题</strong>。7 字重（含 Heavy/Black）+ 可变字体，能对齐怪诞体的粗黑字重</td>
+</tr>
+<tr>
+<td><strong>未来荧黑 Glow Sans</strong></td>
+<td><a href="https://github.com/welai/glow-sans"><code>welai/glow-sans</code></a></td>
+<td>—</td>
+<td>⚠️ <strong>MIT（注意：是 MIT，不是 OFL）</strong></td>
+<td>可变字重/字宽，现代几何黑体，适合与怪诞体对齐字宽</td>
+</tr>
+<tr>
+<td><strong>朱雀仿宋 Zhuque Fangsong</strong></td>
+<td><a href="https://github.com/TrionesType/zhuque"><code>TrionesType/zhuque</code></a></td>
+<td>—</td>
+<td><strong>OFL-1.1</strong> ✅</td>
+<td>仿宋，"旧报纸 / 公文"印刷复古层</td>
+</tr>
+<tr>
+<td><strong>Noto Sans SC</strong></td>
+<td><a href="https://github.com/google/fonts/tree/main/ofl/notosanssc"><code>google/fonts</code></a></td>
+<td>—</td>
+<td><strong>OFL-1.1</strong> ✅（<code>ofl/</code> 前缀即 OFL）</td>
+<td>与思源黑体同源，Web 上子集化后最省流量</td>
+</tr>
+<tr>
+<td>Noto CJK</td>
+<td><a href="https://github.com/notofonts/noto-cjk"><code>notofonts/noto-cjk</code></a></td>
+<td>4,093</td>
+<td>OFL-1.1（实测 <code>Sans/LICENSE</code> 首行原文确认）</td>
+<td>兜底</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>🔴 <strong>中文授权陷阱</strong>：<strong>阿里巴巴普惠体、MiSans、HarmonyOS Sans、OPPO Sans 都不是开源许可证</strong> —— 它们是厂商的「免费商用授权」，条款与 OFL <strong>不同</strong>（通常不可修改、不可再分发字体文件、有附加限制）。
+<strong>必须逐字读官方授权说明</strong>，不要当成 OFL 用。<strong>本次未能取得这些厂商授权页的可引用 URL，请自行到官方页面确认。</strong></p>
+<p>🔴 <strong>中文字体必须做 <code>unicode-range</code> 分包</strong>：思源黑体全量有数 MB，直接 <code>@font-face</code> 引入会严重拖慢首屏。</p>
+</blockquote>
+<h3 id="43-google-fonts">4.3 其他含西里尔的开源怪诞体（非 Google Fonts）<a class="headerlink" href="#43-google-fonts" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字体</th>
+<th>仓库</th>
+<th>Star</th>
+<th>许可证</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Inter</strong></td>
+<td><a href="https://github.com/rsms/inter"><code>rsms/inter</code></a></td>
+<td>19,948</td>
+<td>OFL-1.1，含西里尔，轴 <code>opsz,wght</code></td>
+</tr>
+<tr>
+<td><strong>Geist / Geist Mono</strong></td>
+<td><a href="https://github.com/vercel/geist-font"><code>vercel/geist-font</code></a></td>
+<td>3,637</td>
+<td>OFL-1.1，<strong>含西里尔</strong>，现代几何怪诞</td>
+</tr>
+<tr>
+<td><strong>IBM Plex Sans Condensed</strong></td>
+<td><a href="https://github.com/IBM/plex"><code>IBM/plex</code></a></td>
+<td>11,685</td>
+<td>OFL-1.1，注意其西里尔覆盖标为 <strong><code>cyrillic-ext</code></strong>（非完整 <code>cyrillic</code> 子集）</td>
+</tr>
+<tr>
+<td><strong>Jost</strong></td>
+<td><a href="https://github.com/indestructible-type/Jost"><code>indestructible-type/Jost</code></a></td>
+<td>753</td>
+<td>SPDX 报 NOASSERTION，但仓库内实际是 <code>OFL.txt</code> → 按 OFL 使用。<strong>Futura 的合法开源替代品</strong>，含西里尔</td>
+</tr>
+<tr>
+<td><strong>Giphurs</strong></td>
+<td><a href="https://github.com/Corne2Plum3/Giphurs"><code>Corne2Plum3/Giphurs</code></a></td>
+<td>106</td>
+<td>OFL-1.1，新怪诞体，含拉丁/希腊/西里尔</td>
+</tr>
+<tr>
+<td><strong>Zalando Sans</strong></td>
+<td><a href="https://github.com/zalando/sans"><code>zalando/sans</code></a></td>
+<td>72</td>
+<td>OFL-1.1，可变品牌字体</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>拿字体请认准 <code>google/fonts</code> 仓库中每个 family 目录内的 <code>OFL.txt</code> / <code>LICENSE.txt</code>。</strong></p>
+</blockquote>
+<h3 id="44">4.4 字体获取与判定技巧<a class="headerlink" href="#44" aria-hidden="true">#</a></h3>
+<pre><code class="language-powershell"># ① 权威判定西里尔覆盖（查 1950 个字族的官方元数据）
+$m = Invoke-RestMethod 'https://fonts.google.com/metadata/fonts'
+$m.familyMetadataList | Where-Object { $_.subsets -contains 'cyrillic' } | Select-Object family
+
+# ② 另一条判定路径：带 text= 请求西里尔字符，字体不含该字形会报错
+Invoke-WebRequest 'https://fonts.googleapis.com/css2?family=Oswald&amp;text=%D0%9F%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
+</code></pre>
+<h3 id="45">4.5 ⚠️ 字体授权的两个"看起来能用、其实有坑"<a class="headerlink" href="#45" aria-hidden="true">#</a></h3>
+<p><strong>① Fontshare（ITF FFL）—— 建议整个排除</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>实测结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>授权</td>
+<td>ITF FFL <strong>Version 2.0（2026-08-17）</strong>。可商用、可<strong>自托管（CSS <code>@font-face</code>）</strong>、署名非强制</td>
+</tr>
+<tr>
+<td>🔴 但明文禁止</td>
+<td><strong>subset（子集化）、格式转换、放进任何 repository 分发</strong></td>
+</tr>
+<tr>
+<td>后果</td>
+<td>常规的 <code>next/font</code> / Fontsource / glyphhanger 工作流<strong>会直接违规</strong></td>
+</tr>
+<tr>
+<td>西里尔</td>
+<td>❌ 全部 100 款字体的 <code>languages</code> 字段<strong>没有一款</strong>含 Russian / Ukrainian / Cyrillic</td>
+</tr>
+<tr>
+<td>涉及字体</td>
+<td>Clash Display、Cabinet Grotesk、Satoshi 等</td>
+</tr>
+</tbody>
+</table></div>
+<p>→ <strong>本项目排除 Fontshare</strong>。授权文本取自它自己的 402KB bundle（<code>fontshare.com/js/main.&lt;hash&gt;.js</code>，因为授权页是纯 JS 单页）。</p>
+<p><strong>② Velvetyne —— 官网挂了，但 GitLab 给了一手授权</strong></p>
+<p><code>velvetyne.fr</code> <strong>全站 HTTP 500</strong>（首页是罢工公告），但官方 GitLab 群组可用：
+<code>https://gitlab.com/api/v4/groups/velvetyne/projects</code> → 34 个项目 + 每个仓库根目录的 <code>LICENSE.txt</code> 原文，<strong>全部 OFL 1.1</strong>。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字体</th>
+<th>西里尔</th>
+<th>气质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>grotesk</code></td>
+<td>✅</td>
+<td>"geometric sans serif with extra-large spacing"，全套 4 字重</td>
+</tr>
+<tr>
+<td><code>lack</code></td>
+<td>✅（cyr-ext +124）</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>murmure</code></td>
+<td>✅</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong><code>StudioTriple/pilowlava</code></strong></td>
+<td>✅（README 原文："Support for Cyrillic was added in 2022 by Maksym Kobuzan"）</td>
+<td>先锋派展示体</td>
+</tr>
+<tr>
+<td><code>format-1452</code></td>
+<td>❌ 仅拉丁</td>
+<td>⭐ <strong>气质最贴构成主义</strong>："Din-like, built with modules, <strong>without any optical corrections</strong>"</td>
+</tr>
+<tr>
+<td><code>sligoil</code></td>
+<td>❌ 仅拉丁</td>
+<td>"monospace with <strong>large inktraps</strong>"</td>
+</tr>
+</tbody>
+</table></div>
+<p>❌ <strong>未找到</strong>：用户点名的 <strong><code>Cirrus</code></strong>（官网 500、Velvetyne GitLab 34 项里没有、GitLab 全站搜 <code>cirrus</code> 40 条无字体项目）。
+❌ <strong><code>Druk</code> 没有任何免费授权</strong>，也没有可核实的免费替代授权原文 → 可靠替代只有 Oswald / Anton / Archivo Black 这类 OFL 体。</p>
+<h3 id="46-cmap">4.6 字体事实的三处更正与补充（二进制 <code>cmap</code> 实测）<a class="headerlink" href="#46-cmap" aria-hidden="true">#</a></h3>
+<p>比 Google Fonts 的 <code>subsets</code> 元数据更硬一级 —— 直接下载字体二进制、解析 <code>cmap</code> 表逐字形判定。</p>
+<ul>
+<li><strong>新增有西里尔的选项</strong>：<code>Stalinist One</code>、<code>Tektur</code>、<code>Lack</code>（cyr-ext +124）—— 其中 <strong>Stalinist One</strong> 名字与气质都很对口。</li>
+<li><strong><code>Jost</code> 需要限定</strong>：<strong>俄文完整</strong>，但<strong>乌克兰文不完整（26/31，缺 ұ / є / і / ї）</strong>。只做俄文没问题。</li>
+<li><strong><code>Space Mono</code> 没有西里尔</strong>（此前未列入）。</li>
+<li><strong><code>"Archivo Expanded"</code> 不是一款独立字体</strong> —— 它就是 Archivo 变量字体把 <code>wdth</code> 轴拉到 125，<strong>同样没有西里尔</strong>。</li>
+<li><strong><code>Oswald</code> 的西里尔覆盖最完整</strong>（cyr-ext，+140 字形），且 OFL 允许 subset → 依然是本项目标题字的第一顺位。</li>
+</ul>
+<hr />
+<h2 id="5">5. 参考站点<a class="headerlink" href="#5" aria-hidden="true">#</a></h2>
+<p>⚠️ <strong>状态图例</strong>：✅ 已完成真实 HTTP 请求验证 ｜ ⚠️ 真实存在但被反爬拦截（403） ｜ ❌ 已实测失效（404）</p>
+<h3 id="51">5.1 ⭐ 主题即构成主义的站点（含实测抓到的技术证据）<a class="headerlink" href="#51" aria-hidden="true">#</a></h3>
+<p>这一组是<strong>最有价值的参考</strong>——不是"看起来像"，而是实测到了它们的 CSS 令牌。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>站点</th>
+<th>实测证据</th>
+<th>URL</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>White Tower VR</strong>（叶卡捷琳堡 UZTM 白塔，构成主义建筑遗产）</td>
+<td>抓其 <code>stylesheets/style.css</code> 发现 <strong><code>font-family: rodchenko</code></strong> —— 字体名直接叫「<strong>罗琴科</strong>」；配色 <code>#123a6b</code>；含 <code>filter:</code> 与 <code>transform: rotateX(35deg)</code></td>
+<td>https://wtower.ru/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Red Avantgarde</strong>（苏联海报档案/商店）</td>
+<td>从 110KB 生产 CSS 提取到字体 <strong>PT Sans / PT Serif</strong>（ParaType，专为西里尔设计）+ <strong><code>hagin_caps_mediumregular</code> / <code>hagin_caps_thinregular</code></strong>（Hagin Caps 本身即构成主义风全大写展示体）；色板 <strong><code>#fff</code>×66 / <code>#000</code>×65 / <code>#db3509</code>×14 / <code>#d13309</code>×12 / <code>#ecf3f0</code></strong> —— <strong>教科书级红黑三色，可直接当作本项目配色的一手依据</strong></td>
+<td>https://redavantgarde.com/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Composition 24</strong>（莫斯科 K24 住宅）</td>
+<td>Communication Arts 设计说明原文：基于<strong>至上主义</strong>，「<strong>只用一种基本形、三种对比色、一款高度特异字体</strong>」；首页 intro 是<strong>把至上主义图形变形为建筑本体的矢量动画</strong></td>
+<td>https://www.awwwards.com/sites/composition-24</td>
+<td>✅（<strong>线上站 <code>k24moscow.ru</code> 已 ❌404</strong>）</td>
+</tr>
+<tr>
+<td><strong>The Rodina</strong>（Tereza &amp; Vit Ruller，"performative design"）</td>
+<td>从 Next.js CSS chunk 提取到字体 <strong><code>lars</code>（Lars Pro）+ <code>Tradition</code></strong>，并含 next/font 自动生成的 <strong><code>lars Fallback</code></strong>（度量校准回退）；强调色 <strong><code>#e40014</code></strong> 红</td>
+<td>https://www.therodina.com/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Garage Museum</strong>（车库当代艺术博物馆）</td>
+<td>实测 <strong><code>clip-path</code>×14</strong>；色板 <code>#1A1A1A</code> / <code>#FFFFFF</code> / <strong><code>#F5E123</code> 黄</strong> / <code>#0051d6</code> 蓝</td>
+<td>https://garagemca.org/en</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Jewish Museum and Tolerance Center</strong>（莫斯科，与特列季亚科夫合办李西茨基展）</td>
+<td>实测色板 <code>#1A1A1A</code> / <code>#E5E5E5</code> / <code>#08c6d2</code>，页面用 <code>clip-path</code></td>
+<td>https://www.jewish-museum.ru/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Tretyakov Gallery</strong>（特列季亚科夫画廊）</td>
+<td>实测 <strong><code>text-shadow</code>×8 + <code>repeating-linear-gradient</code>×2</strong> —— 正好是本项目"套印错位 + 斜向网格"的组合</td>
+<td>https://www.tretyakovgallery.ru/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>DIGITAL SUPREMATISM</strong>（supabsmin 博客）</td>
+<td>实测 <strong><code>#f21d1d</code>×18 / <code>#fff</code>×41 / <code>#000</code>×13</strong>（正是红黑白），用 <code>text-shadow</code></td>
+<td>https://supabsmin.blogspot.com/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Tatlin</strong>（tatlin.ru，俄语出版社）</td>
+<td>专出构成主义建筑指南（Tver / Samara 构成主义导览）—— 找<strong>真实几何参考</strong>的一手来源</td>
+<td>https://tatlin.ru/about</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>V&amp;A</strong></td>
+<td>首页存活；另有 Collections 改版博客</td>
+<td>https://www.vam.ac.uk/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>MoMA "Engineer, Agitator, Constructor"</strong>（苏联构成主义大展）</td>
+<td>展览真实存在（新闻稿可查），但页面被 Cloudflare 拦</td>
+<td>https://www.moma.org/calendar/exhibitions/5072</td>
+<td>⚠️403</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="52">5.2 字体厂牌 / 活字标本（可直接看"巨型怪诞体 + 红黑白 + 硬边"）<a class="headerlink" href="#52" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>站点</th>
+<th>实测证据</th>
+<th>URL</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Klim Type Foundry</strong></td>
+<td>CSS 实测：<code>Söhne</code> + <code>k-american-grotesk-*</code>；色板 <strong><code>#000000</code> / <code>#ffffff</code> / <code>#e90702</code> / <code>#E4001C</code>（两枚正红）</strong>；用 <code>clip-path</code> —— <strong>现成范本</strong></td>
+<td>https://klim.co.nz/collections/american-grotesk/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Fonts In Use</strong></td>
+<td>按 "Russian constructivism" 等标签<strong>反查真实印刷品的字体名</strong> —— 考据利器</td>
+<td>https://fontsinuse.com/</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="53">5.3 工作室 / 机构（实测存活，附色板令牌）<a class="headerlink" href="#53" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>站点</th>
+<th>实测证据</th>
+<th>URL</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>By-Kin</strong>（英国）</td>
+<td>主强调色 <strong><code>#FF6542</code></strong>（注意：此色白底仅 2.92:1，<strong>不可用于文字</strong>）；栈为 Next.js + GSAP + Strapi</td>
+<td>https://by-kin.com/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Bureau Mirko Borsche</strong></td>
+<td>实测 <code>clip-path</code>×3</td>
+<td>https://bureauborsche.com/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Shuka / Brand Bureau</strong></td>
+<td>Framer 站，字体含 <strong>Fragment Mono</strong>；色板近乎单色 <code>#000</code> / <code>#2a2a2a</code> / <code>#7f7f7f</code></td>
+<td>https://shuka.design/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Studio von M</strong>（Museum Ludwig 展陈设计）</td>
+<td>项目页存活；博物馆展陈视觉对口参考</td>
+<td>https://studiovonm.com/works/museum-ludwig</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Cargo</strong></td>
+<td>设计师建站工具，「编辑 / 粗野主义作品集」的温床</td>
+<td>https://cargo.site/</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Pentagram / Zak Group / Mucho / Studio Dumbar / Order / Neubau</strong></td>
+<td>六个首页均实测 200，但 HTML 未暴露字体/技术令牌（SPA）→ <strong>不对其具体手法下断言</strong></td>
+<td>各自主域名</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="54">5.4 可用性纪律参考（不是视觉参考）<a class="headerlink" href="#54" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>站点</th>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>brutalist-web.design</strong></td>
+<td>✅ <strong>已直接抓取全文</strong></td>
+<td>粗野主义网页设计七条准则：内容可读、只有链接和按钮响应点击、链接必须带下划线、返回键正常、靠滚动阅读、装饰克制、性能即功能。<strong>读它的可用性纪律，不要读它的视觉</strong>。内容授权 <strong>CC BY-NC-SA 4.0（NC = 禁止商用）</strong></td>
+</tr>
+<tr>
+<td><strong>monolith.nyc</strong></td>
+<td>⚠️ 未直接抓取</td>
+<td>见于 Communication Arts Webpicks（采访页 ✅ 已抓取）。CUSP 自述：瑞士风格 + 粗野主义影响，Next.js + Sanity + GSAP/Framer Motion —— 可作为"瑞士 × 粗野"的对照</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="55">5.5 灵感目录<a class="headerlink" href="#55" aria-hidden="true">#</a></h3>
+<p>Awwwards SOTD ✅ https://www.awwwards.com/websites/sites_of_the_day/ ｜ Godly ✅ https://godly.website/ ｜ Httpster ✅ https://httpster.net/ ｜ Cargo ✅ https://cargo.site/
+❓未实测：SiteInspire、Behance 专题页；Awwwards 粗野主义分类页 https://www.awwwards.com/websites/brutalism/ 返回 200 但列表由前端渲染，抓不到内容。</p>
+<h3 id="56">5.6 实测已失效的链接（<strong>不要写进页面</strong>）<a class="headerlink" href="#56" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>链接</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>https://k24moscow.ru/</code>（Composition 24 线上站）</td>
+<td>❌ 404（Awwwards / CommArts 案例页仍在）</td>
+</tr>
+<tr>
+<td><code>https://grainy-gradients.vercel.app</code>（CSS-Tricks 文章里的 playground）</td>
+<td>❌ 402</td>
+</tr>
+<tr>
+<td><code>https://ultimatedesigntools.com/tools/noise-generator/</code></td>
+<td>❌ 404</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="57">5.7 一手史料<a class="headerlink" href="#57" aria-hidden="true">#</a></h3>
+<p><strong>ROSTA 橱窗</strong>（马雅可夫斯基 + 罗德琴科，1919–1921）—— 俄罗斯电讯社宣传窗，最"原始"的构成主义排版范本。<strong>建议单独检索 <code>ROSTA Windows</code> 图像</strong>。</p>
+<hr />
+<h2 id="6">6. 一手史料来源<a class="headerlink" href="#6" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>来源</th>
+<th>URL</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tate — Constructivism</strong></td>
+<td>https://www.tate.org.uk/art/art-terms/c/constructivism</td>
+<td>定义 + <strong>1923 年《Lef》杂志宣言原文摘引</strong></td>
+</tr>
+<tr>
+<td><strong>TheArtStory — Constructivism</strong></td>
+<td>https://www.theartstory.org/movement/constructivism/</td>
+<td>完整运动概览、关键主张、9 件代表作逐件分析</td>
+</tr>
+<tr>
+<td><strong>TheArtStory — Photomontage</strong></td>
+<td>https://www.theartstory.org/definition/photomontage/</td>
+<td>照片拼贴技法；含李西茨基《自画像（构成者）》分析</td>
+</tr>
+<tr>
+<td><strong>TheArtStory — Rodchenko</strong></td>
+<td>https://www.theartstory.org/artist/rodchenko-alexander/</td>
+<td>生平 + 7 件代表作（Lengiz 出版社海报、红十月饼干广告等）</td>
+</tr>
+<tr>
+<td><strong>Brutalist Web Design</strong></td>
+<td>https://brutalist-web.design/</td>
+<td>粗野主义网页设计准则全文（CC BY-NC-SA 4.0）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="61">6.1 找到但未能读取的重要资料（<strong>缺口，建议人工获取</strong>）<a class="headerlink" href="#61" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>资料</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>《构成主义对现代网页设计视觉语言与结构方案的影响》</strong></td>
+<td>俄文论文，<code>ВЛИЯНИЕ КОНСТРУКТИВИЗМА НА ВИЗУАЛЬНЫЙ ЯЗЫК И СТРУКТУРНЫЕ РЕШЕНИЯ СОВРЕМЕННОГО ВЕБ-ДИЗАЙНА</code>，URL 为 PDF（本环境不支持 PDF）。<strong>这是与本次任务最对口的一篇文献</strong>，建议人工下载</td>
+</tr>
+<tr>
+<td>MoMA《The Russian Avant-Garde Book 1910–1934》展览 PDF</td>
+<td>https://www.moma.org/interactives/exhibitions/2002/russian/5_pdfs/rowell.pdf</td>
+</tr>
+<tr>
+<td>Monoskop — Aleksei Gan, <em>Constructivism</em> 1917–1928</td>
+<td>monoskop.org 上的 PDF，本环境不支持</td>
+</tr>
+<tr>
+<td>MoMA Rodchenko 展览（照片拼贴章节）</td>
+<td>https://www.moma.org/interactives/exhibitions/1998/rodchenko/texts/photocollage.html — <strong>抓取返回 403</strong></td>
+</tr>
+<tr>
+<td>V&amp;A Klutsis 海报</td>
+<td>https://collections.vam.ac.uk/item/O74952/ — 未直接抓取验证</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="7">7. ✅ 公有领域图像素材（<strong>已实测验证</strong>）<a class="headerlink" href="#7" aria-hidden="true">#</a></h2>
+<h3 id="71-commons-api">7.1 方法突破：Commons 网页被拦，但 <strong>API 通</strong><a class="headerlink" href="#71-commons-api" aria-hidden="true">#</a></h3>
+<p>本环境的 <code>web_fetch</code> 访问 <code>commons.wikimedia.org</code> 的<strong>网页</strong>会失败，但 <strong><code>commons.wikimedia.org/w/api.php</code> 完全可用</strong>。这是一条通用经验：<strong>被 Cloudflare 拦的是网页，不代表 API 也被拦。</strong></p>
+<p>可复现的查询方式：</p>
+<pre><code class="language-powershell"># 按关键词搜文件，并直接带出许可元数据
+$u = &quot;https://commons.wikimedia.org/w/api.php?action=query&amp;generator=search&quot; +
+     &quot;&amp;gsrsearch=El%20Lissitzky%20poster&amp;gsrnamespace=6&amp;gsrlimit=6&quot; +
+     &quot;&amp;prop=imageinfo&amp;iiprop=url|extmetadata&amp;format=json&quot;
+Invoke-RestMethod -Uri $u -Headers @{ 'User-Agent' = 'your-tool/1.0 (contact)' }
+</code></pre>
+<p>⚠️ <strong>Commons API 限流较严</strong>（实测连续请求会返回 <strong>429</strong>）。请放慢节奏（每次间隔 15–20 秒），并在 <code>User-Agent</code> 里写明用途与联系方式。</p>
+<h3 id="72">7.2 已实测确认的公有领域作品<a class="headerlink" href="#72" aria-hidden="true">#</a></h3>
+<p>以下每一条都通过 Commons API 逐件查询，<code>extmetadata.LicenseShortName</code> 返回 <strong><code>Public domain</code></strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>作品</th>
+<th>作者</th>
+<th>尺寸</th>
+<th>直链（已实测返回 200）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>《用红色楔子打击白军》</strong> Beat the Whites with the Red Wedge</td>
+<td>李西茨基 El Lissitzky</td>
+<td><strong>1920 × 1572</strong>（301 KB）</td>
+<td><code>https://upload.wikimedia.org/wikipedia/commons/1/13/Beat_the_Whites_with_the_Red_Wedge.jpg</code></td>
+</tr>
+<tr>
+<td><strong>《动态至上主义》</strong> Dynamic Suprematism, 1916</td>
+<td>马列维奇 Malevich</td>
+<td>1536 × 1522</td>
+<td><code>https://upload.wikimedia.org/wikipedia/commons/0/0b/Dynamic_Suprematism_%28Malevich%2C_1916%29.jpg</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>同批查询中还确认了下列文件为 <strong>Public domain</strong>（文件页 URL 用下面的稳定模式构造即可）：</p>
+<blockquote>
+<p>🔴 <strong>但请先读 7.4 的版权判定表再动手。</strong> 下表里凡是<strong>克卢西斯（Klutsis）</strong>相关的，虽然 Commons 标了 <code>Public domain</code>，
+仍可能因"死后平反"条款保护到 <strong>2027 年</strong> —— <strong>2027 年前建议回避</strong>。</p>
+</blockquote>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作者 / 主题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Beat the Whites with the Red Wedge.png</code></td>
+<td>李西茨基</td>
+</tr>
+<tr>
+<td><code>Klinom Krasnym Bej Belych.JPG</code></td>
+<td>李西茨基（俄文原题）</td>
+</tr>
+<tr>
+<td><code>Gustav Klutsis.jpg</code>、<code>Gustav Klutsis-1915.jpg</code></td>
+<td>克卢西斯</td>
+</tr>
+<tr>
+<td><code>Valentina Kulagina by Gustav Klutsis 1929.jpg</code> / <code>...1929b.jpg</code></td>
+<td>克卢西斯</td>
+</tr>
+<tr>
+<td><code>Gustav Klutsis and Valentina Kulagina photomontage book cover...</code></td>
+<td>克卢西斯</td>
+</tr>
+<tr>
+<td><code>Suprematism - Abstract Composition (Malevich, 1915...).jpg</code></td>
+<td>马列维奇</td>
+</tr>
+<tr>
+<td><code>Suprematism by Malevich (1915, GRM).jpg</code>、<code>Supremus 55 (Malevich, 1916).jpg</code></td>
+<td>马列维奇</td>
+</tr>
+<tr>
+<td><code>Rodchenko-Stepanova.jpg</code></td>
+<td>罗德琴科与斯捷潘诺娃</td>
+</tr>
+<tr>
+<td><code>1930. Александр Родченко на перилах 2.jpg</code>、<code>1931. Портрет А.М. Родченко.jpg</code></td>
+<td>罗德琴科（肖像，PD）</td>
+</tr>
+<tr>
+<td><code>SA 1929, 5.jpg</code>、<code>Варвара Степанова во время подготовки представления...</code></td>
+<td>斯捷潘诺娃</td>
+</tr>
+<tr>
+<td><code>Lyubov Popova.jpg</code></td>
+<td>波波娃</td>
+</tr>
+<tr>
+<td><code>Vladimir Tatlin with assistants working on the Tower...</code></td>
+<td>塔特林塔（工作照，PD）</td>
+</tr>
+<tr>
+<td><code>RIAN archive 436925 Poster -742 "Rosta Windows"...</code></td>
+<td><strong>ROSTA 橱窗</strong>（马雅可夫斯基/罗德琴科时期宣传窗）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="73">7.3 稳定链接模式（已验证）<a class="headerlink" href="#73" aria-hidden="true">#</a></h3>
+<p>不要硬编码 <code>upload.wikimedia.org</code> 的具体哈希路径（会变）。用 Commons 的官方重定向模式：</p>
+<pre><code>文件页：https://commons.wikimedia.org/wiki/File:&lt;文件名&gt;
+直链  ：https://commons.wikimedia.org/wiki/Special:FilePath/&lt;URL编码后的文件名&gt;
+</code></pre>
+<p><strong>已实测</strong>：<code>Special:FilePath/Beat%20the%20Whites%20with%20the%20Red%20Wedge.jpg</code> → <strong>HTTP 200，301 KB</strong>，正确重定向到 upload.wikimedia.org 原图。</p>
+<h3 id="74">7.4 🔴 版权判定：一个必须先看的陷阱表<a class="headerlink" href="#74" aria-hidden="true">#</a></h3>
+<p><strong>依据</strong>：Wikimedia Commons 官方模板 <a href="https://commons.wikimedia.org/wiki/Template:PD-Russia-1996"><code>Template:PD-Russia-1996/en</code></a> 的逐字原文。
+俄罗斯 PD 的判定条件是「<strong>作者卒于 1942-01-01 之前</strong>」；美国侧依据「URAA 日（1996-01-01）时在母国已 PD」。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>艺术家</th>
+<th>生卒年</th>
+<th>俄罗斯 PD</th>
+<th>美国 PD</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>波波娃 Popova</strong></td>
+<td>1889–1924</td>
+<td>已 PD</td>
+<td>已 PD</td>
+<td>✅ <strong>零风险，可直接商用</strong></td>
+</tr>
+<tr>
+<td><strong>马列维奇 Malevich</strong></td>
+<td>1879–1935</td>
+<td>已 PD</td>
+<td>已 PD</td>
+<td>✅ <strong>零风险</strong></td>
+</tr>
+<tr>
+<td><strong>李西茨基 Lissitzky</strong></td>
+<td>1890–<strong>1941-12-30</strong></td>
+<td>已 PD</td>
+<td>已 PD</td>
+<td>✅ <strong>零风险</strong>。只差 2 天就落在 1942-01-01 之后，但规则适用无疑义</td>
+</tr>
+<tr>
+<td>罗德琴科 Rodchenko</td>
+<td>1891–1956</td>
+<td><strong>2027 年</strong>才到期</td>
+<td>仅 1930 年及以前出版的</td>
+<td>⚠️ 只取 1930 年前出版物，并加免责说明</td>
+</tr>
+<tr>
+<td>斯捷潘诺娃 Stepanova</td>
+<td>1894–1958</td>
+<td><strong>2029-01-01</strong></td>
+<td>⚠️</td>
+<td>⚠️ 谨慎，建议回避</td>
+</tr>
+<tr>
+<td><strong>克卢西斯 Klutsis</strong></td>
+<td>1895–1938</td>
+<td>⚠️ <strong>表面已 PD，但有例外条款</strong></td>
+<td>已 PD</td>
+<td>🔴 <strong>2027 年前建议回避</strong>（见下）</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>🔴 <strong>克卢西斯陷阱（这是本次最容易被忽略的一条）</strong>
+他虽然 1938 年去世（表面符合「卒于 1942 前」），但 <code>PD-Russia-1996</code> 模板有脚注规定：
+<strong>若作者曾遭镇压并获死后平反，保护期自平反年起算。</strong>
+若他的平反发生在 1956 年，则保护期顺延至 <strong>2027-01-01</strong>。
+（<strong>他的确切平反年份我未能在可达页面核实</strong> —— 标记为「未找到」，因此按最保守口径处理。）
+<strong>→ 本项目的海报一律不使用克卢西斯作品。</strong></p>
+<p>🟠 <strong>Rodchenko 同样处于边缘状态</strong>：俄罗斯侧 2027 年才到期；美国侧只认 1930 年及以前的出版物。
+我在 <code>soviet-press</code> 页面里用的是<strong>李西茨基</strong>（零风险），没有用罗德琴科或克卢西斯的图像 —— 这是刻意的选择。</p>
+</blockquote>
+<h3 id="75">7.5 🔴 翻拍件陷阱（比版权到期更容易踩）<a class="headerlink" href="#75" aria-hidden="true">#</a></h3>
+<p>Commons 上大量标着"构成主义海报"的文件，<strong>其实是 2021/2022 年现代摄影师的翻拍照片</strong>，
+授权是 <strong>CC BY / CC BY-SA</strong> —— <strong>翻拍件本身是新的版权客体</strong>，用它必须署名并以相同方式共享。</p>
+<p>实测两例：
+- <code>Varvara stepanova, giocatori di biliardo</code> → <strong>CC BY-SA 4.0</strong>，摄影 Francesco Bini，2022
+- <code>Long Live the USSR! 1935</code> → <strong>CC BY 2.0</strong>，摄影 Steve Knight，2021</p>
+<p><strong>筛选方法</strong>：查 <code>extmetadata.Artist</code> <strong>是不是画家本人</strong>，再看 <code>DateTimeOriginal</code> 是不是 1920s。
+两个条件都满足才是真·扫描件。</p>
+<p><strong>真·PD 高清件（实测像素）</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>文件</th>
+<th>尺寸</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Beat the Whites with the Red Wedge.jpg</code></td>
+<td>1920 × 1572</td>
+<td>李西茨基 ✅ 本项目在用</td>
+</tr>
+<tr>
+<td><code>Malevich, Kazimir Severinovich - Black Square.jpg</code></td>
+<td>8032 × 8000（52 MB）</td>
+<td>马列维奇 ✅</td>
+</tr>
+<tr>
+<td><code>Under the banner of Lenin… Klucis</code></td>
+<td>4000 × 5516（3.19 MB）</td>
+<td>克卢西斯 🔴 <strong>2027 年前回避</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="76">7.6 ⚠️ 其他仍需注意<a class="headerlink" href="#76" aria-hidden="true">#</a></h3>
+<ol>
+<li>⚠️ <strong><code>LicenseShortName = Public domain</code> 是 Commons 社区自己的判定</strong>，不是法律意见。<strong>商用前请逐件复核</strong>。</li>
+<li>⚠️ <strong>Art Institute of Chicago API 也可调用</strong>（<code>https://api.artic.edu/api/v1/artworks/search</code>，返回 <code>is_public_domain</code>），但实测以 <code>constructivism</code> 检索出的俄国纺织品设计 <strong>多为 <code>not-PD</code></strong>，价值有限。</li>
+<li>❌ <strong>已实测失效的 API</strong>：Met Museum（HTTP 410）、Rijksmuseum（410）、Europeana（401，需 key）。</li>
+</ol>
+<h3 id="77">7.7 纹理与纸张素材（全部实测授权原文）<a class="headerlink" href="#77" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>来源</th>
+<th>授权</th>
+<th>可用内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ambientCG</strong></td>
+<td>✅ <strong>CC0</strong>（授权页原文核实："all ambientCG assets are provided under the Creative Commons CC0 1.0 Universal License… even for commercial purposes, all without asking permission"）</td>
+<td>⭐ <code>Paper001–006</code>、<code>Cardboard001–004</code>、<code>CardboardSet001</code>、<code>CardboardSubstance001</code>（含 PBR 凹凸）。编号经 <code>api/v1/full_json</code> 按 tag 过滤确认存在</td>
+</tr>
+<tr>
+<td><strong>Poly Haven</strong></td>
+<td>✅ <strong>CC0</strong>（授权页原文核实）</td>
+<td>材质与 HDRI</td>
+</tr>
+<tr>
+<td>Commons <code>Graph_paper_mm_green_A4.svg</code></td>
+<td>✅ <strong>CC0</strong></td>
+<td>毫米工程格纸</td>
+</tr>
+<tr>
+<td>Commons <code>MmPapier_orange_no_scale.svg</code></td>
+<td>✅ <strong>CC0</strong></td>
+<td>毫米格纸</td>
+</tr>
+<tr>
+<td>Commons <code>Halftoning_introduction.svg</code></td>
+<td>✅ <strong>PD</strong></td>
+<td>半调原理示意</td>
+</tr>
+<tr>
+<td>Commons <code>Blau_zusammendruck.jpg</code></td>
+<td>✅ <strong>PD / 不受版权保护</strong></td>
+<td><strong>套印错位（overprint）实拍参考</strong></td>
+</tr>
+<tr>
+<td>Commons <code>Cmyk_AM_screen.png</code></td>
+<td>⚠️ <strong>CC BY-SA 4.0</strong></td>
+<td>印刷网屏 —— <strong>需署名 + 相同方式共享</strong>，与"无义务"不符</td>
+</tr>
+</tbody>
+</table></div>
+<p>❌ <strong>未找到</strong>：Rawpixel（只返机器人壳）、NYPL（JS 壳）、Met（429）、MoMA（403）、Smithsonian（403）、Lost&amp;Taken / Toptal（403）、Transparent Textures（超时）、Hero Patterns（授权页未读到）、<strong>扫描划痕类位图来源</strong>。</p>
+<blockquote>
+<p>💡 <strong>6 类效果里有 5 类可以零字节用 CSS/SVG 实现</strong>：<code>feTurbulence</code> 纸纤维、<code>radial-gradient</code> + <code>&lt;pattern patternTransform="rotate(45)"&gt;</code> 真 45° 网屏、非等向 <code>baseFrequency="0.015 0.6"</code> 做横向扫描划痕、<code>repeating-conic-gradient</code> 颗粒、<code>mix-blend-mode: multiply</code> + 伪元素位移做套印错位、六层 <code>repeating-linear-gradient</code> 做毫米工程格。<strong>只有真实纸浆纤维建议用 CC0 位图。</strong></p>
+</blockquote>
+<h3 id="75_1">7.5 作者生卒年（版权判定的起点）<a class="headerlink" href="#75_1" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>艺术家</th>
+<th>生卒年</th>
+<th>版权判定起点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>亚历山大·罗德琴科 Rodchenko</td>
+<td>1891-12-05 – 1956-12-03</td>
+<td>逝世 1956 → 多数司法管辖区 70 年后（2026 年）刚进入公有领域，<strong>边缘状态，需逐件确认</strong></td>
+</tr>
+<tr>
+<td>卡济米尔·马列维奇 Malevich</td>
+<td>1879 – 1935</td>
+<td>已过 70 年</td>
+</tr>
+<tr>
+<td>李西茨基 El Lissitzky</td>
+<td>1890 – 1941</td>
+<td>已过 70 年（但<strong>美国出版年规则</strong>另有计算方式）</td>
+</tr>
+<tr>
+<td>柳博芙·波波娃 Popova</td>
+<td>1889 – 1924</td>
+<td>已过 70 年</td>
+</tr>
+<tr>
+<td>瓦尔瓦拉·斯捷潘诺娃 Stepanova</td>
+<td>1894 – 1958</td>
+<td>70 年后为 <strong>2028 年，尚未到期</strong></td>
+</tr>
+<tr>
+<td>古斯塔夫·克卢西斯 Klutsis</td>
+<td>1895 – 1938</td>
+<td>已过 70 年</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠️ <strong>上表只是起点，不构成法律意见。</strong> 俄罗斯 70 年规则、美国"出版年 + 95 年"规则、以及"二战期间作品可能延长"等因素都会改变结论。</p>
+</blockquote>
+<p><strong>替代方案（无需版权图片）</strong>：
+1. 用<strong>自己的照片</strong>做双色调/半调加工 —— 最安全，且符合构成主义"用真实照片当材料"的精神
+2. 用 CSS/SVG <strong>纯几何生成</strong> —— 楔形、圆、射线、网点全部可代码生成，零版权风险
+3. 用 AI 生成图像后自行加工 —— 注意你自己对生成结果的权利</p>
+<hr />
+<h2 id="8">8. 检索方法论备忘（下次可直接复用）<a class="headerlink" href="#8" aria-hidden="true">#</a></h2>
+<p>本环境的网络限制与绕行方案（这本身是有价值的发现）：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>通道</th>
+<th>状态</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>api.github.com</code>（REST API）</td>
+<td>✅ <strong>可用</strong>（未认证：搜索 10 次/分钟，其他 60 次/小时）</td>
+<td>查真实星数、许可证、文件树、文件内容</td>
+</tr>
+<tr>
+<td><code>fonts.google.com/metadata/fonts</code></td>
+<td>✅ <strong>可用</strong></td>
+<td>1950 个字族的子集/字重/类目权威数据</td>
+</tr>
+<tr>
+<td><code>fonts.googleapis.com/css2</code></td>
+<td>✅ <strong>可用</strong></td>
+<td>判定西里尔覆盖、抓取字体 CSS</td>
+</tr>
+<tr>
+<td><code>developer.mozilla.org</code></td>
+<td>✅ 可用</td>
+<td>Baseline 兼容性唯一可靠来源</td>
+</tr>
+<tr>
+<td><code>github.com</code> 网页版 / <code>raw.githubusercontent.com</code></td>
+<td>❌ 不可达</td>
+<td>改用 api.github.com 的 contents / trees 接口</td>
+</tr>
+<tr>
+<td><code>en.wikipedia.org</code></td>
+<td>❌ 不可达</td>
+<td>改用 Tate / TheArtStory</td>
+</tr>
+<tr>
+<td><code>cdn.jsdelivr.net</code> / <code>data.jsdelivr.com</code></td>
+<td>⚠️ 表现不稳定</td>
+<td>有时可读仓库文件树与内容，可作 api.github.com 的补充</td>
+</tr>
+<tr>
+<td>PDF（任意站点）</td>
+<td>❌ 不支持</td>
+<td>只能记录标题与 URL，无法读取</td>
+</tr>
+<tr>
+<td><strong><code>commons.wikimedia.org/w/api.php</code>（Commons API）</strong></td>
+<td>✅ <strong>可用！</strong>（网站网页被拦，但 API 通；限流较严，连续请求会 429，需间隔 15–20 秒并写明 User-Agent）</td>
+<td>⭐ <strong>公有领域图像素材的唯一可靠通道</strong>，可带出 <code>extmetadata</code> 许可信息</td>
+</tr>
+<tr>
+<td><code>api.artic.edu</code>（芝加哥艺术学院 API）</td>
+<td>✅ 可用</td>
+<td>返回 <code>is_public_domain</code> 字段；但俄国构成主义相关藏品多为 <code>not-PD</code></td>
+</tr>
+<tr>
+<td><code>collectionapi.metmuseum.org</code>（大都会 API）</td>
+<td>❌ HTTP 410</td>
+<td>已失效</td>
+</tr>
+<tr>
+<td><code>api.europeana.eu</code></td>
+<td>❌ HTTP 401</td>
+<td>需 API key</td>
+</tr>
+<tr>
+<td><code>www.rijksmuseum.nl/api</code></td>
+<td>❌ HTTP 410</td>
+<td>已失效</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>未认证 GitHub API 的省流技巧</strong>（避免海量 JSON 挤爆上下文）：</p>
+<pre><code class="language-powershell">$r = Invoke-RestMethod &quot;https://api.github.com/search/repositories?q=brutalist+css&amp;sort=stars&amp;per_page=5&quot; `
+     -Headers @{ 'User-Agent'='x'; 'Accept'='application/vnd.github+json' }
+$r.items | Select-Object full_name, stargazers_count, @{n='lic';e={$_.license.spdx_id}}, pushed_at
+</code></pre>
+<hr />
+<h2 id="9">9. 交付缺口清单（我知道自己没做到的）<a class="headerlink" href="#9" aria-hidden="true">#</a></h2>
+<ol>
+<li>✅ <strong>公有领域海报的高清下载链接</strong> —— <strong>已通过 Commons API 解决</strong>，见第 7 节（李西茨基、马列维奇等作品的直链已实测 200）。<strong>剩余缺口</strong>：克卢西斯、斯捷潘诺娃、波波娃的具体直链未逐条取（文件已确认为 PD，但为避免再次触发 429 未逐一取 URL），可自行用 <code>Special:FilePath</code> 模式构造</li>
+<li>❌ <strong>每件作品的精确版权状态</strong> —— 只给了作者生卒年作为起点，未逐件核定</li>
+<li>⚠️ <strong>RGB 以外的深度案例</strong> —— 第 5 节已补入 11 个<strong>实测抓到 CSS 证据</strong>的真实站点，但 <strong>Behance / SiteInspire 上的俄语区案例未逐页核实</strong></li>
+<li>❌ <strong>俄文论文《构成主义对现代网页设计的影响》全文</strong> —— PDF 无法读取</li>
+<li>❌ <strong>真实的构成主义印刷网点/纸张扫描素材</strong> —— 未找到可验证的免费商用下载源</li>
+<li>❌ <strong><code>reyrove/Deconstructed-Stage-Generative-Art</code>、<code>josiebb/about2squares</code>、<code>oziomarc/poster-recreation</code></strong> —— 检索结果可见，但<strong>独立核实未成功</strong>（API 限流 / 404），标记为未验证</li>
+<li>⚠️ <strong><code>@property</code> / <code>animation-timeline</code> / <code>text-spacing-trim</code> 的兼容性</strong> —— MDN 未取到 Baseline 标识，未做断言（<code>animation-timeline</code> 在 <a href="./05-前端技术方案.html"><code>05-前端技术方案.md</code></a> 中有更细的 BCD 数据）</li>
+<li>⚠️ <strong>几个仓库的许可证细节</strong> —— <code>pinecreativelabs/Brutalist-Framework</code>（Other）需人工确认</li>
+<li>❌ <strong>厂商中文字体的官方授权页 URL</strong> —— 阿里巴巴普惠体 / MiSans / HarmonyOS Sans / OPPO Sans 的授权页未取得</li>
+<li>⚠️ <strong><code>shape()</code> 与 <code>color-mix()</code> 的精确 BCD 版本号</strong> —— 已标注未核实，未填数字</li>
+</ol>
+<p><strong>这些缺口的共同原因都是网络访问限制，不是没去找。</strong> 建议在能访问外网的机器上补齐。</p>
+<p><strong>其中真正影响动手的只有第 1 条</strong>（找不到合法可用的历史海报素材）。但它有干净的替代方案：<strong>用自己的照片做双色调/半调加工</strong>，或用 CSS/SVG 纯几何生成——两者都零版权风险，且更符合构成主义"用真实照片当材料"的精神。</p>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="02-设计系统规格.html">← 02-设计系统规格</a>
+    <a href="index.html">目录</a>
+    <a href="04-技术实现手册.html">04-技术实现手册 →</a>
+  </nav>
+</div>
+
+</body>
+</html>

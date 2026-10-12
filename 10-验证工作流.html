@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>验证工作流 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="验证工作流">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">10 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="10">10 · 验证工作流</h1>
+<blockquote>
+<p>本次抓到的问题里，<strong>大多数靠看代码发现不了</strong>。这份文档是那套"能真的抓到问题"的验证手段。
+配套脚本在 <code>verify/</code>，可直接改路径复用。</p>
+</blockquote>
+<hr />
+<h2 id="0">0. 决策表：什么该用什么手段验<a class="headerlink" href="#0" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>要验的东西</th>
+<th>手段</th>
+<th>能不能靠看代码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>配色对比度</td>
+<td><strong>精算</strong>（WCAG 相对亮度）</td>
+<td>❌ 完全不能</td>
+</tr>
+<tr>
+<td>布局 / 构图 / 溢出 / 遮挡</td>
+<td><strong>无头浏览器截图</strong></td>
+<td>❌ 不能</td>
+</tr>
+<tr>
+<td>交互链路（点击、键盘、历史）</td>
+<td><strong><code>--dump-dom</code> 功能测试</strong></td>
+<td>⚠️ 只能看逻辑，不能看是否真的触发</td>
+</tr>
+<tr>
+<td>路由 / 解析 / 状态机纯逻辑</td>
+<td><strong>抽取函数做单元测试</strong></td>
+<td>✅ 可以</td>
+</tr>
+<tr>
+<td>HTML 结构 / CSS 语法 / JS 语法</td>
+<td><strong>静态检查</strong></td>
+<td>✅ 可以</td>
+</tr>
+<tr>
+<td>字体是否覆盖某语言</td>
+<td><strong>查元数据 / 解析 <code>cmap</code></strong></td>
+<td>❌ 不能（气质会骗人）</td>
+</tr>
+<tr>
+<td>无障碍（焦点、读屏、降级）</td>
+<td>⚠️ 静态检查只能覆盖一部分；<strong>必须真机 / 真读屏</strong></td>
+<td>❌ 基本不能</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>结论：一张截图 + 一次精算，抵得上一小时读代码。</strong></p>
+<hr />
+<h2 id="1">1. 静态检查（每次改完都跑）<a class="headerlink" href="#1" aria-hidden="true">#</a></h2>
+<p><code>verify/static-check.ps1</code> 一次跑完四项：</p>
+<ol>
+<li><strong>HTML 标签栈式配平</strong> —— 比正则计数可靠（正则会被 <code>&lt;p&gt;</code> / <code>&lt;path&gt;</code> 前缀搞混）</li>
+<li><strong>CSS 大括号配平 + 未定义变量检测</strong></li>
+<li><strong><code>node --check</code> 校验 JS 语法</strong>（前提：本机有 node）</li>
+<li><strong>JS 里 <code>getElementById</code> 引用的 id 是否都真实存在</strong> —— 这条能抓到"改了 HTML 忘了改 JS"</li>
+</ol>
+<pre><code class="language-powershell">$proj = 'C:\Users\23077\Desktop\work_place\视频工作流\soviet-press'
+powershell -ExecutionPolicy Bypass -File .\verify\static-check.ps1 -Dir $proj
+</code></pre>
+<hr />
+<h2 id="2">2. 无头浏览器截图（判"长相对不对"）<a class="headerlink" href="#2" aria-hidden="true">#</a></h2>
+<pre><code class="language-powershell">powershell -ExecutionPolicy Bypass -File .\verify\shot.ps1 -Page &quot;$proj\index.html&quot; -Out &quot;$proj\_shots&quot;
+</code></pre>
+<p>要点：</p>
+<ul>
+<li><strong>逐个状态用 URL 直接落到该状态</strong>再截（<code>index.html#/p/1/a</code>），<strong>不要靠脚本驱动后截图</strong> —— 时机不可控</li>
+<li><code>--window-size=1440,900</code> 给足；长页面会被裁，需要更高的窗口</li>
+<li><strong>必须逐张看</strong>。本次的"巨型字被 multiply 抹掉"、"红字压红底"、"形状画成平行四边形"，都是看图才发现的</li>
+</ul>
+<pre><code class="language-powershell">$edge = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+Start-Process -FilePath $edge -ArgumentList @(
+  '--headless=new','--disable-gpu','--no-sandbox','--hide-scrollbars',
+  '--window-size=1440,900','--virtual-time-budget=7000',
+  &quot;--screenshot=$out&quot;, $url
+) -Wait -NoNewWindow
+</code></pre>
+<hr />
+<h2 id="3">3. 功能测试（判"逻辑对不对"）<a class="headerlink" href="#3" aria-hidden="true">#</a></h2>
+<p><strong>用 <code>--dump-dom</code> 读文本，不要用截图。</strong> 截图受网络/虚拟时钟影响，时机不可控。</p>
+<h3 id="31">3.1 关键：测试页必须和被测页同目录<a class="headerlink" href="#31" aria-hidden="true">#</a></h3>
+<p>🔴 <strong>这是本次踩过的坑</strong>（见 <a href="./09-踩坑清单.html"><code>09-踩坑清单.md</code></a> 的 F1）。</p>
+<p>被测页如果用 <code>&lt;script src="press.js"&gt;</code> 这种<strong>相对路径</strong>，测试页就必须生成在<strong>同一个目录</strong>里。放到 <code>%TEMP%</code> 会导致所有资源静默不加载，然后你会看到一堆"什么都没发生"的<strong>假失败</strong>。</p>
+<h3 id="32">3.2 模式<a class="headerlink" href="#32" aria-hidden="true">#</a></h3>
+<pre><code class="language-powershell"># 1) 把测试脚本注入到 &lt;/body&gt; 之前，并把测试页写进【被测页所在目录】
+$patched = $html.Replace('&lt;/body&gt;', $testScript + &quot;`n&lt;/body&gt;&quot;)
+$tp = Join-Path $dir '_test.html'          # ← 同目录，不是 TEMP
+[IO.File]::WriteAllText($tp, $patched, (New-Object Text.UTF8Encoding($false)))
+
+# 2) --dump-dom 的输出【重定向到文件】再读（管道拿不到）
+$outF = Join-Path $env:TEMP 'dom.txt'
+Start-Process -FilePath $edge -ArgumentList @(
+  '--headless=new','--disable-gpu','--no-sandbox',
+  '--virtual-time-budget=20000','--dump-dom', $url
+) -Wait -NoNewWindow -RedirectStandardOutput $outF -RedirectStandardError $errF
+
+# 3) 结果通过 body 属性回传，正则取出
+$c = [IO.File]::ReadAllText($outF, [Text.Encoding]::UTF8)
+$m = [regex]::Match($c, 'data-test-result=&quot;([^&quot;]*)&quot;')
+</code></pre>
+<p>测试脚本骨架（写进 <code>data-test-result</code> 属性）：</p>
+<pre><code class="language-js">(async function () {
+  const out = [];
+  const sleep = ms =&gt; new Promise(r =&gt; setTimeout(r, ms));
+  const snap = () =&gt; document.body.dataset.view + '/' + document.body.dataset.drawer;
+  const chk = (label, expected) =&gt; {
+    const got = snap();
+    out.push((got.indexOf(expected) === 0 ? 'OK:' : 'XX:') + label + '=' + got);
+  };
+  try {
+    await sleep(400);
+    chk('1init', 'paper/closed');
+    document.querySelector('[data-goto=&quot;0&quot;]').click();
+    await sleep(1600);
+    chk('2poster', 'poster/closed');
+    /* … */
+  } catch (e) { out.push('THROWN=' + e.message); }   // ← 必须捕获，否则静默空白
+  document.body.setAttribute('data-test-result', out.join(' ;; '));
+})();
+</code></pre>
+<p><strong>三个必备要素</strong>：
+1. <code>try/catch</code> —— 否则脚本一抛异常，页面就一片空白，你连"失败了"都看不出来
+2. 结果写进 <strong>DOM 属性</strong>，不要写 <code>console.log</code>（拿不到）
+3. <strong>上报 <code>window.onerror</code></strong>，方便区分"逻辑错"和"脚本崩了"</p>
+<h3 id="33">3.3 整屏覆盖层必须验"归位"<a class="headerlink" href="#33" aria-hidden="true">#</a></h3>
+<p>任何全屏转场/幕布，<strong>最后一条断言必须是它回到了看不见的状态</strong>：</p>
+<pre><code class="language-js">const cp = getComputedStyle(document.getElementById('wipe')).clipPath;
+out.push((cp.indexOf('100% 100%') &lt; 0 ? 'OK:' : 'XX:') + '6overlay-parked=' + cp);
+</code></pre>
+<h3 id="34-reduced-motion">3.4 用 reduced-motion 桩把状态机和动画分开验<a class="headerlink" href="#34-reduced-motion" aria-hidden="true">#</a></h3>
+<p>动画路径和状态机路径混在一起测，失败时分不清是谁的问题。<strong>注入一个 <code>matchMedia</code> 桩强制走降级快路径</strong>，就能单独验状态机：</p>
+<pre><code class="language-js">// 注入在业务脚本【之前】
+(function(){
+  var orig = window.matchMedia.bind(window);
+  window.matchMedia = function (q) {
+    if (String(q).indexOf('prefers-reduced-motion') &gt;= 0)
+      return { matches: true, media: q, addEventListener(){}, removeEventListener(){} };
+    return orig(q);
+  };
+})();
+</code></pre>
+<p>两种都跑一遍：
+- <strong>加强制桩 → 验状态机</strong>（快、确定）
+- <strong>不加桩 → 验真实动画收敛</strong>（慢、但验的是真实路径）</p>
+<hr />
+<h2 id="4">4. 纯逻辑单元测试（最便宜的一种验证）<a class="headerlink" href="#4" aria-hidden="true">#</a></h2>
+<p>把状态机里的<strong>纯函数</strong>抽出来单独跑，不需要浏览器。本次的路由函数跑了 12 个用例（含畸形输入）：</p>
+<pre><code class="language-js">const MAX_INDEX = 2;
+const hashFor = (s) =&gt; (s.view !== 'poster' ? '#/' : `#/p/${s.index}${s.drawer ? '/a' : ''}`);
+function stateFromHash(hash) {
+  const m = /^#\/p\/(\d)(\/a)?$/.exec(hash || '');
+  if (m) { const i = Number(m[1]);
+    if (i &gt;= 0 &amp;&amp; i &lt;= MAX_INDEX) return { view:'poster', index:i, drawer:Boolean(m[2]) }; }
+  return { view:'paper', index:null, drawer:false };
+}
+// 用例：[输入, 期望]；外加&quot;往返一致性 hashFor(stateFromHash(h)) === h&quot;
+</code></pre>
+<p><strong>重点测畸形输入</strong>：<code>#/p/9</code>（越界）、<code>#/p/0/x</code>、<code>#/garbage</code>、<code>#/p/1/a/extra</code>、<code>""</code>。</p>
+<pre><code class="language-powershell">&amp; node .\verify\route-test.js ; &quot;退出码 $LASTEXITCODE&quot;
+</code></pre>
+<hr />
+<h2 id="5">5. 字体覆盖验证（不要凭气质猜）<a class="headerlink" href="#5" aria-hidden="true">#</a></h2>
+<h3 id="51-google-fonts">5.1 Google Fonts 官方元数据（权威、一次性拿全）<a class="headerlink" href="#51-google-fonts" aria-hidden="true">#</a></h3>
+<pre><code class="language-powershell">$m = Invoke-RestMethod 'https://fonts.google.com/metadata/fonts'   # 约 1950 个字族
+$m.familyMetadataList | Where-Object { $_.subsets -contains 'cyrillic' } | Select-Object family
+# 某几个字的字重轴：
+$m.familyMetadataList | Where-Object { $_.family -eq 'Oswald' } |
+  ForEach-Object { $_.fonts.PSObject.Properties.Name }
+</code></pre>
+<h3 id="52-text">5.2 快速判定单款字体（用 <code>text=</code> 参数）<a class="headerlink" href="#52-text" aria-hidden="true">#</a></h3>
+<pre><code class="language-powershell"># 若字体不含该字形，Google Fonts 会报错；成功返回 @font-face 即【有】覆盖
+Invoke-WebRequest 'https://fonts.googleapis.com/css2?family=Oswald&amp;text=%D0%9F%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
+</code></pre>
+<h3 id="53-cmap">5.3 最硬一级：解析 <code>cmap</code><a class="headerlink" href="#53-cmap" aria-hidden="true">#</a></h3>
+<p>下载字体二进制 → 解析 <code>cmap</code> 表 → 逐字形判定。适合"必须确定"的场合（例如商业项目要保证俄文/乌克兰文全覆盖）。<strong>本方法能发现元数据看不出的差异</strong>，例如某字体俄文完整但乌克兰文缺 <code>ұ / є / і / ї</code>。</p>
+<hr />
+<h2 id="6">6. 对比度精算<a class="headerlink" href="#6" aria-hidden="true">#</a></h2>
+<p>见 <a href="./07-设计规则速查.html"><code>07-设计规则速查.md</code></a> 第 1.1 节的脚本（无依赖，PowerShell 直接跑）。</p>
+<p><strong>把项目里所有前景/背景配对标成一张表，逐对跑</strong>，而不是只验你怀疑的那几个。本次就是靠全量跑才发现 <code>#8E1B14 on 黑 = 2.79</code> 这条。</p>
+<hr />
+<h2 id="7">7. 交付前清单<a class="headerlink" href="#7" aria-hidden="true">#</a></h2>
+<p><strong>静态</strong>
+- [ ] HTML 标签配平、无重复属性
+- [ ] CSS 大括号配平、无未定义变量
+- [ ] JS <code>node --check</code> 通过
+- [ ] JS 引用的 id / class 都真实存在
+- [ ] 文档内相对链接全部可解析</p>
+<p><strong>视觉</strong>（必须逐张看图）
+- [ ] 桌面 + 移动两个宽度
+- [ ] 每个可达状态各一张
+- [ ] 文字没有被几何图形遮挡
+- [ ] 没有元素溢出 / 被裁</p>
+<p><strong>功能</strong>（<code>--dump-dom</code>）
+- [ ] 主要交互链路端到端通过
+- [ ] 键盘路径（Tab / Enter / ESC）通过
+- [ ] 整屏覆盖层结束时归位
+- [ ] 无 <code>window.onerror</code></p>
+<p><strong>无障碍</strong>
+- [ ] 焦点环在所有背景上都可见
+- [ ] 可交互元素身上没有 <code>clip-path</code>
+- [ ] <code>prefers-reduced-motion</code> / <code>prefers-contrast</code> / <code>forced-colors</code> 三套降级都在
+- [ ] 触控目标 ≥ 44px
+- [ ] 所有前景/背景配对都算过对比度</p>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="09-踩坑清单.html">← 09-踩坑清单</a>
+    <a href="index.html">目录</a>
+    <a href="README.html">README →</a>
+  </nav>
+</div>
+
+</body>
+</html>

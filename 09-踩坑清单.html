@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>踩坑清单 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="踩坑清单">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">09 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="09">09 · 踩坑清单</h1>
+<blockquote>
+<p>每一条都是本次实际踩到并修掉的，不是从文档里抄的。
+格式：<strong>现象 → 原因 → 修法 → 可复用判据</strong>。
+其中很大一部分只有靠"截图看"或"算一遍"才能发现 —— 看代码是看不出来的。</p>
+</blockquote>
+<hr />
+<h2 id="a">A. 色彩与混合模式<a class="headerlink" href="#a" aria-hidden="true">#</a></h2>
+<h3 id="a1-multiply">A1. 纸色字 + <code>multiply</code> = 把字抹掉<a class="headerlink" href="#a1-multiply" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：巨型标题设了 <code>color: var(--paper); mix-blend-mode: multiply;</code>，压在红色横带上——<strong>字完全看不见</strong>。</p>
+<p><strong>原因</strong>：数学上 <code>multiply(纸色, 红) ≈ 红</code>，<code>multiply(纸色, 纸色) = 纸色</code>。等于把字涂成了底色。</p>
+<p><strong>修法</strong>：巨型字用墨黑，不用混合模式。</p>
+<p><strong>判据</strong>：<code>multiply</code> 只会让结果<strong>变暗</strong>。所以<strong>浅色元素永远不要用 <code>multiply</code></strong> ——它不可能浮出来。要"提亮"用 <code>screen</code> / <code>lighten</code>。</p>
+<hr />
+<h3 id="a2">A2. 小字落在同色系的色块上<a class="headerlink" href="#a2" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：海报页脚的说明文字正好压在红色几何上；其中 <code>--red-ink</code>（深红）的小字落在红底上，<strong>几乎不可读</strong>。</p>
+<p><strong>原因</strong>：页脚是透明的，背后几何图形的颜色是变化的。文字颜色只保证"在纸底上"合格，没保证"在色块上"合格。</p>
+<p><strong>修法</strong>：给页脚一块<strong>通栏纸色底</strong>。这样无论背后是什么，对比度都是确定的。</p>
+<p><strong>判据</strong>：<strong>任何承载文字的区域，必须自己拥有确定的背景色</strong>，不能依赖"背后大概是纸色"。浮动元素（页脚、徽标、角标）尤其要注意。</p>
+<hr />
+<h3 id="a3">A3. 抬升带用了和背景同色的颜色<a class="headerlink" href="#a3" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：给底部抽屉加"悬浮阴影"，用 <code>0 -14px 0 0 var(--red)</code> 做抬升带 —— 落在<strong>红色海报</strong>上时，<strong>完全看不出来</strong>。</p>
+<p><strong>原因</strong>：抬升带和背后的海报同色。</p>
+<p><strong>修法</strong>：改成双层，外层用中性色：</p>
+<pre><code class="language-css">box-shadow: 0 -5px 0 0 var(--red), 0 -17px 0 0 var(--ink);
+</code></pre>
+<p><strong>判据</strong>：<strong>当背景色不可控时，装饰性色带至少要有一层是对比色。</strong></p>
+<hr />
+<h3 id="a4">A4. "看起来够深"的暗色实际不合格<a class="headerlink" href="#a4" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：<code>#8E1B14</code> 暗红看起来很深很安全，压在纯黑上其实是 <strong>2.79:1</strong> —— 任何字号都不合格。</p>
+<p><strong>修法</strong>：删掉这枚颜色，改用 <code>#a30000</code>（on 纸 6.76:1）。</p>
+<p><strong>判据</strong>：<strong>暗色 + 暗底是最容易翻车的组合</strong>，因为两者亮度都很低。必须算。</p>
+<hr />
+<h3 id="a5-background-blend-mode">A5. <code>background-blend-mode</code> 混不到文字<a class="headerlink" href="#a5-background-blend-mode" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：想让文字"压进"纸张纹理里，用了 <code>background-blend-mode: multiply</code> —— 没用。</p>
+<p><strong>原因</strong>：<code>background-blend-mode</code> <strong>只混合元素自己的多层背景</strong>，不涉及内容、也不涉及背后元素。</p>
+<p><strong>修法</strong>：要跨元素混合只能用 <code>mix-blend-mode</code>，并且<strong>必须配 <code>isolation: isolate</code></strong> 把混合锁在组件内。</p>
+<p><strong>判据</strong>：<code>background-blend-mode</code> = 自己内部；<code>mix-blend-mode</code> = 与背后。别混。</p>
+<hr />
+<h2 id="b">B. 无障碍<a class="headerlink" href="#b" aria-hidden="true">#</a></h2>
+<h3 id="b1-clip-path-outline">B1. <code>clip-path</code> 会把 <code>outline</code> 一起裁掉 → 键盘焦点不可见<a class="headerlink" href="#b1-clip-path-outline" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：给按钮做了斜切外观（<code>clip-path</code>），键盘 Tab 到它时<strong>焦点环完全看不见</strong>。</p>
+<p><strong>原因</strong>：<code>clip-path</code> 裁剪的是元素的<strong>全部绘制输出</strong>，<code>outline</code> 也在其中。</p>
+<p><strong>严重性</strong>：直接违反 WCAG 2.4.7（焦点可见）。键盘用户无法操作。</p>
+<p><strong>修法</strong>：把 <code>clip-path</code> 交给一个 <code>aria-hidden="true"</code> 的<strong>装饰子层</strong>，交互元素本体不裁剪：</p>
+<pre><code class="language-html">&lt;button class=&quot;wedge-btn&quot;&gt;
+  &lt;span class=&quot;wedge-btn__decor&quot; aria-hidden=&quot;true&quot;&gt;&lt;/span&gt;
+  &lt;span class=&quot;wedge-btn__label&quot;&gt;按此&lt;/span&gt;
+&lt;/button&gt;
+</code></pre>
+<pre><code class="language-css">.wedge-btn { position: relative; background: none; border: 0; padding: 0; }
+.wedge-btn__decor { position: absolute; inset: 0; clip-path: polygon(...); z-index: 0; }
+.wedge-btn__label { position: relative; z-index: 1; }
+.wedge-btn:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
+</code></pre>
+<p><strong>判据</strong>：<strong><code>clip-path</code> 和 <code>outline</code> 不可共存</strong>。凡是可交互元素，裁剪一律外移。</p>
+<hr />
+<h3 id="b2">B2. 伪元素重复文字会被读屏念两遍<a class="headerlink" href="#b2" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：套印错位效果用 <code>::before { content: attr(data-text); }</code> 复制文本 —— 部分屏幕阅读器会把标题<strong>朗读两遍</strong>。</p>
+<p><strong>修法</strong>：改用真实的、带 <code>aria-hidden</code> 的 <code>&lt;span&gt;</code>：</p>
+<pre><code class="language-html">&lt;h1 class=&quot;misreg&quot;&gt;标题&lt;span class=&quot;misreg__ghost&quot; aria-hidden=&quot;true&quot;&gt;标题&lt;/span&gt;&lt;/h1&gt;
+</code></pre>
+<p><strong>判据</strong>：<strong>伪元素内容在无障碍树里不是总被忽略的。</strong> 任何"复制一份文字做效果"的手法都要用 <code>aria-hidden</code> 的真实节点，别用 <code>content</code>。</p>
+<p><strong>附带好处</strong>：真实 <code>&lt;span&gt;</code> 还能 <code>user-select: none</code> 防止复制出重复文字；伪元素做不到。</p>
+<hr />
+<h3 id="b3-prefers-reduced-motion">B3. <code>prefers-reduced-motion</code> 下元素卡在屏幕外<a class="headerlink" href="#b3-prefers-reduced-motion" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：入场动画用 <code>@keyframes</code> 的 <code>from</code> 做初始位移（<code>translateY(0.6em)</code>），在 <code>prefers-reduced-motion</code> 下关掉动画后，<strong>元素永久停在位移位置</strong>（甚至屏幕外）。</p>
+<p><strong>修法</strong>：
+1. <strong>静止态必须是默认样式</strong>，动效只做增强（animation 只负责"怎么来"，不负责"在哪"）
+2. 降级媒体查询里<strong>显式复位</strong>，不能只写 <code>animation: none</code>：</p>
+<pre><code class="language-css">@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .stagger &gt; * { opacity: 1; transform: none; }   /* ← 两个都要复位 */
+}
+</code></pre>
+<p><strong>判据</strong>：<strong>只复位 <code>opacity</code> 是最常见的漏项。</strong> 位移、缩放、旋转都要一起复位。</p>
+<hr />
+<h3 id="b4">B4. 用颜色单独传达状态<a class="headerlink" href="#b4" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：焦点样式只靠 <code>outline-color</code> 变化；<code>forced-colors</code>（Windows 高对比）下被系统覆盖，状态消失。</p>
+<p><strong>修法</strong>：加 <code>@media (forced-colors: active)</code> 分支，用系统色 <code>ButtonText</code> / <code>Canvas</code>，并保证形状（粗细、位移、下划线）本身也能区分。</p>
+<p><strong>判据</strong>：<strong>任何状态至少要有两个通道</strong>（颜色 + 形状/位置/文字）。</p>
+<hr />
+<h2 id="c">C. 布局与尺寸<a class="headerlink" href="#c" aria-hidden="true">#</a></h2>
+<h3 id="c1-vw">C1. <code>vw</code> 不感知容器宽度<a class="headerlink" href="#c1-vw" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：<code>font-size: clamp(4rem, 15vw, 16rem)</code> 的组件被放进一个窄侧栏，<strong>字号照样巨大，直接溢出</strong>。</p>
+<p><strong>原因</strong>：<code>vw</code> 是视口单位，和元素所在的容器无关。</p>
+<p><strong>修法</strong>：组件级响应式改用容器查询单位 <code>cqw</code>：</p>
+<pre><code class="language-css">.hero { container-type: inline-size; }
+.hero__title { font-size: clamp(2rem, 14cqw, 12rem); }
+</code></pre>
+<p><strong>判据</strong>：<strong>只要一个组件可能被放进不同宽度的容器，就不要用 <code>vw</code> 定它的尺寸。</strong></p>
+<hr />
+<h3 id="c2">C2. 固定高度抽屉 + 内容短 = 一大片死白<a class="headerlink" href="#c2" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：文章抽屉设 <code>height: min(74svh, 680px)</code>，但内容只有 500px —— 底部留下一大片空白，看起来像"没做完"。</p>
+<p><strong>修法</strong>：
+1. 面板改 <code>max-height</code>，让它跟着内容收缩
+2. <strong>想让它"占屏大"，就把内容做大</strong>（字号、行高、留白），而不是把面板拉高</p>
+<pre><code class="language-css">.drawer__body { max-height: var(--drawer-h); }   /* 不是 height */
+.drawer__inner { font-size: clamp(1.0625rem, .5vw + .9rem, 1.25rem); line-height: 1.72; }
+</code></pre>
+<p><strong>判据</strong>：<strong>"面板空"是内容问题，不是尺寸问题。</strong> 拉高面板只会把空白放大。</p>
+<hr />
+<h3 id="c3-line-height-1">C3. <code>line-height &lt; 1</code> 时字形溢出行盒，被下面的线切过去<a class="headerlink" href="#c3-line-height-1" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：巨型标题 <code>line-height: .76</code>，下面的副标题横线<strong>从字母底部切过去</strong>。</p>
+<p><strong>原因</strong>：行盒比字形矮，字形向上向下都溢出。</p>
+<p><strong>修法</strong>：给大标题留出下边距，或按溢出量补偿：</p>
+<pre><code class="language-css">.mega { line-height: .8; margin-bottom: .14em; }
+</code></pre>
+<p><strong>判据</strong>：<strong><code>line-height &lt; 1</code> 就一定会溢出</strong>，粗略量是 <code>(1 - line-height) / 2</code> 每侧。紧邻元素必须让开。</p>
+<hr />
+<h3 id="c4-svg-preserveaspectratio">C4. <code>svg preserveAspectRatio</code> 与画幅比例不符会裁掉主体<a class="headerlink" href="#c4-svg-preserveaspectratio" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：<code>viewBox="0 0 1000 1000"</code> + <code>preserveAspectRatio="xMidYMid slice"</code> 放进 1440×900 的区域，<strong>圆形的顶部被裁掉</strong>。</p>
+<p><strong>原因</strong>：<code>slice</code> 是"填满并裁切"，正方形 viewBox 在宽画幅上会按高度放大，左右裁切 —— 反过来也一样。</p>
+<p><strong>修法</strong>：<strong>让 viewBox 的宽高比和预期的展示画幅一致</strong>（例如 <code>viewBox="0 0 1440 900"</code> 配 16:10 区域），再配合 <code>slice</code>，就基本不裁。</p>
+<p><strong>判据</strong>：<code>slice</code> + 比例不符 = 必然裁掉边缘。构图主体不要放在靠边位置。</p>
+<hr />
+<h3 id="c5">C5. 几何形状要对着原典验，别凭印象画<a class="headerlink" href="#c5" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：想画一个"楔形"，写出来的多边形两条边平行 —— 实际是<strong>平行四边形</strong>，完全没有楔形的收束感。</p>
+<p><strong>修法</strong>：真楔形是三角形，顶点必须收成一个尖。</p>
+<p><strong>判据</strong>：<strong>形状类元素（楔、箭头、斜切）要写完后单独截图确认</strong>，代码上看坐标很容易看不出问题。</p>
+<hr />
+<h2 id="d">D. 动效与转场<a class="headerlink" href="#d" aria-hidden="true">#</a></h2>
+<h3 id="d1-translatex">D1. <code>translateX</code> 两段式转场的"第三态"会二次扫过<a class="headerlink" href="#d1-translatex" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：转场用 <code>translateX(-101%) → 0 → 101%</code>，清掉 <code>is-out</code> 时元素要从 <code>+101%</code> 回到 <code>-101%</code>，<strong>又横扫了一遍屏幕</strong>。</p>
+<p><strong>修法</strong>（二选一）：
+1. <strong>原路退出</strong>：只用 <code>is-in</code>，加类 = 进，删类 = 原路退回。两态即可。
+2. <strong>零面积态</strong>：<code>clip-path</code> 方案下，"收拢在顶边"和"收拢在底边"<strong>都是零面积</strong>，互相过渡时不可见，所以可以安全地清类。</p>
+<pre><code class="language-css">.overlay { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }          /* 零面积·顶边 */
+.overlay.is-in  { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }  /* 满屏 */
+.overlay.is-out { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); } /* 零面积·底边 */
+</code></pre>
+<p><strong>判据</strong>：<strong>加动画之前先想清楚"清掉类之后会过渡到什么状态"。</strong> 三个状态以上的转场必须检查"归位路径"是否可见。</p>
+<hr />
+<h3 id="d2-transitionend">D2. 换动画实现时忘了改 <code>transitionend</code> 的判断属性<a class="headerlink" href="#d2-transitionend" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：转场从 <code>clip-path</code> 改成 <code>transform</code> 后，<code>transitionend</code> 监听还在判 <code>'clip-path'</code> —— 永远等不到，<strong>只能靠兜底定时器，每次都白等 700ms</strong>。</p>
+<p><strong>修法</strong>：两者一起改。</p>
+<p><strong>判据</strong>：<strong><code>propertyName</code> 和实际动画属性是强耦合的一对。</strong> 换实现时列个清单一起改，或干脆用 <code>el.getAnimations()</code>。</p>
+<hr />
+<h3 id="d3">D3. 动画时长照抄规则值，页面转场变成"闪一下"<a class="headerlink" href="#d3" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：把设计规范里"微交互只准 75/100ms"直接套到<strong>全屏页面转场</strong>上，转场快到像闪烁，完全失去了"压过来"的力度。</p>
+<p><strong>修法</strong>：<strong>页面转场单独开令牌</strong>，不复用微交互的：</p>
+<pre><code class="language-css">--dur-fast: 75ms;  --dur-base: 100ms;     /* 微交互 */
+--dur-curtain: 280ms; --ease-curtain: cubic-bezier(.85,0,.15,1);   /* 页面转场 */
+</code></pre>
+<p><strong>判据</strong>：<strong>"统一动效时长"是个陷阱。</strong> 微交互和页面转场是两种时间尺度，共用令牌必然有一边不合适。</p>
+<hr />
+<h3 id="d4">D4. 转场结束后元素没归位，永久盖在页面上<a class="headerlink" href="#d4" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>（差点发生）：<code>clip-path</code> 转场的收场态如果没清干净，幕布会以零面积以外的形态留在屏幕上。</p>
+<p><strong>修法/验证</strong>：转场测试必须<strong>显式断言收场后的计算样式</strong>：</p>
+<pre><code class="language-js">const cp = getComputedStyle(document.getElementById('wipe')).clipPath;
+// 期望零面积：polygon(0px 0%, 100% 0%, 100% 0%, 0px 0%)  ← 不含 100% 100%
+const ok = !cp.includes('100% 100%');
+</code></pre>
+<p><strong>判据</strong>：<strong>任何整屏覆盖层的测试，最后一条必须是"它回到了看不见的状态"。</strong> 这条最容易漏，也最容易变成线上事故。</p>
+<hr />
+<h2 id="e">E. 字体<a class="headerlink" href="#e" aria-hidden="true">#</a></h2>
+<h3 id="e1-font-black-900">E1. 把 <code>font-black</code> 当成"数值 900"照抄<a class="headerlink" href="#e1-font-black-900" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：规范写 <code>font-black</code>，但选用的窄体字<strong>最重只有 700</strong>。强行写 <code>font-weight: 900</code> 会触发<strong>伪粗体</strong>（浏览器把字形机械加粗），笔画粘连、变模糊。</p>
+<p><strong>修法</strong>：要么承认该字体的黑就是 700（窄体怪诞体的 700 视觉重量本来就接近常规体的 900），要么<strong>换一款真有 900 的字体</strong>。</p>
+<p><strong>判据</strong>：<strong><code>font-weight</code> 的有效区间取决于字体文件本身</strong>，不是想写多少就写多少。选字体前先查它的字重轴。</p>
+<hr />
+<h3 id="e2">E2. 凭字体气质猜它是多语言覆盖<a class="headerlink" href="#e2" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：Anton / Bebas Neue / Archivo Black / Barlow Condensed 这类"海报体"看起来万能，实际<strong>全都没有西里尔字形</strong> —— 页面一出现俄文就掉字体，版式立刻塌。</p>
+<p><strong>修法</strong>：实测覆盖范围，不要猜。</p>
+<p><strong>判据</strong>：
+- Google Fonts：查官方元数据 <code>https://fonts.google.com/metadata/fonts</code> 的 <code>subsets</code> 字段
+- 更硬一级：<strong>下载字体二进制解析 <code>cmap</code> 表</strong>逐字形判定
+- 快速判定：<code>https://fonts.googleapis.com/css2?family=X&amp;text=Привет</code> —— 不含该字形会报错</p>
+<p>详见 <a href="./10-验证工作流.html"><code>10-验证工作流.md</code></a>。</p>
+<hr />
+<h2 id="f">F. 工具链与验证<a class="headerlink" href="#f" aria-hidden="true">#</a></h2>
+<h3 id="f1">F1. 测试页放在别的目录 → 相对路径资源全没加载 → 一堆假失败<a class="headerlink" href="#f1" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：功能测试报告"点击板块没反应"，但代码没问题。排查后发现：<strong>测试页生成在 <code>%TEMP%</code>，而它 <code>&lt;script src="press.js"&gt;</code> 是相对路径，压根没加载。</strong></p>
+<p><strong>后果</strong>：差点让我去"修"一个不存在的 bug。</p>
+<p><strong>修法</strong>：<strong>测试页必须生成在被测页的同目录</strong>（或改用绝对路径 / 内联资源）。</p>
+<p><strong>判据</strong>：<strong>"测试失败"的第一反应应该是"测试本身对不对"，而不是"代码坏了"。</strong> 尤其当失败模式是"什么都没发生"时。</p>
+<hr />
+<h3 id="f2-dump-dom">F2. <code>--dump-dom</code> 通过管道捕获不到输出<a class="headerlink" href="#f2-dump-dom" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：<code>&amp; $edge --headless --dump-dom $url</code> 拿到空字符串。</p>
+<p><strong>修法</strong>：重定向到文件再读：</p>
+<pre><code class="language-powershell">Start-Process -FilePath $edge -ArgumentList @('--headless=new','--dump-dom',$url) `
+  -Wait -NoNewWindow -RedirectStandardOutput $outFile -RedirectStandardError $errFile
+$dom = [IO.File]::ReadAllText($outFile)
+</code></pre>
+<p><strong>判据</strong>：拿不到输出时，先换投递通道（文件），再怀疑被测对象。</p>
+<hr />
+<h3 id="f3">F3. 无头截图"看起来空白"未必是页面坏了<a class="headerlink" href="#f3" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：<code>--virtual-time-budget</code> + <code>--screenshot</code> 偶尔截到一张几乎全空白的图。</p>
+<p><strong>原因</strong>：外部字体等网络请求会<strong>暂停虚拟时钟</strong>，截图时机因此不可预测。</p>
+<p><strong>修法/判据</strong>：
+- <strong>判"逻辑对不对"用 <code>--dump-dom</code> 读文本</strong>，不要靠截图
+- <strong>判"长相对不对"用截图</strong>，并且<strong>逐个状态用 URL 直接落到该状态</strong>再截，不要依赖脚本驱动
+- 截图尺寸给足（<code>--window-size=1440,900</code>），长页面会被裁</p>
+<hr />
+<h3 id="f4">F4. 测试桩注入在业务脚本之后 = 桩形同虚设<a class="headerlink" href="#f4" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：给测试页注入 <code>matchMedia</code> 桩想强制走 reduced-motion 快路径，结果<strong>毫无效果</strong>，测出来的仍是慢的动画路径。</p>
+<p><strong>原因</strong>：桩被注入到 <code>&lt;/body&gt;</code> 之前，而业务 <code>&lt;script src="app.js"&gt;</code> 在<strong>它之前</strong>。浏览器是<strong>顺序执行</strong>的——业务脚本在解析到桩之前就已经跑完，并已经把真实的 <code>matchMedia</code> 结果存进了变量。</p>
+<pre><code class="language-js">// app.js 加载时就捕获了，之后再替换 window.matchMedia 也没用
+const reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+</code></pre>
+<p><strong>修法</strong>：桩必须插在<strong>第一个业务 <code>&lt;script&gt;</code> 之前</strong>：</p>
+<pre><code class="language-powershell">$idx = $patched.IndexOf('&lt;script')
+$patched = $patched.Substring(0, $idx) + $stubBlock + &quot;`n&quot; + $patched.Substring($idx)
+</code></pre>
+<p><strong>判据</strong>：<strong>任何"注入桩 / 打补丁"的操作，都要问一句"目标代码是否已经执行过了"。</strong> 浏览器的执行是顺序的，补丁必须早于被补的对象。</p>
+<hr />
+<h3 id="f5">F5. 异步收尾的断言只读一次 = 假失败<a class="headerlink" href="#f5" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：断言"转场层已归位"，同一个测试<strong>时好时坏</strong>。失败时读到的是 <code>polygon(0px 100%, ...)</code>（转场中途/收尾态），而不是已归位的状态。</p>
+<p><strong>原因</strong>：转场收尾是异步的（<code>transitionend</code> 或兜底定时器），固定 <code>sleep</code> 之后读一次，遇到边界情况就读到了中间态。</p>
+<p><strong>修法</strong>：<strong>轮询到稳定</strong>，并给出超时：</p>
+<pre><code class="language-js">let cp = '';
+for (let i = 0; i &lt; 40; i++) {
+  cp = getComputedStyle(wipe).clipPath;
+  if (cp.indexOf('100% 100%') &lt; 0) break;   // 已归位就提前退出
+  await sleep(100);
+}
+</code></pre>
+<p><strong>判据</strong>：<strong>凡是断言"最终会收敛到什么状态"，一律轮询，不要 sleep 一次就断言。</strong> 否则你会得到一个随机红的测试，然后开始怀疑代码——而代码是好的。</p>
+<hr />
+<h3 id="f6-powershell-51-bom-utf-8-ps1">F6. PowerShell 5.1 读<strong>没有 BOM</strong> 的 UTF-8 <code>.ps1</code> 会乱码并报语法错误<a class="headerlink" href="#f6-powershell-51-bom-utf-8-ps1" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：写好的 <code>.ps1</code> 脚本（含中文注释/字符串）在 Windows PowerShell 5.1 下直接报一堆语法错误，报错信息里全是乱码（<code>鏈棴鍚?</code>）。用 <code>PSParser</code> 一测，错误消失——因为读入方式不同。</p>
+<p><strong>原因</strong>：<strong>PowerShell 5.1 默认按 ANSI 代码页解码 <code>.ps1</code> 文件</strong>，只有检测到 <strong>UTF-8 BOM</strong> 时才按 UTF-8 读。没有 BOM → 中文变乱码 → 乱码里可能夹带引号类字符 → <strong>破坏引号/here-string 配平</strong> → 报语法错误。</p>
+<p><strong>修法</strong>：<strong>.ps1 一律带 UTF-8 BOM 保存</strong>。</p>
+<pre><code class="language-powershell">$utf8Bom = New-Object System.Text.UTF8Encoding($true)   # $true = 写 BOM
+[IO.File]::WriteAllText($path, $content, $utf8Bom)
+</code></pre>
+<blockquote>
+<p>⚠️ 很多现代编辑器/工具（包括某些 write 工具）默认写 <strong>无 BOM</strong> 的 UTF-8。改动 <code>.ps1</code> 之后要<strong>复查 BOM 是否还在</strong>。</p>
+</blockquote>
+<p><strong>判据</strong>：
+- <code>.md</code> / <code>.js</code> / <code>.html</code>：无 BOM 更安全（Node、浏览器都按 UTF-8 处理）
+- <strong><code>.ps1</code>：必须带 BOM</strong>（否则 5.1 会乱码）；PowerShell 7 无此问题，但为兼容性统一加 BOM</p>
+<hr />
+<h3 id="f7-replace-2">F7. <code>-replace</code> 的参数被解析成多个，报"只允许 2 个元素"<a class="headerlink" href="#f7-replace-2" aria-hidden="true">#</a></h3>
+<p><strong>现象</strong>：<code>$s -replace 'a', 'b' + "</code>n" + 'c'` 报错 <em>"运算符只允许后面包含 2 个元素，而不是 3 个"</em>。</p>
+<p><strong>原因</strong>：PowerShell 把逗号后面的整个表达式列表当成参数数组，<code>'b' + ... + 'c'</code> 没被括号包住就被拆开了。</p>
+<p><strong>修法</strong>：要么加括号，要么<strong>改用字面替换 <code>.Replace()</code></strong>：</p>
+<pre><code class="language-powershell"># ❌ 参数解析有坑，而且替换串里的 $ 还要额外转义
+$s = $t -replace '&lt;/body&gt;', ($inject -replace '\$', '$$' + &quot;`n&lt;/body&gt;&quot;)
+# ✅ 字面替换，不需要任何转义
+$s = $t.Replace('&lt;/body&gt;', ($inject + &quot;`n&lt;/body&gt;&quot;))
+</code></pre>
+<p><strong>判据</strong>：<strong>注入/拼接场景一律用 <code>.Replace()</code>（字面），不要用 <code>-replace</code>（正则）</strong> —— 既能避开 PowerShell 的参数解析坑，又能避开替换串里 <code>$</code>、<code>\</code> 的转义坑。</p>
+<hr />
+<h2 id="_1">一句话总结<a class="headerlink" href="#_1" aria-hidden="true">#</a></h2>
+<blockquote>
+<p><strong>能靠"看代码"发现的 bug 是少数。</strong>
+本次抓到的近 30 个问题里，绝大多数要么靠<strong>截图逐张看</strong>，要么靠<strong>把数值算一遍</strong>，
+要么靠<strong>在真实浏览器里跑一遍</strong>。三件事都必须做，缺一项就会漏。</p>
+<p>还有一个反直觉的：<strong>其中好几个 bug 出在"验证工具"自己身上</strong>
+（脚手架放错目录、测试桩注入顺序错、断言没轮询、脚本编码丢了 BOM）。
+所以当测试报红时，<strong>第一反应应该是"测试本身对不对"</strong>，尤其当失败模式是"什么都没发生"时。</p>
+</blockquote>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="08-交互模式.html">← 08-交互模式</a>
+    <a href="index.html">目录</a>
+    <a href="10-验证工作流.html">10-验证工作流 →</a>
+  </nav>
+</div>
+
+</body>
+</html>

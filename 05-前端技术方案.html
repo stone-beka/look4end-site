@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>俄国构成主义网页 · 现代 CSS/SVG/JS 实现技术方案 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="俄国构成主义网页 · 现代 CSS/SVG/JS 实现技术方案">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">05 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="csssvgjs">俄国构成主义网页 · 现代 CSS/SVG/JS 实现技术方案</h1>
+<blockquote>
+<p>目标风格：强对角线构图、红/黑/白三色撞色、巨型无衬线大写标题、几何原语（楔形/射线/圆环）、文字沿斜线或沿路径、半调网点、套印错位、纸张颗粒、硬边零圆角。</p>
+</blockquote>
+<hr />
+<h2 id="0">0. 检索方法与验证状态说明（请先读）<a class="headerlink" href="#0" aria-hidden="true">#</a></h2>
+<p><strong>检索方式</strong>：<code>web_search</code> + <code>web_fetch</code>，中途中搜索后端返回 <code>HTTP 402 Insufficient Balance</code> 失效，随后改用<strong>直接 HTTP 抓取</strong>（PowerShell <code>Invoke-WebRequest</code>）+ 拉取权威数据源原始 JSON 完成验证：</p>
+<ul>
+<li>MDN 文档页与 <code>index.json</code>（<code>https://developer.mozilla.org/.../index.json</code>）</li>
+<li><strong>MDN Browser Compat Data 原始 JSON</strong>：<code>https://raw.githubusercontent.com/mdn/browser-compat-data/main/...</code>（本文所有 "MDN BCD" 版本号均由此读取）</li>
+<li><strong>caniuse 原始 JSON</strong>：<code>https://raw.githubusercontent.com/Fyrd/caniuse/main/features-json/*.json</code></li>
+<li>GitHub License API：<code>https://api.github.com/repos/{owner}/{repo}/license</code></li>
+<li>Debian 版权文件、W3C 规范页</li>
+</ul>
+<p><strong>状态图例</strong>（本文所有 URL 我都发过真实请求）：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>标记</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅</td>
+<td>我实测返回 HTTP 200</td>
+</tr>
+<tr>
+<td>⚠️403</td>
+<td>真实存在，但对自动化请求返回 403（Cloudflare / CodePen 反爬）；URL 由搜索引擎索引结果与页面元数据双重确认</td>
+</tr>
+<tr>
+<td>⚠️402</td>
+<td>真实存在但当前部署异常/计费问题</td>
+</tr>
+<tr>
+<td>❌404</td>
+<td>我实测已失效，<strong>不要用</strong></td>
+</tr>
+<tr>
+<td>❓</td>
+<td>我这个会话未能取得权威数据，明确标注</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>本文中我实测失效的链接（不要写进页面注释）</strong>：</p>
+<ul>
+<li>❌ <code>https://k24moscow.ru/</code> → 404（Composition 24 线上站已下线；Awwwards/CommArts 的案例页仍在）</li>
+<li>❌ <code>https://grainy-gradients.vercel.app</code> → 402（CSS-Tricks 文章里的 playground 已不可用）</li>
+<li>❌ <code>https://ultimatedesigntools.com/tools/noise-generator/</code> → 404</li>
+<li>⚠️403 <code>https://www.moma.org/calendar/exhibitions/5072</code> → Cloudflare 拦截（"Engineer, Agitator, Constructor" 展览页，真实存在）</li>
+</ul>
+<hr />
+<h2 id="1-rotate-vs-clip-path-vs-repeating-linear-gradient">1. 斜向构图：<code>rotate()</code> vs <code>clip-path</code> vs <code>repeating-linear-gradient</code><a class="headerlink" href="#1-rotate-vs-clip-path-vs-repeating-linear-gradient" aria-hidden="true">#</a></h2>
+<h3 id="11">1.1 三者的选择判据<a class="headerlink" href="#11" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>手段</th>
+<th>影响布局？</th>
+<th>适用</th>
+<th>主要坑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>transform: rotate()</code></td>
+<td><strong>否</strong>（视觉变换，不改变盒模型与留白）</td>
+<td>整块内容倾斜 15°/45°/73°、斜排文字块</td>
+<td>旋转后四角出现空白；<code>position: fixed</code> 后代失效；<code>overflow</code> 裁切按未旋转的盒子算</td>
+</tr>
+<tr>
+<td><code>clip-path: polygon()</code></td>
+<td><strong>否</strong>（只裁剪绘制，不改变布局，也不产生滚动条）</td>
+<td>楔形色块、斜切图片、硬边几何</td>
+<td>百分比坐标系容易搞错；会<strong>连带裁掉 border 和 outline</strong>；非 <code>none</code> 会新建 stacking context</td>
+</tr>
+<tr>
+<td><code>repeating-linear-gradient</code></td>
+<td>否（背景绘制）</td>
+<td>斜向网格、斜条纹底纹、印刷线</td>
+<td>无法做内容布局，只是图案</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>结论：<strong>"斜向版式"用 <code>transform</code>，"斜向形状"用 <code>clip-path</code>，"斜向底纹"用 <code>repeating-linear-gradient</code>。</strong> 三者常叠在同一区块上。</p>
+</blockquote>
+<h3 id="12-transform-rotate-url">1.2 <code>transform: rotate()</code> 要点（✅ 权威 URL）<a class="headerlink" href="#12-transform-rotate-url" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">/* 斜向区块：放大容器抵消旋转留白 */
+.diag-band {
+  width: 140%;
+  margin-inline: -20%;
+  transform: rotate(-15deg);
+  transform-origin: 50% 50%;
+}
+/* 73° 的&quot;锐角&quot;版面（构成主义经典锐角） */
+.diag-sharp { transform: rotate(73deg); }
+@media (prefers-reduced-motion: no-preference) {
+  .diag-band { transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+}
+</code></pre>
+<ul>
+<li>⚠️ <strong>不要把文字"只想斜着放"就整块旋转</strong>：屏幕阅读器读的是 DOM 顺序，旋转不改变顺序，视觉顺序与阅读顺序不一致会让低视力/放大用户迷失（见 §9）。</li>
+<li>⚠️ <code>transform</code> 会创建 containing block，导致后代 <code>position: fixed</code> 变成相对它定位。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/transform ✅</li>
+</ul>
+<p><strong>兼容性</strong>：<code>transform</code> 为 Baseline Widely available，全绿。</p>
+<h3 id="13-clip-path-polygon">1.3 <code>clip-path: polygon()</code> 的坐标系陷阱（<strong>重点</strong>）<a class="headerlink" href="#13-clip-path-polygon" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">/* 构成主义楔形 / 三角楔 */
+.wedge {
+  clip-path: polygon(0% 100%, 0% 45%, 100% 0%, 100% 100%);
+}
+/* 显式指定参考盒（默认是 border-box！） */
+.wedge-content-box {
+  clip-path: content-box polygon(0% 100%, 0% 45%, 100% 0%, 100% 100%);
+}
+/* 响应式斜切：用 shape()，支持百分比与自定义属性 */
+.wedge-fluid {
+  --cut: 12%;
+  clip-path: shape(from 0% 100%, line to 0% var(--cut), line to 100% 0%, line to 100% 100%, close);
+}
+</code></pre>
+<p><strong>四个真实陷阱</strong>（均由我实测读取的 MDN 文档确认）：</p>
+<ol>
+<li><strong>参考盒默认是 <code>border-box</code>，不是 <code>padding-box</code></strong>。所以 <code>clip-path</code> 的 0%/100% 落在<strong>边框外缘</strong>。要按内容区计算必须写 <code>content-box polygon(...)</code>。
+   - 实测原文（MDN clip-path）："If no geometry box is specified, the <code>border-box</code> will be used as the reference box"；"Percentages refer to reference box when specified, otherwise border-box"。</li>
+<li><strong><code>path()</code> 里的长度是 px，不随元素缩放；<code>shape()</code> 支持百分比</strong>。MDN 明确用示例对比："the path defined with the <code>shape()</code> function grows with the element, whereas the <code>path()</code> version does not"，并称 <code>shape()</code> "more robust"。→ <strong>响应式斜切一律用 <code>shape()</code> 或 <code>polygon()</code>，不要用 <code>path()</code>。</strong></li>
+<li><strong>非 <code>none</code> 的 <code>clip-path</code> 会新建 stacking context</strong>（MDN 原注："A computed value other than <code>none</code> results in the creation of a new stacking context the same way that CSS <code>opacity</code> does"）。这<strong>会截断/改变 <code>mix-blend-mode</code> 的混合范围</strong>，是套印错位失效最常见的原因（见 §6）。</li>
+<li><strong><code>outline</code> 会被一起裁掉 → 键盘焦点不可见</strong>。这是本风格最大的无障碍事故，见 §9。</li>
+</ol>
+<p>另外（CSS-Tricks polygon() 实测原文）：多边形顶点是 <code>x y</code> 空格分隔、逗号分隔点，<strong>至少 3 点</strong>；<code>fill-rule</code> 可选（<code>nonzero</code> 默认 / <code>evenodd</code> 处理自交）；<code>shape-outside</code> 也吃同一套 <code>polygon()</code>，但 <strong><code>path()</code> 和 <code>shape()</code> 不能用于 <code>shape-outside</code></strong>（原文："Neither <code>path()</code> nor <code>shape()</code> can be used with the <code>shape-outside</code> property"）。</p>
+<ul>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/clip-path ✅</li>
+<li>URL：https://css-tricks.com/almanac/functions/p/polygon/ ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/shape-outside ✅</li>
+<li>规范：https://drafts.csswg.org/css-masking/ ✅</li>
+</ul>
+<p><strong>兼容性（MDN BCD 实测）</strong>：<code>clip-path</code> chrome 55（另 23 为前缀实现）/ firefox 3.5 / safari 9.1（另 7 前缀）。<code>shape-outside</code> chrome 37 / firefox 62 / safari 10.1。<code>shape()</code> 函数较新（❓本次未取到 BCD 版本号，用前请查 MDN 该函数的兼容表）。</p>
+<h3 id="14-shape-outside">1.4 <code>shape-outside</code> 让正文绕斜楔排布<a class="headerlink" href="#14-shape-outside" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.wedge-float {
+  float: left;
+  width: 240px; height: 100%;
+  shape-outside: polygon(0% 100%, 0% 45%, 100% 0%, 100% 100%);
+  shape-margin: 1.5rem;          /* 文字与斜边的间距 */
+  clip-path: polygon(0% 100%, 0% 45%, 100% 0%, 100% 100%);
+  background: #D62B1F;
+}
+</code></pre>
+<ul>
+<li>⚠️ 必须 <code>float</code>，且文字只绕<strong>形心的右侧</strong>（CSS-Tricks 原文示例旁注："you can only see the right side of the star because the text only flows around the right side of the shape"）。</li>
+<li>⚠️ 形状若超出<strong>参考盒</strong>（默认 margin-box），文本会退化成绕矩形排。需要用 <code>shape-outside: polygon(...) margin-box</code> 之类的关键词换盒。</li>
+<li>URL：https://css-tricks.com/almanac/properties/s/shape-outside/ ✅</li>
+</ul>
+<h3 id="15-73">1.5 斜向网格（73° 正交双线）<a class="headerlink" href="#15-73" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.diag-grid {
+  background-image:
+    repeating-linear-gradient(73deg,  #111 0 2px, transparent 2px 48px),
+    repeating-linear-gradient(-17deg, #111 0 2px, transparent 2px 48px);
+}
+/* 印刷&quot;出血线/裁切线&quot;：细线 + 大间距 */
+.crop-marks {
+  background-image: repeating-linear-gradient(45deg, rgba(17,17,17,.6) 0 1px, transparent 1px 64px);
+}
+</code></pre>
+<p><code>73deg</code> 与 <code>-17deg</code> 互余（垂直），这是构成主义版面里最常见的锐角网格。
+- URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/gradient/repeating-linear-gradient ✅
+- <strong>兼容性</strong>：<code>css-gradients</code> caniuse 实测 chrome≥100 / safari≥15.4 / firefox≥100 全绿。</p>
+<hr />
+<h2 id="2">2. 巨型无衬线大写标题 + 极端字号对比<a class="headerlink" href="#2" aria-hidden="true">#</a></h2>
+<pre><code class="language-css">:root { --ink:#111; --red:#D62B1F; --paper:#F5F5F0; }
+
+.headline {
+  font-family: &quot;Grotesque Var&quot;, &quot;Noto Sans SC&quot;, system-ui, sans-serif;
+  font-weight: 900;
+  font-stretch: 87.5%;                    /* 可变字体的窄体轴，构成主义要窄 */
+  font-size: clamp(4rem, 18vw, 22rem);    /* 一个词占满整屏 */
+  line-height: 0.84;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;              /* HTML 里保留原大小写！见下 */
+  text-wrap: balance;                     /* 多行标题自动配平 */
+  hanging-punctuation: first last;
+  color: var(--ink);
+}
+/* 去掉大标题上下多余空白，让字真正&quot;贴边&quot; */
+.headline--tight { text-box: trim-both cap alphabetic; }
+
+/* 斜排的巨字块 */
+.headline--diag { transform: rotate(-7deg); }
+</code></pre>
+<p><strong>关键要点</strong></p>
+<ul>
+<li><strong><code>text-transform: uppercase</code> 而不要直接把大写字母写进 HTML</strong>：若 DOM 里就是 <code>ПРОЛЕТАРИИ</code>，部分屏幕阅读器会<strong>逐字母朗读</strong>（"П Р О Л Е Т..."）。视觉大写 + DOM 正常大小写 = 两全。</li>
+<li><code>text-wrap: balance</code> 对<strong>大标题</strong>有效（浏览器只对有限行数生效，通常 ≤6 行）；长正文不要用它（会有性能上限）。<code>text-wrap: pretty</code> 用于避免孤字/寡行。</li>
+<li><code>clamp()</code> 的中间项用 <code>vw</code> 是"一个词占满宽"的正解；配合 <code>overflow-wrap: anywhere</code> 防长西里尔词溢出。</li>
+<li>字号极端对比（<code>22rem</code> 标题 + <code>0.75rem</code> 注解）本身就是构成主义语法，但要保证小字仍 ≥ 16px（移动端）否则不可读。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-wrap-style ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-wrap ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-box-trim ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-variation-settings ✅</li>
+</ul>
+<p><strong>兼容性（实测）</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Chrome</th>
+<th>Firefox</th>
+<th>Safari</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>text-wrap</code>（简写）</td>
+<td>114</td>
+<td>121</td>
+<td>17.4</td>
+</tr>
+<tr>
+<td><code>text-wrap: balance</code></td>
+<td>114</td>
+<td>121</td>
+<td>17.5</td>
+</tr>
+<tr>
+<td><code>text-wrap: pretty</code></td>
+<td>117</td>
+<td><strong>不支持</strong></td>
+<td>26</td>
+</tr>
+<tr>
+<td><code>text-box-trim</code></td>
+<td>133</td>
+<td>154</td>
+<td>18.2</td>
+</tr>
+<tr>
+<td><code>font-variation-settings</code></td>
+<td>62</td>
+<td>62</td>
+<td>11</td>
+</tr>
+</tbody>
+</table></div>
+<p>（<code>text-wrap: balance</code> 的 caniuse 独立数据也一致：chrome≥130 / safari≥17.5 / firefox≥121。）</p>
+<hr />
+<h2 id="3">3. 几何原语：圆、矩形、三角楔、射线、圆环<a class="headerlink" href="#3" aria-hidden="true">#</a></h2>
+<pre><code class="language-css">/* 圆 */
+.disc { aspect-ratio: 1; border-radius: 50%; background: var(--red); }
+
+/* 圆环（构成主义常见&quot;靶心&quot;） */
+.ring {
+  aspect-ratio: 1; border-radius: 50%;
+  border: clamp(8px, 1.6vw, 28px) solid var(--ink);
+  background: transparent;
+}
+
+/* 射线 / 扇形（不用 SVG，纯 CSS） */
+.rays {
+  aspect-ratio: 1; border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, var(--ink) 0deg 6deg, transparent 6deg 14deg);
+}
+
+/* 三角楔（最标志性的符号） */
+.wedge {
+  aspect-ratio: 3 / 4;
+  background: var(--red);
+  clip-path: polygon(0% 100%, 0% 40%, 100% 0%, 100% 100%);
+}
+/* 双楔对撞（El Lissitzky 式） */
+.wedge--pair::after {
+  content: &quot;&quot;; position: absolute; inset: 0;
+  background: var(--ink);
+  clip-path: polygon(100% 0%, 100% 60%, 0% 100%, 0% 0%);
+  mix-blend-mode: multiply;
+}
+</code></pre>
+<ul>
+<li><code>repeating-conic-gradient</code> 做射线比 SVG 省事，但注意 <strong><code>conic-gradient</code> 在圆心处会有可见的像素接缝</strong>，射线类图案常要叠一层 <code>radial-gradient(circle, var(--paper) 0 18%, transparent 18%)</code> 把中心糊掉。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/gradient/conic-gradient ✅</li>
+<li><strong>SVG 描边版</strong>（要做"粗黑描边 + 填充"的几何体）：<code>paint-order: stroke fill</code> 让描边压在填充下方，避免描边吃掉字形/形状。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/paint-order ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/pattern ✅</li>
+</ul>
+<hr />
+<h2 id="4">4. 文字沿斜线 / 竖排 / 沿路径<a class="headerlink" href="#4" aria-hidden="true">#</a></h2>
+<h3 id="41-svg-textpath">4.1 SVG <code>&lt;textPath&gt;</code> 写法要点<a class="headerlink" href="#41-svg-textpath" aria-hidden="true">#</a></h3>
+<pre><code class="language-html">&lt;svg viewBox=&quot;0 0 400 200&quot; role=&quot;img&quot; aria-label=&quot;全世界无产者，联合起来！&quot;&gt;
+  &lt;defs&gt;
+    &lt;!-- 路径一定要放 defs，否则红线会显形 --&gt;
+    &lt;path id=&quot;slash&quot; d=&quot;M0,180 L400,20&quot; fill=&quot;none&quot;/&gt;
+    &lt;path id=&quot;arc&quot;   d=&quot;M40,160 A140,140 0 1,1 360,160&quot; fill=&quot;none&quot;/&gt;
+  &lt;/defs&gt;
+
+  &lt;!-- 沿斜线排字 --&gt;
+  &lt;text fill=&quot;#D62B1F&quot; font-size=&quot;26&quot; font-weight=&quot;900&quot; letter-spacing=&quot;3&quot;&gt;
+    &lt;textPath href=&quot;#slash&quot; startOffset=&quot;0%&quot; side=&quot;left&quot;
+              method=&quot;align&quot; spacing=&quot;auto&quot;&gt;CONSTRUCTIVISM&lt;/textPath&gt;
+  &lt;/text&gt;
+
+  &lt;!-- 文字绕圆 --&gt;
+  &lt;text fill=&quot;#111&quot; font-size=&quot;20&quot; letter-spacing=&quot;6&quot;&gt;
+    &lt;textPath href=&quot;#arc&quot; startOffset=&quot;25%&quot; textLength=&quot;300&quot;
+              lengthAdjust=&quot;spacingAndGlyphs&quot;&gt;PROLETARIANS OF ALL LANDS UNITE&lt;/textPath&gt;
+  &lt;/text&gt;
+&lt;/svg&gt;
+</code></pre>
+<p><strong>要点与陷阱</strong></p>
+<ul>
+<li>用 <strong><code>href</code></strong>（SVG 2），<code>xlink:href</code> 已弃用但仍被旧实现接受。</li>
+<li><code>&lt;path&gt;</code> 放 <code>&lt;defs&gt;</code> 里；<code>fill="none"</code> 只控制填充，<strong>描边仍会画出来</strong>，调试时把 <code>stroke</code> 去掉。</li>
+<li><code>startOffset</code> 支持 <code>%</code> 与 <code>&lt;length&gt;</code>，可动画（MDN 标注 <em>Animatable: yes</em>）。</li>
+<li><code>side="left|right"</code> 让文字跑到路径另一侧；老浏览器只支持"负 <code>startOffset</code> + 反向 path"这种土办法。</li>
+<li><code>textLength</code> + <code>lengthAdjust="spacingAndGlyphs|spacing"</code> 可以<strong>强制把一行字撑满/压进</strong>固定长度 —— 这是构成主义"文字对齐到版心两端"的关键工具。</li>
+<li>⚠️ <strong><code>&lt;textPath&gt;</code> 里的文字不换行、不自动缩放</strong>，超长直接溢出路径末端。</li>
+<li>⚠️ <strong><code>textPath</code> 的文字选择/复制体验差</strong>，屏幕阅读器只把它当图形。可访问做法：<code>&lt;svg role="img" aria-label="…"&gt;</code>，同时<strong>在旁边放一份真实的（可 <code>visually-hidden</code>）文本</strong>给 AT 和搜索引擎。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/textPath ✅</li>
+<li>规范：https://www.w3.org/TR/SVG2/text.html ✅</li>
+</ul>
+<p><strong>兼容性（MDN BCD 实测）</strong>：<code>textPath</code> chrome 1 / firefox 2 / safari 3.1；MDN 页面标注 <strong>Baseline Widely available（跨浏览器自 2015-07 起）</strong>。<code>side</code>、<code>spacing</code>、<code>textLength</code> 的组合支持度参差（MDN 页面标注 "<em> Some parts of this feature may have varying levels of support"）→ </em><em>生产环境用 <code>href</code> + <code>startOffset</code> + <code>textLength</code> 的保守子集</em>*。</p>
+<h3 id="42-css-only">4.2 文字绕圆（CSS-only，逐字路径）<a class="headerlink" href="#42-css-only" aria-hidden="true">#</a></h3>
+<pre><code class="language-html">&lt;p class=&quot;circular&quot; aria-label=&quot;RODCHENKO&quot;&gt;
+  &lt;span style=&quot;--i:0&quot;&gt;R&lt;/span&gt;&lt;span style=&quot;--i:1&quot;&gt;O&lt;/span&gt;…
+&lt;/p&gt;
+</code></pre>
+<pre><code class="language-css">.circular { position: relative; width: 20rem; aspect-ratio: 1; }
+.circular &gt; span {
+  position: absolute; inset: 0; text-align: center;
+  offset-path: circle(8rem at 50% 50%);
+  offset-rotate: 0deg;                        /* 0deg = 字始终正立；auto = 随切线转 */
+  offset-distance: calc(var(--i) * 9%);
+}
+</code></pre>
+<ul>
+<li><code>offset-rotate: auto</code> 让字随圆弧旋转（构成主义贴纸感）；<code>0deg</code> 让字保持正立（海报感）。</li>
+<li>需要 JS 逐字生成 <code>&lt;span&gt;</code> 和 <code>--i</code>；<code>aria-label</code> 保证 AT 读到完整词。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/offset-path ✅</li>
+<li><strong>兼容性（MDN BCD 实测）</strong>：<code>offset-path</code> chrome 55（另 46 为旧名）/ firefox 72 / safari 15.4。</li>
+</ul>
+<h3 id="43">4.3 竖排文字（构成主义边栏的典型手法）<a class="headerlink" href="#43" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;    /* 中文正常，拉丁字母保持横向阅读方向 */
+}
+.vertical--upright { text-orientation: upright; }  /* 全直立，慎用：拉丁字几乎不可读 */
+.vertical--aside { position: absolute; right: 0; top: 0; padding-block: 1rem; letter-spacing: .2em; }
+</code></pre>
+<ul>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/writing-mode ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-orientation ✅</li>
+<li><strong>兼容性（MDN BCD 实测）</strong>：<code>writing-mode</code> chrome 48（旧值 8）/ firefox 41 / safari 10.1（旧值 5.1）；<code>text-orientation</code> chrome 48（旧值 12）/ firefox 41 / safari 14（旧值 5.1）。</li>
+<li>⚠️ <code>writing-mode</code> 会<strong>交换 inline/block 轴</strong>：<code>width/height</code>、<code>margin-top</code>、<code>padding-left</code> 的物理含义全部改变。改用逻辑属性（<code>margin-block</code>、<code>padding-inline</code>、<code>inline-size</code>、<code>block-size</code>）才能不炸。</li>
+<li>⚠️ 竖排拉丁文（<code>upright</code>）的可读性极差，只适合装饰性的短标签。</li>
+<li>⚠️ 竖排时浏览器原生快捷键（Ctrl+F 高亮、选区）可用，但<strong>复制到纯文本编辑器后顺序可能被打乱</strong>。</li>
+</ul>
+<hr />
+<h2 id="5-halftone4">5. 半调网点（Halftone）：4 种做法<a class="headerlink" href="#5-halftone4" aria-hidden="true">#</a></h2>
+<blockquote>
+<p><strong>先说清一个关键区分</strong>，否则方案会做错：
+- <strong>均匀网点 / 印刷网纹（flat screen）</strong>：点径固定，只是"加了一层网"。→ 纯 CSS 可做。
+- <strong>真·半调（tone-dependent halftone）</strong>：<strong>点径随图像明暗变化</strong>。→ 纯 CSS <code>radial-gradient</code> <strong>做不到</strong>（渐变图案是位图平铺，不会响应底图亮度）。必须用 SVG 滤镜、Canvas/WebGL，或预生成的位图 tile。</p>
+</blockquote>
+<h3 id="51-asvg-feturbulence-fecolormatrix">5.1 方法 A：SVG <code>feTurbulence</code> + <code>feColorMatrix</code>（可完美复制，已实测源码）<a class="headerlink" href="#51-asvg-feturbulence-fecolormatrix" aria-hidden="true">#</a></h3>
+<p>这是 CSS-Tricks 那篇 SVG 图案文章里给出的<strong>可直接复制</strong>的 data-URI 写法（我实测抓到了源码原文）：</p>
+<pre><code class="language-css">.grain-screen {
+  background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='filter'%3E%3CfeTurbulence baseFrequency='0.2'/%3E%3CfeColorMatrix values='0 0 0 9 -4 0 0 0 9 -4 0 0 0 9 -4 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23filter)'/%3E%3C/svg%3E%0A&quot;);
+}
+</code></pre>
+<p>同一个 data-URI 也能直接给 <code>&lt;img&gt;</code> 用（原文给了 <code>&lt;img src="data:image/svg+xml,…"&gt;</code> 的等价形式）。
+<code>feColorMatrix</code> 那串 <code>0 0 0 9 -4 …</code> 是<strong>逐通道的线性放大 + 偏置</strong>（×9 再 −4），作用是把 Perlin 噪声的柔和灰度<strong>硬切成几个台阶</strong> → 视觉上就是印刷网点/颗粒。</p>
+<p><strong>硬边色块（posterize / 套印色版）</strong>用 <code>feComponentTransfer</code> 的 <code>discrete</code> 阶梯表（原文源码）：</p>
+<pre><code class="language-html">&lt;feFuncR type=&quot;discrete&quot; tableValues=&quot;0 0 0 0 1 1&quot;/&gt;
+&lt;feFuncG type=&quot;discrete&quot; tableValues=&quot;0 0 0 1 1&quot;/&gt;
+&lt;feFuncB type=&quot;discrete&quot; tableValues=&quot;0 1&quot;/&gt;
+</code></pre>
+<p>这会把连续噪声切成 R/G/B 各自有限档位的色块 —— <strong>红/黑/白三色印刷的"色版分离"感就是这么来的</strong>。</p>
+<ul>
+<li>URL：https://css-tricks.com/creating-patterns-with-svg-filters/ ✅（作者 Bence Szabó）</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feTurbulence ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feColorMatrix ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feComponentTransfer ✅</li>
+<li><strong>兼容性（MDN BCD 实测）</strong>：<code>feTurbulence</code> chrome 5 / firefox 3 / safari 6；<code>feColorMatrix</code> chrome 5 / firefox 3 / safari 6。<code>svg-filters</code> caniuse 实测 chrome≥10 / safari≥10 / firefox≥10。</li>
+<li>⚠️ <strong>Safari 实测 bug（该文作者亲测）</strong>：用 <code>&lt;radialGradient spreadMethod="repeat"&gt;</code> 做重复圆形图案时，<strong>Safari 会把它当成 <code>spreadMethod="pad"</code></strong>（Chrome/Firefox 正常）→ 重复类图案<strong>不要用 SVG <code>radialGradient</code> 的 repeat</strong>，改用 CSS <code>repeating-radial-gradient</code> 或 <code>&lt;pattern&gt;</code>。</li>
+<li>⚠️ <strong>Firefox 实测 bug</strong>：全屏（Fullscreen API）时 Firefox <strong>不渲染视口扩展区域里的 SVG</strong>，Chrome/Safari 正常。</li>
+</ul>
+<h3 id="52-brepeating-radial-gradient-mask">5.2 方法 B：<code>repeating-radial-gradient</code> 点阵 + <code>mask</code> 作用到图片<a class="headerlink" href="#52-brepeating-radial-gradient-mask" aria-hidden="true">#</a></h3>
+<p><strong>B-1 均匀网点覆盖层</strong>（加在照片上做"报纸印刷"感）：</p>
+<pre><code class="language-css">.halftone-overlay {
+  position: absolute; inset: 0;
+  pointer-events: none;                  /* 必须：否则挡点击 */
+  background-image: radial-gradient(circle at 50% 50%, #000 38%, transparent 39%);
+  background-size: 8px 8px;              /* 点距 = 8px（印刷网点 pitch） */
+  background-repeat: repeat;
+  opacity: .35;
+  mix-blend-mode: multiply;
+}
+</code></pre>
+<p><strong>B-2 四色套印角度（模拟 CMYK 各色版的网点角度差）</strong>：</p>
+<pre><code class="language-css">.halftone-cmyk {
+  background-image:
+    radial-gradient(circle at 50% 50%, #111 30%, transparent 31%),
+    radial-gradient(circle at 50% 50%, #111 30%, transparent 31%);
+  background-size: 9px 9px, 9px 9px;
+  background-position: 0 0, 4.5px 4.5px;   /* 半格错位 = 套印不准 */
+}
+</code></pre>
+<p><strong>B-3 把网点当 <code>mask</code> 作用到 <code>&lt;img&gt;</code> 上</strong>（真正的"图变成网点图"）：</p>
+<pre><code class="language-css">.photo {
+  mask-image: radial-gradient(circle at 50% 50%, #000 42%, transparent 43%);
+  mask-size: 6px 6px;
+  mask-repeat: repeat;
+  mask-mode: alpha;        /* 默认 match-source；显式写更稳 */
+}
+/* 多层 mask 的合成规则（点阵 ∩ 渐隐） */
+.photo--fade {
+  mask-image: radial-gradient(circle, #000 42%, transparent 43%), linear-gradient(#000, transparent);
+  mask-size: 6px 6px, 100% 100%;
+  mask-repeat: repeat, no-repeat;
+  mask-composite: intersect;
+}
+</code></pre>
+<ul>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/gradient/repeating-radial-gradient ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/mask-image ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/mask-composite ✅</li>
+<li><strong>兼容性（MDN BCD 实测，这是本方案最容易踩坑的一项）</strong>：</li>
+<li><code>mask-image</code> chrome <strong>120</strong>（另 1 为 <code>-webkit-</code> 时代）/ firefox 53 / safari <strong>15.4</strong>（另 4 为前缀）</li>
+<li><code>mask</code>（简写）chrome 120 / firefox 53 / safari 15.4</li>
+<li>caniuse <code>css-masks</code> 实测：chrome≥120 / safari≥15.4 / firefox≥100</li>
+<li>→ <strong>要覆盖 Safari 15.4 以下，必须写 <code>-webkit-mask-image</code> 等前缀长属性</strong>；写前缀时<strong>不要</strong>依赖 <code>mask</code> 简写。</li>
+<li>⚠️ ⚠️ <strong>最重要的一条</strong>：<code>mask-image: radial-gradient(...)</code> 只在<strong>固定 pitch 的图案</strong>上有效。<strong>它不会让点径随照片明暗变化</strong> —— 均匀网点 = 假半调。要"暗处点大、亮处点小"，见 5.4。</li>
+</ul>
+<h3 id="53-c-svg-pattern-tile-mask-background">5.3 方法 C：位图 / SVG <code>&lt;pattern&gt;</code> tile 当 mask 或 background<a class="headerlink" href="#53-c-svg-pattern-tile-mask-background" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.paper-dot {
+  background-image: url(&quot;./dot-8x8.png&quot;);        /* 8×8 无缝网点 tile */
+  background-size: 8px 8px;
+  background-repeat: repeat;
+}
+.photo-bitmap-mask {
+  -webkit-mask-image: url(&quot;./dot-8x8.png&quot;);
+          mask-image: url(&quot;./dot-8x8.png&quot;);
+  -webkit-mask-size: 6px 6px;
+          mask-size: 6px 6px;
+  -webkit-mask-repeat: repeat;
+          mask-repeat: repeat;
+}
+</code></pre>
+<ul>
+<li><code>mask-mode</code> 的关键差别：<strong><code>alpha</code></strong> 用 tile 的不透明度通道（PNG 透明圆点 → 直接用）；<strong><code>luminance</code></strong> 用亮度（黑白 tile，白=显示、黑=遮住）。用错模式会得到"整块消失"或"完全没有效果"。</li>
+<li>用 <code>&lt;pattern&gt;</code> 在 SVG 内做 tile（比 <code>radialGradient spreadMethod="repeat"</code> 可靠，规避 §5.1 的 Safari bug）：</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/pattern ✅</li>
+<li><strong>性能</strong>：位图 tile 是<strong>最省</strong>的方案（浏览器只做一次纹理采样平铺）；SVG 滤镜是<strong>最贵</strong>的（每帧/每次重绘都要重算）。要做全屏常驻网点层，优先 tile。</li>
+</ul>
+<h3 id="54-d">5.4 方法 D：真·半调（点径随明暗变化）<a class="headerlink" href="#54-d" aria-hidden="true">#</a></h3>
+<p><strong>纯 CSS 做不到</strong>，两条可行路径：</p>
+<p><strong>(1) Canvas 逐格计算</strong>（完全可控，可导出 PNG 缓存）：</p>
+<pre><code class="language-js">function halftone(img, cell = 8, ink = '#111') {
+  const c = document.createElement('canvas');
+  const ctx = c.getContext('2d');
+  c.width = img.naturalWidth; c.height = img.naturalHeight;
+  ctx.drawImage(img, 0, 0);
+  const src = ctx.getImageData(0, 0, c.width, c.height).data;   // RGBA
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); // 纸白
+  ctx.fillStyle = ink;
+  for (let y = 0; y &lt; c.height; y += cell) {
+    for (let x = 0; x &lt; c.width; x += cell) {
+      let sum = 0, n = 0;
+      for (let j = 0; j &lt; cell; j++) for (let i = 0; i &lt; cell; i++) {
+        const k = ((y + j) * c.width + (x + i)) * 4;
+        if (k + 2 &gt;= src.length) continue;
+        sum += 0.2126 * src[k] + 0.7152 * src[k + 1] + 0.0722 * src[k + 2];
+        n++;
+      }
+      const lum = n ? sum / n / 255 : 1;        // 0 = 黑, 1 = 白
+      const r = (1 - lum) * cell * 0.72;        // 越暗 → 点越大
+      if (r &lt;= 0.2) continue;
+      ctx.beginPath();
+      ctx.arc(x + cell / 2, y + cell / 2, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  return c;   // 再 c.toBlob() 缓存成 WebP，避免每次重算
+}
+</code></pre>
+<ul>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData ✅</li>
+<li>⚠️ 必须处理 <strong>CORS</strong>（跨域图片会让 canvas 变成 tainted，<code>getImageData</code> 抛 SecurityError）→ 图片加 <code>crossorigin="anonymous"</code>。</li>
+<li>⚠️ <strong>不要在滚动/resize 时实时跑</strong>：<code>getImageData</code> 是同步的、主线程阻塞操作。跑一次 → <code>toBlob()</code> 出 WebP → 之后只用位图。</li>
+</ul>
+<p><strong>(2) SVG 滤镜链</strong>：<code>feImage</code>/<code>feTile</code> 生成网点 tile + <code>feMorphology</code>（膨胀/腐蚀改变点径）+ <code>feComponentTransfer</code> 做阈值。
+- URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feTile ✅
+- URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feMorphology ✅
+- URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feDisplacementMap ✅
+- <strong>❓ 诚实说明</strong>：我尝试核实的两处"SVG 滤镜做照片半调"的教程来源（<code>stackoverflow.com/questions/76079382/halftone-image-effect-with-svg-filters</code>、CodePen 上的若干 demo）在本会话中对自动化请求均返回 <strong>403</strong>，我<strong>没有</strong>取得可验证的完整实现代码。因此本条的 SVG 滤镜链我<strong>只给原语清单，不给承诺可用的代码</strong>——请以 Canvas 方案（已验证可写对）为默认。</p>
+<h3 id="55">5.5 半调层的通用工程约定<a class="headerlink" href="#55" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.halftone-layer {
+  position: absolute; inset: 0;
+  z-index: 1;
+  pointer-events: none;          /* 绝不挡交互 */
+  opacity: .25;                  /* 5%–15% 用于&quot;颗粒&quot;，网点可到 25%–40% */
+  mix-blend-mode: multiply;      /* 印刷叠印 = multiply */
+}
+/* 新栈 → 把混合关在本组件内，不污染页面背景 */
+.halftone-scope { isolation: isolate; position: relative; }
+</code></pre>
+<hr />
+<h2 id="6-misregistration-chromatic-offset">6. 套印错位 / 色差偏移（misregistration / chromatic offset）<a class="headerlink" href="#6-misregistration-chromatic-offset" aria-hidden="true">#</a></h2>
+<h3 id="61-text-shadow-at">6.1 方法一：<code>text-shadow</code> 三色偏移（最省、最安全、不影响 AT）<a class="headerlink" href="#61-text-shadow-at" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.misreg {
+  color: #111;
+  text-shadow:
+     2.5px  0    0 rgba(214, 43, 31, .85),   /* 红版右偏 */
+    -2.5px  0    0 rgba(0,  81, 214, .55),   /* 青版左偏 */
+     0      3px  0 rgba(245, 225, 35, .60),  /* 黄版下偏 */
+     0.5px -1px  0 rgba(17, 17, 17,  .35);   /* 黑版微偏，增&quot;脏&quot;感 */
+}
+.misreg--loud { text-shadow: 4px 0 0 #D62B1F, -4px 0 0 #0051D6; }
+</code></pre>
+<ul>
+<li>优点：<code>text-shadow</code> <strong>不会被屏幕阅读器朗读</strong>，也不产生重复文本节点 → 这是<strong>唯一"零无障碍代价"的错位做法</strong>。</li>
+<li>缺点：<code>text-shadow</code> <strong>不参与混合</strong>（按 <code>normal</code> 合成），所以做不出真正的 <code>multiply</code> 叠印变暗效果。要叠印变暗必须用 6.2/6.3。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/text-shadow ✅</li>
+<li><strong>兼容性</strong>：<code>css-textshadow</code> caniuse 实测 chrome≥10 / safari≥10 / firefox≥10（全绿，最安全）。</li>
+</ul>
+<h3 id="62-mix-blend-mode">6.2 方法二：伪元素 + <code>mix-blend-mode</code>（真叠印）<a class="headerlink" href="#62-mix-blend-mode" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.misreg-blend {
+  position: relative;
+  color: #111;
+  isolation: isolate;              /* ← 关键：把混合关在本元素内 */
+}
+.misreg-blend span[aria-hidden=&quot;true&quot;] {
+  position: absolute; inset: 0;
+  color: #D62B1F;
+  mix-blend-mode: multiply;
+  transform: translate(3px, -2px);
+}
+</code></pre>
+<pre><code class="language-html">&lt;h2 class=&quot;misreg-blend&quot;&gt;ПРОЛЕТАРИИ&lt;span aria-hidden=&quot;true&quot;&gt;ПРОЛЕТАРИИ&lt;/span&gt;&lt;/h2&gt;
+</code></pre>
+<p><strong><code>mix-blend-mode</code> 与 <code>isolation</code> 的坑（这是本节的核心）</strong></p>
+<ol>
+<li><code>mix-blend-mode</code> 混合的是<strong>同一 stacking context 内、元素背后的内容</strong>（MDN 原文："blends the element with content <em>behind</em> it in the stacking context"）。
+   → 若不隔离，红色版会<strong>一路混到 <code>&lt;body&gt;</code> 的背景色</strong>上，颜色完全失控。</li>
+<li><strong><code>isolation: isolate</code> 是最干净的解法</strong>：它新建一个 stacking context，把混合范围锁在组件内。
+   - URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/isolation ✅
+   - 兼容性（MDN BCD 实测）：chrome 41 / firefox 36 / safari 8。
+   - CSS-Tricks 那篇 grainy gradients 文章用同一手法并有可交互的 Pen 演示"注释掉 isolation 会怎样"（我实测抓到了这段说明）。</li>
+<li><strong>⚠️ 很多属性会"顺手"新建 stacking context，从而意外切断或改变混合范围</strong>：<code>opacity &lt; 1</code>、<code>transform</code>、<code>filter</code>、<code>clip-path</code>（≠none）、<code>mask</code>、<code>will-change</code>、<code>contain: paint</code>、<code>position: fixed/sticky</code>。<strong>在构成主义页面里 <code>transform: rotate()</code> 和 <code>clip-path</code> 到处都是 → 混合范围会被切得七零八落</strong>，这是"明明写了 multiply 却没变暗"的头号原因。</li>
+<li>⚠️ <strong>不能用伪元素 <code>content: attr(data-text)</code> 做第二层</strong>：部分屏幕阅读器会把伪元素内容读出来 → 标题被念两遍。<strong>用真实的 <code>&lt;span aria-hidden="true"&gt;</code></strong>（如上例）。</li>
+<li>⚠️ <strong>Blink 与 WebKit 对 <code>mix-blend-mode</code> 的实现存在可见差异</strong>（CSS-Tricks 原文作者原话：他不得不用浏览器专属媒体查询做微调）→ 错位量不要卡在临界值，留 ±1px 冗余。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/mix-blend-mode ✅
+   - 该页 MDN 标注 <strong>Baseline Widely available，跨浏览器自 2020-01 起</strong>；<code>plus-lighter</code> / <code>plus-darker</code> 为 <code>mix-blend-mode</code> 的补充值（"Some parts of this feature may have varying levels of support"）。</li>
+</ol>
+<h3 id="63-svg">6.3 方法三：SVG 滤镜做真错位 + 加色/减色混合<a class="headerlink" href="#63-svg" aria-hidden="true">#</a></h3>
+<pre><code class="language-html">&lt;svg width=&quot;0&quot; height=&quot;0&quot; aria-hidden=&quot;true&quot; focusable=&quot;false&quot;&gt;
+  &lt;filter id=&quot;misreg-filter&quot;
+          x=&quot;-20%&quot; y=&quot;-20%&quot; width=&quot;140%&quot; height=&quot;140%&quot;      &lt;!-- 必须放大滤镜区域！ --&gt;
+          color-interpolation-filters=&quot;sRGB&quot;&gt;               &lt;!-- 默认 linearRGB 会让红色发灰 --&gt;
+    &lt;feOffset in=&quot;SourceGraphic&quot; dx=&quot;4&quot; dy=&quot;-3&quot; result=&quot;r&quot;/&gt;
+    &lt;feColorMatrix in=&quot;r&quot; type=&quot;matrix&quot;
+      values=&quot;1 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 1 0&quot; result=&quot;redOnly&quot;/&gt;
+    &lt;feOffset in=&quot;SourceGraphic&quot; dx=&quot;-4&quot; dy=&quot;3&quot; result=&quot;c&quot;/&gt;
+    &lt;feColorMatrix in=&quot;c&quot; type=&quot;matrix&quot;
+      values=&quot;0 0 0 0 0   0 0 0 0 0   0 0 1 0 0   0 0 0 1 0&quot; result=&quot;cyanOnly&quot;/&gt;
+    &lt;feBlend in=&quot;redOnly&quot; in2=&quot;cyanOnly&quot; mode=&quot;multiply&quot; result=&quot;misreg&quot;/&gt;
+    &lt;feMerge&gt;
+      &lt;feMergeNode in=&quot;misreg&quot;/&gt;
+      &lt;feMergeNode in=&quot;SourceGraphic&quot;/&gt;
+    &lt;/feMerge&gt;
+  &lt;/filter&gt;
+&lt;/svg&gt;
+</code></pre>
+<pre><code class="language-css">.misreg-svg { filter: url(#misreg-filter); }
+</code></pre>
+<p><strong>三个真实陷阱</strong></p>
+<ol>
+<li><strong>滤镜区域（filter region）默认只有 <code>-10% -10% 120% 120%</code></strong>，偏移量稍大就被裁掉 → 必须显式写 <code>x/y/width/height</code>。</li>
+<li><strong><code>color-interpolation-filters</code> 默认是 <code>linearRGB</code></strong>，做红/青偏移时颜色会明显发灰发暗，和 <code>text-shadow</code> 的结果对不上 → 印刷感要显式设 <code>sRGB</code>。</li>
+<li><strong><code>filter: url(#id)</code> 引用同文档内联 SVG 是可行的，但历史上有限制</strong>：CSS-Tricks 那篇文章提到"用 id 在 CSS 里引用外部 SVG 文件对某些怪原因不工作"——<strong>外部 <code>.svg</code> 文件里的滤镜用 <code>url(file.svg#id)</code> 引用在各浏览器上行为不一致</strong>；把 <code>&lt;svg&gt;</code> 内联进 HTML 是可靠做法。另外在部分场景下引用 SVG 滤镜还会受 <strong>CORS</strong> 影响。
+- URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/filter ✅
+- URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/filter ✅
+- <strong>兼容性（MDN BCD 实测）</strong>：<code>filter</code> chrome 53（旧值 18）/ firefox 35（旧值 49 为 <code>-moz-</code>）/ safari 9.1（旧值 6）。<code>css-filters</code> caniuse 实测 chrome≥100 / safari≥10 / firefox≥100。
+- <code>backdrop-filter</code>（做"印刷版偏移的毛玻璃"）：chrome 76 / firefox 103 / <strong>safari 18</strong>（含 9 为 <code>-webkit-</code>）—— iOS 长期只有 <code>-webkit-backdrop-filter</code>。</li>
+</ol>
+<hr />
+<h2 id="7">7. 纸张颗粒 / 印刷脏感 / 叠印混合<a class="headerlink" href="#7" aria-hidden="true">#</a></h2>
+<h3 id="71-feturbulence-data-uri">7.1 <code>feTurbulence</code> 内联为 data-URI 背景（可直接复制，已实测源码）<a class="headerlink" href="#71-feturbulence-data-uri" aria-hidden="true">#</a></h3>
+<p>这是 ibelick 那篇文章里的完整可复制写法（我实测抓到了源码原文）：</p>
+<pre><code class="language-css">.card { position: relative; overflow: hidden; }
+.card::before {
+  content: &quot;&quot;;
+  position: absolute;
+  inset: 0;                          /* 原文用 top/left + width/height:100%，等效 */
+  background-color: transparent;
+  background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)'/%3E%3C/svg%3E&quot;);
+  background-repeat: repeat;
+  background-size: 182px;            /* 决定颗粒尺度 */
+  opacity: 0.12;                     /* 原文说 0.1；实践 5%–15% */
+  pointer-events: none;              /* ← 我补的：避免挡交互 */
+}
+.card-content { position: relative; z-index: 1; }
+</code></pre>
+<p><strong>URL 编码的坑（逐条对应上面那串）</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字符</th>
+<th>必须编码为</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>#</code></td>
+<td><code>%23</code></td>
+<td><strong>最容易忘</strong>：<code>url(%23a)</code> 对应 <code>id='a'</code>，写成 <code>#a</code> 会被当 fragment 截断，整个滤镜失效</td>
+</tr>
+<tr>
+<td><code>%</code></td>
+<td><code>%25</code></td>
+<td>所以 <code>width='100%'</code> → <code>width='100%25'</code></td>
+</tr>
+<tr>
+<td><code>&lt;</code> <code>&gt;</code></td>
+<td><code>%3C</code> <code>%3E</code></td>
+<td>不编码在多数浏览器也能跑，但会破坏 HTML 属性引号解析</td>
+</tr>
+<tr>
+<td><code>"</code></td>
+<td><code>'</code></td>
+<td>用单引号包裹 SVG 内部属性，外层用双引号</td>
+</tr>
+<tr>
+<td>换行/空格</td>
+<td>可保留首尾空格</td>
+<td>建议 <code>...%3C/svg%3E%0A</code> 收尾</td>
+</tr>
+</tbody>
+</table></div>
+<p>用工具生成：作者推荐的编码器是 <strong>https://yoksel.github.io/url-encoder/</strong>（来自原文链接，本次未单独实测该工具页）。</p>
+<ul>
+<li>URL：https://ibelick.com/blog/create-grainy-backgrounds-with-css ✅</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/feTurbulence ✅</li>
+</ul>
+<h3 id="72-grainy-gradients">7.2 "Grainy Gradients"：把噪点提纯（已实测）<a class="headerlink" href="#72-grainy-gradients" aria-hidden="true">#</a></h3>
+<p>CSS-Tricks 那篇的思路与关键代码（我实测读到全文）：</p>
+<pre><code class="language-css">.noise {
+  background:
+    linear-gradient(to right, blue, transparent),
+    url(https://…/noise.svg);          /* 顺序有意义：渐变在上，噪点在下 */
+  filter: contrast(170%) brightness(1000%);   /* 把混沌灰阶推成黑/白颗粒 */
+}
+</code></pre>
+<p>原文的三个关键提示：</p>
+<ol>
+<li><strong>顺序有意义</strong>（"Order matters here."）—— 上层渐变末端要 <code>transparent</code>，噪点才能透出来。</li>
+<li><strong><code>filter: contrast(170%) brightness(1000%)</code></strong> 是"把噪点提纯"的核心；但这个 <code>filter</code> 会作用于整个元素，<strong>连渐变色也被改掉</strong>（原文明确警告）。</li>
+<li><strong><code>isolation</code></strong>：原文用 <code>.isolate { isolation: isolate; }</code> 包住两层，并直接演示"<strong>注释掉这行，渐变与覆盖层就会和背景色混合</strong>"。</li>
+<li>原文还提到：噪点里的"彩色雪花"可以用 <code>mix-blend-mode</code> / <code>background-blend-mode</code> 滤掉。</li>
+<li>浏览器支持（原文给出的 caniuse 表）：<strong>SVG 作为 CSS 背景</strong> chrome 5 / firefox 24 / safari 5 / edge 16；<strong>CSS filter effects</strong> chrome 18 / firefox 35 / safari 6 / edge 79（IE 不支持）。原文称"本技术核心在所有现代浏览器都支持，IE 除外"。
+- URL：https://css-tricks.com/grainy-gradients/ ✅</li>
+</ol>
+<p><strong>同一个页面外链的"性能"参考</strong>：《SVG Runtime Performance》被原文列为性能优化阅读材料（❓该文我未单独实测，故不列 URL）。</p>
+<h3 id="73-background-blend-mode">7.3 <code>background-blend-mode</code> 叠纸张纹理<a class="headerlink" href="#73-background-blend-mode" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">.paper {
+  background-color: #F5F5F0;
+  background-image: url(&quot;./paper-fiber.png&quot;);
+  background-size: 512px;
+  background-blend-mode: multiply;      /* 纹理 × 底色 */
+}
+/* 多层背景各自指定混合模式（逗号分隔，顺序对应） */
+.paper--rich {
+  background-image: url(&quot;./fiber.png&quot;), linear-gradient(160deg, #fff, #E8E6DC);
+  background-blend-mode: multiply, normal;
+}
+</code></pre>
+<ul>
+<li><strong>核心坑（MDN 首页就直接点名）</strong>：<code>background-blend-mode</code> 只混合<strong>元素自己的多层背景</strong>；<code>mix-blend-mode</code> 才是与<strong>背后内容</strong>混合。MDN 原文："To blend an element's own background layers with each other, use <code>background-blend-mode</code> instead."
+  → <strong>纸纹想让文字也"压"进纸里，必须用 <code>mix-blend-mode</code>（配 <code>isolation</code>），<code>background-blend-mode</code> 做不到。</strong></li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/background-blend-mode ✅</li>
+<li>兼容性（MDN BCD 实测）：chrome 35 / firefox 30 / safari 8；caniuse <code>css-backgroundblendmode</code> 实测 chrome≥100 / safari≥10.1 / firefox≥100。</li>
+</ul>
+<h3 id="74">7.4 颗粒的性能注意点（这是最容易被忽略的一节）<a class="headerlink" href="#74" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>做法</th>
+<th>成本</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>内联 SVG <code>feTurbulence</code> data-URI 背景（矢量、随尺寸重算）</td>
+<td><strong>高</strong>：每次重绘/缩放/滚动合成都要重新光栅化滤镜</td>
+<td>只用于<strong>小面积</strong>组件；<code>background-size</code> 固定为 px，别用 <code>%</code>/<code>cover</code></td>
+</tr>
+<tr>
+<td>PNG/WebP <strong>无缝噪点 tile</strong></td>
+<td><strong>低</strong>：一次性纹理，平铺走 GPU</td>
+<td><strong>全屏常驻颗粒层一律用这个</strong></td>
+</tr>
+<tr>
+<td><code>filter: contrast() brightness()</code> 提纯</td>
+<td>中：整个元素参与滤镜链</td>
+<td>别放在会被动画/滚动的容器上</td>
+</tr>
+<tr>
+<td>CSS 渐变（多色停点）造假噪点</td>
+<td>低（但效果差）</td>
+<td>仅作降级方案</td>
+</tr>
+</tbody>
+</table></div>
+<p>其它必须注意：</p>
+<ul>
+<li>全屏颗粒层：<code>position: fixed; inset: 0; pointer-events: none; z-index: 9999;</code>，并且<strong>不要</strong>加 <code>background-attachment: fixed</code>（移动端会强制全屏重绘，掉帧明显）。</li>
+<li>大范围 <code>filter</code> 会强制提升为合成层，注意 <code>will-change</code> 滥用会导致显存爆掉；用完就移除。</li>
+<li><code>contain: paint</code> / <code>content-visibility</code> 可以把滤镜重算锁在局部。</li>
+<li><strong><code>prefers-reduced-transparency</code></strong>（chrome 118 / firefox 113 / <strong>safari 不支持</strong>）可用来关掉胶片颗粒：
+  <code>css
+  @media (prefers-reduced-transparency: reduce) { .grain { display: none; } }</code></li>
+<li>透明度经验值 <strong>5%–15%</strong>（来自我实测抓到的 2026 年趋势文章建议），并且该文明确要求 <code>pointer-events: none</code>。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/background-blend-mode ✅</li>
+<li>URL（趋势与约定来源）：https://www.wetch.co.jp/ai/2026/08/06/%e3%82%b0%e3%83%ac%e3%82%a4%e3%83%b3%e3%81%a8%e5%b7%a8%e5%a4%a7%e3%82%bf%e3%82%a4%e3%83%9d%e3%81%a7%e4%ba%ba%e9%96%93%e3%82%89%e3%81%97%e3%81%95%e3%82%92%e5%87%ba%e3%81%99%e2%94%80/ ✅</li>
+</ul>
+<hr />
+<h2 id="8">8. 硬边、零圆角、粗描边<a class="headerlink" href="#8" aria-hidden="true">#</a></h2>
+<pre><code class="language-css">:root { --ink:#111; --red:#D62B1F; }
+
+/* 1) 防御性归零：比在几十个组件里改 border-radius 可靠 */
+*, *::before, *::after { border-radius: 0; }
+
+/* 2) 原生控件才是圆角的真凶 */
+button, input, select, textarea { appearance: none; border-radius: 0; }
+
+/* 3) 粗黑描边 + 硬阴影（构成主义&quot;贴纸&quot;感） */
+.sticker {
+  border: 6px solid var(--ink);
+  box-shadow: 14px 14px 0 0 var(--red);   /* 硬阴影：零 blur 零 spread 过渡 */
+  background: var(--paper);
+}
+
+/* 4) 粗线分隔（用元素而不是 border，便于动画与 grid 控制） */
+.rule { height: 10px; background: var(--ink); border: 0; }
+.rule--thin { height: 3px; }
+.rule--double { height: 14px; background: linear-gradient(var(--ink) 0 5px, transparent 5px 9px, var(--ink) 9px 14px); }
+</code></pre>
+<p><strong>关键陷阱</strong>：<strong><code>clip-path</code> 会把 <code>border</code> 一起裁掉！</strong> 所以 §1.3 的楔形<strong>不能</strong>同时加 <code>border</code> 来描边。三条出路：</p>
+<ol>
+<li><strong>双层</strong>：底层元素加 <code>clip-path</code> 并给底色（充当描边色），上层元素 <code>clip-path</code> 缩进几像素（在 <code>polygon()</code> 里把坐标内缩）。</li>
+<li><strong><code>filter: drop-shadow()</code></strong>：<code>filter: drop-shadow(0 0 0 var(--ink))</code> 不是描边；真要描边得叠多个方向的 drop-shadow（成本高）。</li>
+<li><strong>用 SVG 画</strong>：<code>&lt;polygon&gt;</code> + <code>stroke-width</code> + <code>paint-order: stroke fill</code>（让描边画在填充下面，避免描边吃掉尖角）。
+   - URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/paint-order ✅</li>
+</ol>
+<p>其它：</p>
+<ul>
+<li>粗描边 + <code>box-shadow</code> 硬阴影是本风格最"对味"的组合，但<strong>硬阴影不参与 <code>mix-blend-mode</code> 的分层</strong>（它在元素自己的绘制里）→ 要做"阴影也参与叠印"，用伪元素画实心块再 <code>mix-blend-mode</code>。</li>
+<li><code>outline</code> 在 <code>clip-path</code> 元素上会被裁掉 → 焦点样式见 §9。</li>
+</ul>
+<hr />
+<h2 id="9">9. 无障碍与可用性警告（这套风格踩坑最多的地方）<a class="headerlink" href="#9" aria-hidden="true">#</a></h2>
+<h3 id="91-wcag-wcag-2x">9.1 红黑对比度：<strong>实测 WCAG 对比度表</strong>（我用 WCAG 2.x 相对亮度公式真实计算）<a class="headerlink" href="#91-wcag-wcag-2x" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>前景色</th>
+<th>on <code>#FFFFFF</code></th>
+<th>on <code>#000000</code></th>
+<th>on 纸白 <code>#F5F5F0</code></th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>#FF0000</code>（纯红）</td>
+<td><strong>4.00</strong></td>
+<td>5.25</td>
+<td>3.66</td>
+<td>⚠️ 白底<strong>正常字号不过 AA</strong>；仅大字（≥24px/18.66px bold，3:1）可用</td>
+</tr>
+<tr>
+<td><code>#D62B1F</code></td>
+<td><strong>4.97</strong></td>
+<td>4.22</td>
+<td>4.55</td>
+<td>✅ 白底过 AA 正常字号；黑底仅大字</td>
+</tr>
+<tr>
+<td><code>#E4001C</code></td>
+<td><strong>4.87</strong></td>
+<td>4.32</td>
+<td>4.45</td>
+<td>✅ 白底过 AA；黑底仅大字</td>
+</tr>
+<tr>
+<td><code>#DB3509</code></td>
+<td>4.64</td>
+<td><strong>4.53</strong></td>
+<td>4.24</td>
+<td>✅ 两边都擦线过 AA（余量极小）</td>
+</tr>
+<tr>
+<td><code>#D13309</code></td>
+<td>5.01</td>
+<td>4.19</td>
+<td>4.58</td>
+<td>✅ 白底安全</td>
+</tr>
+<tr>
+<td><code>#ED1C24</code></td>
+<td>4.38</td>
+<td><strong>4.79</strong></td>
+<td>4.01</td>
+<td>⚠️ 白底<strong>不过</strong> AA，黑底过</td>
+</tr>
+<tr>
+<td><code>#C8102E</code></td>
+<td><strong>5.88</strong></td>
+<td>3.57</td>
+<td>5.38</td>
+<td>✅ 白底最佳（推荐作主红）</td>
+</tr>
+<tr>
+<td><code>#AD2A07</code></td>
+<td><strong>6.75</strong></td>
+<td>3.11</td>
+<td>6.17</td>
+<td>✅ 白底最优</td>
+</tr>
+<tr>
+<td><code>#E90702</code></td>
+<td>4.67</td>
+<td>4.50</td>
+<td>4.27</td>
+<td>✅ 擦线过</td>
+</tr>
+<tr>
+<td><code>#FF6542</code></td>
+<td><strong>2.92</strong></td>
+<td><strong>7.19</strong></td>
+<td>2.67</td>
+<td>❌ 白底连大字都不过；黑底极好</td>
+</tr>
+<tr>
+<td><code>#111</code> 墨黑 on 白</td>
+<td><strong>21.0</strong>（纯黑）/ <code>#111</code>…</td>
+<td>—</td>
+<td>—</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>#1A1A1A</code> on 白</td>
+<td>17.4</td>
+<td>—</td>
+<td>—</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>#0051D6</code> 蓝 on 白</td>
+<td>6.67</td>
+<td>—</td>
+<td>—</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>白字 on <code>#D62B1F</code></td>
+<td>4.97</td>
+<td>—</td>
+<td>—</td>
+<td>✅ AA 正常字号</td>
+</tr>
+<tr>
+<td>黑 on <code>#F5E123</code> 黄</td>
+<td><strong>15.68</strong></td>
+<td>—</td>
+<td>—</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>结论与强制约束</strong></p>
+<ol>
+<li><strong>主红请用 <code>#C8102E</code> 或 <code>#AD2A07</code></strong>（白底 5.88 / 6.75）。<strong>不要用纯 <code>#FF0000</code> 做白底正文</strong>（4.00 不过 AA）。</li>
+<li>红底白字是这套设计最常用的组合（<code>#D62B1F</code> 上白字 = 4.97 ✅），但<strong>红底上用黑字要重算</strong>（<code>#D62B1F</code> 上黑字 = 4.22 → 正常字号不过）。</li>
+<li><strong>红 + 黑 + 白三色里，"红"不能作为唯一的信息载体</strong>（例如"红色=错误/必读"）：色盲用户 + 高对比模式会把红压成黑。必须配形状/图标/下划线/文字标签。</li>
+<li>WCAG 2.2 对<strong>非文本对比度</strong>（UI 组件、图形）要求 3:1 —— 粗黑描边做视觉分隔时，线条颜色也要过 3:1。
+- URL：https://www.w3.org/TR/WCAG22/ ✅
+- URL：https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html ✅
+- URL：https://developer.mozilla.org/en-US/docs/Web/Accessibility/Guides/Colors_and_Luminance ✅
+- URL：https://developer.mozilla.org/en-US/docs/Web/Accessibility/Guides/Understanding_WCAG/Perceivable/Color_contrast ✅</li>
+</ol>
+<h3 id="92-prefers-reduced-motion">9.2 <code>prefers-reduced-motion</code> 对动效的处理<a class="headerlink" href="#92-prefers-reduced-motion" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">/* 默认样式 = 静止终态（关键：不要用 animation 做初始位移） */
+.band { transform: rotate(-15deg); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .band { animation: slide-in .7s cubic-bezier(.2,.8,.2,1) both; }
+}
+@keyframes slide-in { from { transform: translateX(-8rem) rotate(-15deg); } }
+
+/* 兜底：用户开了&quot;减少动态&quot;就彻底关掉 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</code></pre>
+<ul>
+<li>⚠️ <strong>不要用 <code>display: none</code> 处理 reduced-motion</strong> —— 那会把内容藏掉。</li>
+<li>⚠️ <strong>不要只写 <code>animation: none</code></strong> 就完事：如果初始状态是用 <code>animation</code> 的 <code>from</code> 做的位移，动画一关元素会<strong>卡在错误位置</strong>（比如斜块停在屏幕外）。→ <strong>静止态必须是默认 CSS，动效只做"增强"</strong>（如上）。</li>
+<li><code>prefers-reduced-motion</code> 的<strong>真实语义是"减少"，不是"禁止运动"</strong>：淡入淡出（opacity）通常可保留，位移/缩放/旋转要移除。视差滚动是明确的高危项（前庭功能障碍）。</li>
+<li><strong>兼容性（MDN BCD 实测）</strong>：chrome 74 / firefox 63 / safari 10.1。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion ✅</li>
+</ul>
+<h3 id="93-writing-mode">9.3 斜排文字、<code>writing-mode</code> 对屏幕阅读器与文本选择的影响<a class="headerlink" href="#93-writing-mode" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>风险</th>
+<th>事实</th>
+<th>对策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>视觉顺序 ≠ DOM 顺序</td>
+<td><code>transform: rotate()</code> 不改变 DOM 顺序，屏幕阅读器仍按 DOM 读；但<strong>低视力/放大用户看到的是旋转后的版式</strong>，会找不到下一段</td>
+<td>DOM 顺序必须就是正确的阅读顺序；不要为了斜排而重排 DOM</td>
+</tr>
+<tr>
+<td>巨字 + 斜排造成"找不到导航"</td>
+<td>放大到 400% 时斜排区块会互相遮挡</td>
+<td>保证 reflow（WCAG 1.4.10）；斜排只用于<strong>装饰层</strong>，正文保持水平</td>
+</tr>
+<tr>
+<td><code>writing-mode: vertical-rl</code></td>
+<td>屏幕阅读器一般能正确朗读；但<strong>复制出的纯文本顺序可能异常</strong>，PDF 打印也可能乱</td>
+<td>竖排只用于短标签/边栏；提供正常的水平版本作为主内容</td>
+</tr>
+<tr>
+<td><code>text-orientation: upright</code></td>
+<td>拉丁字母变成"一堆正立字母"，可读性极差</td>
+<td>只用于装饰；正文用 <code>mixed</code></td>
+</tr>
+<tr>
+<td><strong><code>clip-path</code> 裁掉 <code>outline</code></strong></td>
+<td><strong>键盘焦点框直接不可见 → WCAG 2.4.7 / 2.4.11 失败</strong></td>
+<td>⬇️ 见下</td>
+</tr>
+<tr>
+<td>半调/网点压在文字上</td>
+<td>文字边缘抖动，Dyslexia/低视力用户难读</td>
+<td>纹理层 <code>pointer-events: none</code> + 降到文字下方（z-index）+ 低不透明度</td>
+</tr>
+<tr>
+<td>全大写</td>
+<td>若 DOM 里是大写字符串，部分 AT 逐字母朗读</td>
+<td>DOM 保留正常大小写，只用 <code>text-transform: uppercase</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>焦点可见性的正确写法</strong>（本风格最致命的一处）：</p>
+<pre><code class="language-css">.interactive {
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
+  outline: none;                                  /* 只在 :focus-visible 里给替代 */
+}
+.interactive:focus-visible {
+  /* 方案 A：把焦点环画在&quot;内部不被裁&quot;的子元素上 */
+  &amp; .interactive__inner { outline: 4px solid #0051D6; outline-offset: 3px; }
+  /* 方案 B：用 inset box-shadow（也仍在被裁区域内 → 要放在内层元素） */
+}
+/* 方案 C：把 clip-path 放到装饰性伪元素上，交互元素本体不裁 → outline 正常 */
+.decor { clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%); position: absolute; inset: 0; }
+</code></pre>
+<p><strong>最稳的是方案 C：把 <code>clip-path</code> 从交互元素上拿掉，交给 <code>aria-hidden</code> 的装饰层。</strong></p>
+<h3 id="94">9.4 高对比 / 强制色模式<a class="headerlink" href="#94" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">@media (forced-colors: active) {
+  .ink-block { background: CanvasText; color: Canvas; forced-color-adjust: none; /* 只在极必要处 */ }
+  .halftone-layer, .grain { display: none; }        /* 纹理在强制色下只会添乱 */
+}
+@media (prefers-contrast: more) {
+  :root { --red: #AD2A07; }                          /* 自动切到 6.75:1 的红 */
+  .halftone-layer { opacity: .1; }
+}
+</code></pre>
+<ul>
+<li><strong>兼容性（MDN BCD 实测）</strong>：<code>forced-colors</code> chrome 89 / firefox 89 / safari 16；<code>prefers-contrast</code> chrome 96 / firefox 101 / safari 14.1。</li>
+<li>URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/forced-color-adjust ✅</li>
+<li>⚠️ 强制色模式下 <code>mix-blend-mode</code> 与 <code>background-image</code> 常被 UA 覆盖，<strong>错位/网点会消失</strong>：不要把它们当作传达信息的唯一手段。</li>
+</ul>
+<h3 id="95-cyrillic">9.5 Cyrillic / 中文混排的字体回退<a class="headerlink" href="#95-cyrillic" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">:root {
+  /* 顺序 = 拉丁怪诞体 → 西里尔体 → 中文 → 系统兜底 */
+  --font-stack:
+    &quot;Grotesque Display&quot;, &quot;Helvetica Neue&quot;, Arial,
+    &quot;PT Sans&quot;, &quot;Noto Sans&quot;,                    /* 西里尔 */
+    &quot;Noto Sans SC&quot;, &quot;Source Han Sans SC&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;,
+    sans-serif;
+}
+body { font-family: var(--font-stack); }
+/* 中文段落单独用 CJK 栈，避免被拉丁字体的西里尔字形抢走 */
+:lang(zh) { font-family: &quot;Noto Sans SC&quot;, &quot;Source Han Sans SC&quot;, &quot;PingFang SC&quot;, sans-serif; }
+:lang(ru) { font-family: &quot;PT Sans&quot;, &quot;Noto Sans&quot;, Arial, sans-serif; }
+</code></pre>
+<p>要点：
+1. <strong>用 <code>:lang()</code> 分区</strong>，不要指望一条 <code>font-family</code> 同时伺候西里尔与汉字：同一字重下拉丁字体与 CJK 字体的<strong>视觉字重/字宽差很远</strong>，混排会"跳"。
+2. <strong><code>unicode-range</code> 分包</strong>：中文全量字体动辄 5–20MB，必须按 <code>unicode-range</code> 切子集、按需加载。
+   - URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@font-face/unicode-range ✅
+   - URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@font-face ✅
+3. <strong><code>size-adjust</code> 校准中文 fallback 的视觉大小</strong>（中文系统字通常比拉丁字视觉更大/更满）：
+   <code>css
+   @font-face {
+     font-family: "Noto Sans SC Fallback";
+     src: local("PingFang SC"), local("Microsoft YaHei");
+     size-adjust: 96%;          /* 按实测微调 */
+   }</code>
+   - 兼容性（MDN BCD 实测）：<code>size-adjust</code> <strong>chrome 92 / firefox 92 / safari 17</strong>。
+4. ⚠️ <strong><code>ascent-override</code> / <code>descent-override</code> 在 Safari 仍不支持</strong>（MDN BCD 实测：chrome 87 / firefox 89 / <strong>safari = preivew（仅 Safari TP）</strong>）→ <strong>不要依赖字体度量覆盖来消除 CJK 的 CLS</strong>；改用显式 <code>line-height</code> + 预留容器高度。
+   - URL：https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@font-face/ascent-override ✅
+5. <code>font-display: swap</code> + 预加载关键子集；中文首屏务必内联 <code>@font-face</code> 的 <code>unicode-range</code> 元数据，否则会 FOUT 成方块。</p>
+<hr />
+<h2 id="10">10. 参考站点（全部实测过，附我实际抓到的技术证据）<a class="headerlink" href="#10" aria-hidden="true">#</a></h2>
+<p><strong>说明</strong>：下表的"实测证据"是我<strong>真实抓取页面或其 CSS 后</strong>提取到的；标 ❓ 的是我只确认了站点存活、未能进入其打包后的 CSS（多为 JS 渲染的 SPA）。</p>
+<h3 id="101">10.1 主题即构成主义的项目（最对路）<a class="headerlink" href="#101" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>站点</th>
+<th>是什么</th>
+<th>我实测到的技术证据</th>
+<th>URL</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>White Tower VR</strong>（叶卡捷琳堡 UZTM 白塔）</td>
+<td>构成主义建筑遗产的 WebVR 互动项目，Awwwards SOTD</td>
+<td>其 <code>stylesheets/style.css</code> 里 <strong><code>font-family: rodchenko</code></strong> —— 字体名直接叫"<strong>罗琴科</strong>"！配色 <code>#123a6b</code>（白塔是白/蓝），Typekit 载入字体，含 <code>filter:</code> 与 <code>transform: rotateX(35deg)</code></td>
+<td>https://wtower.ru/ ／ 案例页 https://www.awwwards.com/sites/webvr-site-for-the-white-tower</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Composition 24</strong>（莫斯科 K24 住宅）</td>
+<td>至上主义视觉语言的商业站，Awwwards SOTD + Communication Arts Webpick</td>
+<td>Communication Arts 的设计说明原文：视觉识别基于<strong>至上主义</strong>，<strong>"只用一种基本形、三种对比色、一款高度特异字体"</strong>（"using just a single basic form, three simple contrasting colors and a highly idiosyncratic typeface"）；<strong>首页 intro 是一段矢量动画，把至上主义图形变形为建筑本体</strong>；每个板块用几何形重排版式</td>
+<td>案例页 https://www.awwwards.com/sites/composition-24 ／ https://www.commarts.com/webpicks/composition-24 ／ 开发商 http://videinfra.com</td>
+<td>案例页 ✅ / <strong>线上站 ❌404</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Red Avantgarde</strong>（苏联海报档案与商店）</td>
+<td>苏联先锋派/构成主义海报的数字化档案</td>
+<td>我从它 <code>production.min.css</code>（110KB）实测提取：字体为 <strong>PT Sans / PT Serif（ParaType，专为西里尔设计）+ <code>hagin_caps_mediumregular</code> / <code>hagin_caps_thinregular</code>（Hagin Caps，本身就是构成主义风全大写展示体）</strong>；自托管 <code>PTF55F-webfont.woff</code>；色板 <strong><code>#fff</code> ×66 / <code>#000</code> ×65 / <code>#db3509</code> 红 ×14 / <code>#d13309</code> 红 ×12 / <code>#ecf3f0</code> 纸灰</strong>——教科书级的红黑三色</td>
+<td>https://redavantgarde.com/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Tatlin</strong>（tatlin.ru）</td>
+<td>俄语出版社，专出构成主义建筑指南（Tver/Samara 构成主义导览）</td>
+<td>站点存活；内容即"构成主义建筑普查"，是找真实构成主义素材/几何参考的一手来源</td>
+<td>https://tatlin.ru/about</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>The Rodina</strong>（荷兰/捷克，Tereza &amp; Vit Ruller）</td>
+<td>"performative design"工作室，作品大量使用构成主义式巨型字与高饱和撞色</td>
+<td>我从其 Next.js CSS chunk 实测提取：字体 <strong><code>lars</code>（Lars Pro）+ <code>Tradition</code></strong>，并含 next/font 自动生成的 <strong><code>lars Fallback</code></strong>（即度量校准回退，见 §9.5）；色板以黑白为主，强调色 <strong><code>#e40014</code>（红）/ <code>#1dff9a</code> / <code>#f99c00</code></strong></td>
+<td>https://www.therodina.com/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Moscow Design Museum</strong>（莫斯科设计博物馆，1C-Bitrix 案例）</td>
+<td>俄罗斯设计博物馆站</td>
+<td>通过 1C-Bitrix 的项目案例页确认其建置；视觉方向为俄式现代主义</td>
+<td>案例 https://www.1c-bitrix.ru/products/cms/projects/1335541/</td>
+<td>❓未逐页核实</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Jewish Museum and Tolerance Center</strong>（莫斯科）</td>
+<td>与特列季亚科夫画廊合办 <strong>"El Lissitzky"</strong> 展</td>
+<td>实测抓到色板 <code>#1A1A1A</code> 墨 / <code>#E5E5E5</code> 灰 / <code>#08c6d2</code> 青，页面使用 <code>clip-path</code>；李西茨基是构成主义核心人物，站点视觉直接继承其几何语法</td>
+<td>https://www.jewish-museum.ru/ ／ 展览资料 https://www.jewish-museum.ru/upload/iblock/5c1/5c18ca27af2ea1662a9e3c27d38ba3e9.docx</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Garage Museum of Contemporary Art</strong>（车库当代艺术博物馆，莫斯科）</td>
+<td>俄当代艺术主阵地，站点视觉冷峻几何</td>
+<td>实测抓到 <strong><code>clip-path</code> ×14 次</strong>；色板 <code>#1A1A1A</code> / <code>#FFFFFF</code> / <strong><code>#F5E123</code> 黄</strong> / <code>#0051d6</code> 蓝（构成主义的红黄蓝+黑白谱系）</td>
+<td>https://garagemca.org/en ／ 改版说明 https://garagemca.org/en/news/2015-12-21-garage-museum-of-contemporary-art-is-pleased-to-announce-the-launch-of-its-new-website ／ 设计方 https://www.charmerstudio.com/work/garage</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>MoMA "Engineer, Agitator, Constructor: The Artist Reinvented"</strong></td>
+<td>2020–21 MoMA 苏联构成主义大展的官方页（这是本风格的<strong>内容圣经</strong>）</td>
+<td>⚠️ 页面 403（Cloudflare）我<strong>无法</strong>读取内容；展览本身真实（新闻稿 PDF 可查）。<strong>列在此处作为"内容/符号参考"而非"网页技术参考"</strong></td>
+<td>https://www.moma.org/calendar/exhibitions/5072 ／ 新闻稿 http://press.moma.org/wp-content/uploads/2020/12/1_MoMA_EAC_PressRelease_FINAL.pdf</td>
+<td>⚠️403</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>DIGITAL SUPREMATISM</strong>（supabsmin）</td>
+<td>长期更新的"数字至上主义"博客/实验档案</td>
+<td>实测抓到 <strong><code>#f21d1d</code> 红 ×18 / <code>#000</code> ×13 / <code>#fff</code> ×41</strong>（正是红黑白三色），并使用 <code>text-shadow</code></td>
+<td>https://supabsmin.blogspot.com/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Vkhutemas / Bauhaus 100 学术对照</strong>（魏玛包豪斯大学）</td>
+<td>呼捷玛斯（ВХУТЕМАС）与包豪斯的对照研究页</td>
+<td>站点存活；作为"构成主义—包豪斯"谱系的学术参考</td>
+<td>https://www.uni-weimar.de/en/architecture-and-urbanism/chairs/theory-and-history-of-modern-architecture/atheo-l/archiv-der-lehrveranstaltungen/winter-1617/bauhaus100-vchutemas-labor-der-moderne/</td>
+<td>❓未逐页核实</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="102">10.2 字体厂牌 / 活字标本（构成主义怪诞体的现成来源）<a class="headerlink" href="#102" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>站点</th>
+<th>我实测到的证据</th>
+<th>URL</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12</td>
+<td><strong>Klim Type Foundry · American Grotesk / National 2</strong></td>
+<td>从首页 CSS 实测：字体 <code>Söhne</code> + <code>k-american-grotesk-*</code>；色板 <strong><code>#000000</code> / <code>#ffffff</code> / <code>#e90702</code> / <code>#E4001C</code>（两枚正红）</strong>；使用 <code>clip-path</code>。是"巨型怪诞体 + 红黑白 + 硬边"的现成范本</td>
+<td>https://klim.co.nz/collections/american-grotesk/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>Fonts In Use</strong></td>
+<td>可按 "Russian constructivism" 等标签检索真实印刷品用的字体，用于反查字体名</td>
+<td>https://fontsinuse.com/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>Grilli Type / Dinamo / Pangram Pangram</strong> 等同类厂牌</td>
+<td>—</td>
+<td>❓ 本次未逐个实测，不列具体 URL</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="103">10.3 工作室（我实测了存活 + 色板/技术令牌）<a class="headerlink" href="#103" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>站点</th>
+<th>我实测到的证据</th>
+<th>URL</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>15</td>
+<td><strong>By-Kin</strong>（英国工作室）</td>
+<td>首页存活，实测主强调色 <strong><code>#FF6542</code></strong>（橙红）；据我实测抓到的 2026 年趋势文章，它拿到 Awwwards SOTD / Developer Award / FWA / CSS Design Awards，技术栈 Next.js + GSAP + Strapi</td>
+<td>https://by-kin.com/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>Shuka ★ Brand Bureau</strong></td>
+<td>首页存活（Framer 建站，440KB 内联），字体含 Google Fonts 的 <strong>Fragment Mono</strong> + 一批 <code>framerusercontent</code> 自托管 woff2；色板近乎单色（<code>#000</code> / <code>#2a2a2a</code> / <code>#7f7f7f</code>）</td>
+<td>https://shuka.design/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>17</td>
+<td><strong>Bureau Mirko Borsche</strong></td>
+<td>首页存活，实测使用 <code>clip-path</code> ×3</td>
+<td>https://bureauborsche.com/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>18</td>
+<td><strong>Studio von M</strong>（Museum Ludwig 展陈设计）</td>
+<td>项目页存活；是"博物馆展陈/展览视觉"的对口参考</td>
+<td>https://studiovonm.com/works/museum-ludwig</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>19</td>
+<td><strong>Pentagram / Zak Group / Mucho / Studio Dumbar / Order / Neubau</strong></td>
+<td>六个首页我均实测 <strong>200</strong>，但 HTML 内未暴露字体/技术令牌（SPA），<strong>我不对它们的具体手法下断言</strong></td>
+<td>https://www.pentagram.com/ ・ https://www.zakgroup.com/ ・ https://mucho.com/ ・ https://studiodumbar.com/ ・ https://order.design/ ・ https://www.neubau.net/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>20</td>
+<td><strong>Cargo</strong></td>
+<td>面向设计师的建站工具，是"编辑/粗野主义作品集"的温床（据趋势文章）</td>
+<td>https://cargo.site/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>21</td>
+<td><strong>V&amp;A（英国 V&amp;A 博物馆）</strong></td>
+<td>首页 200；另有官方博客记录 Collections 页面改版</td>
+<td>https://www.vam.ac.uk/ ／ https://www.vam.ac.uk/blog/digital/how-weve-refreshed-the-v-and-a-from-the-collections-pages</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>22</td>
+<td><strong>Tretyakov Gallery（特列季亚科夫画廊）</strong></td>
+<td>首页 1.4MB、存活；实测抓到 <code>text-shadow</code> ×8 与 <code>repeating-linear-gradient</code> ×2（构成主义常用的硬线/斜纹手法）</td>
+<td>https://www.tretyakovgallery.ru/</td>
+<td>✅ 200</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="104">10.4 灵感目录（用于持续找同类站）<a class="headerlink" href="#104" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>站点</th>
+<th>URL</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Awwwards · Sites of the Day</td>
+<td>https://www.awwwards.com/websites/sites_of_the_day/</td>
+<td>✅ 200（实测 HTML 里含 <code>clip-path</code> ×8）</td>
+</tr>
+<tr>
+<td>Godly</td>
+<td>https://godly.website/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>Httpster</td>
+<td>https://httpster.net/</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>SiteInspire</td>
+<td>https://www.siteinspire.com/</td>
+<td>❓ 本次未实测</td>
+</tr>
+<tr>
+<td>Behance（构成主义专题检索）</td>
+<td>https://www.behance.net/search/projects/constructivismo%20ruso</td>
+<td>❓ 未实测</td>
+</tr>
+<tr>
+<td>Behance 单项目示例</td>
+<td>https://www.behance.net/gallery/192654271/Constructivism-Russian-Infographic</td>
+<td>❓ 未实测</td>
+</tr>
+<tr>
+<td>2026 趋势综述（"触觉粗野主义"：颗粒 + 巨型字 + 单色硬线）</td>
+<td>https://www.wetch.co.jp/ai/2026/08/06/…（见 §7.4 链接）</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td>Fireart 趋势综述</td>
+<td>https://fireart.studio/blog/the-best-web-design-trends/</td>
+<td>✅ 200（由趋势文章外链）</td>
+</tr>
+<tr>
+<td>Hon Tran · 2026 获奖网站</td>
+<td>https://www.hontran.dev/blog/best-award-winning-websites-2026</td>
+<td>✅ 200（同上）</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="11-font-family">11. 中文混排：免费字体、许可证（已逐个核验）与 <code>font-family</code> 策略<a class="headerlink" href="#11-font-family" aria-hidden="true">#</a></h2>
+<h3 id="111-github-license-api-debian">11.1 可放心商用/免费的中文字体（许可证经 GitHub License API + Debian 版权文件双重核验）<a class="headerlink" href="#111-github-license-api-debian" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字体</th>
+<th>仓库 / 主页</th>
+<th>我认为的<strong>实测</strong>许可证结论</th>
+<th>与构成主义怪诞体搭配点评</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>思源黑体 Source Han Sans</strong> / <strong>Noto Sans CJK</strong></td>
+<td>https://github.com/adobe-fonts/source-han-sans ✅ ／ https://github.com/notofonts/noto-cjk ✅</td>
+<td><strong>SIL OFL 1.1</strong>。我实测抓到官方 <code>LICENSE.txt</code> 首行原文："Copyright 2014-2025 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'… licensed under th…"；Noto CJK 的 <code>Sans/LICENSE</code> 首行原文："This Font Software is licensed under the SIL Open Font License, Version 1.1."；Google Fonts 收录页 https://github.com/google/fonts/tree/main/ofl/notosanssc ✅（<code>ofl/</code> = OFL 授权）</td>
+<td><strong>首选正文/标题中文</strong>。多字重（含 Heavy/Black）+ 可做可变字体，能和 Helvetica/怪诞体的粗黑字重对齐；7 个字重足以撑起"极端字号对比"</td>
+</tr>
+<tr>
+<td><strong>得意黑 Smiley Sans</strong></td>
+<td>https://github.com/atelier-anchor/smiley-sans ✅</td>
+<td><strong>SIL OFL 1.1</strong>。GitHub License API 实测：<code>spdx_id = OFL-1.1</code>；Debian <code>fonts-smiley-sans</code> 版权文件实测原文：<code>Upstream-Name: smiley-sans</code> / <code>Source: https://github.com/atelier-anchor/smiley-sans</code> / <code>License: OFL-1.1</code> / <code>Copyright: 2022, atelierAnchor</code></td>
+<td><strong>最"构成主义"的免费中文标题体</strong>：倾斜、窄、硬朗，天生带速度感与斜切气质，适合巨字标题与斜排；字形数量少，<strong>只作标题/短句，不要用于正文</strong></td>
+</tr>
+<tr>
+<td><strong>霞鹜文楷 LXGW WenKai</strong></td>
+<td>https://github.com/lxgw/LxgwWenKai ✅ ／ 屏幕版 https://github.com/lxgw/LxgwWenKai-Screen ✅</td>
+<td><strong>SIL OFL 1.1 + 保留字体名</strong>。GitHub License API 实测 <code>spdx_id = OFL-1.1</code>（<code>OFL.txt</code>）；Debian 版权文件实测原文：<code>License: OFL-1.1</code> / <code>With Reserved Font Names "霞鹜" and "LXGW"</code></td>
+<td>楷体气质，<strong>与构成主义的硬边怪诞体是反方向的</strong>。适合做"引文/档案/手写批注"的对比层（报纸拼贴感），不要用作大标题</td>
+</tr>
+<tr>
+<td><strong>未来荧黑 Glow Sans</strong></td>
+<td>https://github.com/welai/glow-sans ✅</td>
+<td>GitHub License API 实测：<code>spdx_id = MIT</code>（注意：<strong>是 MIT，不是 OFL</strong>，与思源黑体不同）</td>
+<td>可变字重、可调字宽，现代几何黑体，适合与怪诞体对齐字宽</td>
+</tr>
+<tr>
+<td><strong>朱雀仿宋 Zhuque Fangsong</strong></td>
+<td>https://github.com/TrionesType/zhuque ✅</td>
+<td>GitHub License API 实测：<code>spdx_id = OFL-1.1</code>（<code>LICENSE.txt</code>）</td>
+<td>仿宋，适合"旧报纸/公文"的印刷复古层</td>
+</tr>
+<tr>
+<td><strong>Noto Sans SC（单语言子集）</strong></td>
+<td>https://fonts.google.com/noto/specimen/Noto+Sans+SC ✅ ／ https://github.com/google/fonts/tree/main/ofl/notosanssc ✅</td>
+<td><strong>SIL OFL 1.1</strong>（Google Fonts 的 <code>ofl/</code> 目录 + Noto CJK 的 OFL 许可）</td>
+<td>与 Source Han Sans 同源，<strong>Web 上按需子集化后最省流量的选择</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠️ 我<strong>没有</strong>去核实的一类：阿里巴巴普惠体、MiSans、HarmonyOS Sans、OPPO Sans —— 这些<strong>不是开源许可证</strong>（是厂商"免费商用授权"），条款与 OFL 不同，<strong>必须逐字读官方授权说明</strong>。本条我<strong>未取得可引用的权威 URL</strong>，请自行到各厂商官方页面确认后再用。</p>
+</blockquote>
+<h3 id="112-font-family-font-face">11.2 <code>font-family</code> 回退与 <code>@font-face</code> 注意点<a class="headerlink" href="#112-font-family-font-face" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">/* 1) 拉丁/西里尔怪诞体（自托管，子集化到 latin + cyrillic） */
+@font-face {
+  font-family: &quot;Grotesque Display&quot;;
+  src: url(&quot;/fonts/grotesque-display-black.woff2&quot;) format(&quot;woff2&quot;);
+  font-weight: 900;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0400-04FF, U+2116;   /* 拉丁 + 西里尔 + № */
+}
+
+/* 2) 中文子集：按 unicode-range 切片，别一次加载 10MB */
+@font-face {
+  font-family: &quot;Noto Sans SC Black&quot;;
+  src: url(&quot;/fonts/noto-sans-sc-black-subset-0.woff2&quot;) format(&quot;woff2&quot;);
+  font-weight: 900;
+  font-display: swap;
+  unicode-range: U+4E00-9FFF;                        /* 常用汉字区（实际请用工具切成多片） */
+}
+
+/* 3) 中文回退的视觉尺寸校准 */
+@font-face {
+  font-family: &quot;CJK Fallback&quot;;
+  src: local(&quot;PingFang SC&quot;), local(&quot;Microsoft YaHei&quot;), local(&quot;Hiragino Sans GB&quot;);
+  size-adjust: 96%;          /* Chrome 92+ / FF 92+ / Safari 17+ */
+  /* ascent-override / descent-override 在 Safari 仍是 preview → 不要依赖 */
+}
+
+/* 4) 三段栈 */
+:root {
+  --display: &quot;Grotesque Display&quot;, &quot;Noto Sans SC Black&quot;, &quot;CJK Fallback&quot;, &quot;Noto Sans SC&quot;, sans-serif;
+  --body: &quot;PT Sans&quot;, &quot;Noto Sans SC&quot;, &quot;CJK Fallback&quot;, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
+}
+</code></pre>
+<p><strong>必须知道的六条</strong></p>
+<ol>
+<li><strong>中文别整包加载</strong>：Noto Sans SC / 思源黑体全量数 MB。用 <code>unicode-range</code> 切子集（<code>font-unicode-range</code> caniuse 实测 chrome≥100 / safari≥10 / firefox≥100），或用 <code>pyftsubset</code>/<code>fonttools</code>、Google Fonts 的 <code>&amp;text=</code> 参数现切。</li>
+<li><strong><code>size-adjust</code> 已经是安全项</strong>（chrome 92 / ff 92 / <strong>safari 17</strong>），但 <strong><code>ascent-override</code> / <code>descent-override</code> 在 Safari 仅 TP 可用</strong>（MDN BCD 实测 <code>safari = preview</code>）→ <strong>所有"用度量覆盖来消灭 CLS"的方案在 Safari 都会失效</strong>，请老老实实给巨字容器预留 <code>min-height</code> 或用 <code>line-height</code> 控制。</li>
+<li><strong>CJK 字体的默认行高比拉丁字体大</strong>（思源黑体的 ascent+descent 约 1.16–1.4 em）→ 用同一份 <code>line-height</code> 会让中英混排的段落"忽高忽低"。要么给 CJK 段落单独调 <code>line-height</code>，要么用 <code>text-box: trim-both</code>（chrome 133 / safari 18.2 / ff 154，<strong>fallback 必须存在</strong>）。</li>
+<li><strong>字重不匹配</strong>：拉丁怪诞体常用 800–900，而中文若只有 Regular，混排会明显"中文发虚"。→ <strong>优先选有 7 个字重的思源黑体/Noto Sans SC</strong>，或对中文单独用 <code>font-weight: 700</code> + <code>-webkit-text-stroke</code> 假装加粗（慎用，会糊）。</li>
+<li><strong><code>font-display: swap</code> 是双刃剑</strong>：中文 swap 会先闪系统字体（字宽差极大 → 布局跳动）。巨字标题建议 <code>font-display: optional</code> 或 <code>&lt;link rel="preload"&gt;</code> 关键子集。</li>
+<li><strong>标点与字距</strong>：构成主义巨字常配极紧字距，但中文的 <code>letter-spacing</code> 负值会导致标点粘连 → 中文标题建议 <code>letter-spacing: 0</code>，靠 <code>font-stretch</code>/窄体字形来"收紧"。同时打开 <code>font-feature-settings: "halt" 1, "palt" 1</code>（Ja）或 <code>text-spacing-trim</code>（中文标点挤压）。</li>
+</ol>
+<hr />
+<h2 id="12-css">12. 构成主义页面 CSS 骨架清单<a class="headerlink" href="#12-css" aria-hidden="true">#</a></h2>
+<h3 id="2026">✅ 必需（缺了就不"构成主义"，且都有 2026 年可用支持）<a class="headerlink" href="#2026" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>特性</th>
+<th>一行最小实现</th>
+<th>支持基线（实测）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>三色 CSS 变量</td>
+<td><code>--ink:#111; --red:#C8102E; --paper:#F5F5F0;</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>2</td>
+<td>硬边零圆角</td>
+<td><code>*,*::before,*::after{border-radius:0}</code> + <code>button,input{appearance:none}</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>3</td>
+<td>三段字体栈（拉丁怪诞 → 西里尔 → CJK）</td>
+<td><code>font-family: "Grotesque Display","PT Sans","Noto Sans SC",sans-serif</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>4</td>
+<td>视觉大写但 DOM 保留原大小写</td>
+<td><code>text-transform: uppercase</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>5</td>
+<td>巨字 + 极端字号比</td>
+<td><code>font-size: clamp(4rem,18vw,22rem); line-height:.84; letter-spacing:-.03em</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>6</td>
+<td>流体字号不溢出</td>
+<td>配 <code>overflow-wrap:anywhere</code> + <code>hyphens:auto</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>7</td>
+<td>斜向构图</td>
+<td><code>transform: rotate(-15deg)</code>（配 140% 宽容器）</td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>8</td>
+<td>斜切/楔形几何</td>
+<td><code>clip-path: polygon(0 100%,0 40%,100% 0,100% 100%)</code></td>
+<td>chrome 55 / ff 3.5 / safari 9.1</td>
+</tr>
+<tr>
+<td>9</td>
+<td>斜向网格</td>
+<td><code>repeating-linear-gradient(73deg, …)</code> + 互余的 <code>-17deg</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>10</td>
+<td>粗黑描边 + 硬阴影</td>
+<td><code>border:6px solid; box-shadow:14px 14px 0 0 var(--red)</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>11</td>
+<td>叠印（multiply）<strong>必须配 <code>isolation</code></strong></td>
+<td><code>isolation:isolate</code> + <code>mix-blend-mode:multiply</code></td>
+<td>chrome 41 / ff 36 / safari 8</td>
+</tr>
+<tr>
+<td>12</td>
+<td>纸张颗粒</td>
+<td><code>feTurbulence</code> data-URI 背景（<code>%23</code> 编码！）+ <code>opacity:.12</code></td>
+<td>feTurbulence chrome 5 / ff 3 / safari 6</td>
+</tr>
+<tr>
+<td>13</td>
+<td>均匀网点</td>
+<td><code>radial-gradient(...)</code> + <code>background-size:8px 8px</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>14</td>
+<td>网点作用到图片</td>
+<td><code>-webkit-mask-image</code> + <code>mask-image</code>（<strong>双写前缀</strong>）</td>
+<td><code>mask-image</code> chrome 120 / ff 53 / safari 15.4</td>
+</tr>
+<tr>
+<td>15</td>
+<td>套印错位</td>
+<td><code>text-shadow: 2.5px 0 0 var(--red), -2.5px 0 0 #0051D6</code></td>
+<td>chrome 10 / ff 10 / safari 10</td>
+</tr>
+<tr>
+<td>16</td>
+<td>纹理层不挡交互</td>
+<td><code>.tex{pointer-events:none;z-index:1}</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>17</td>
+<td>焦点可见（<strong>别被 clip-path 吃掉</strong>）</td>
+<td>装饰层用 <code>clip-path</code>，交互元素保留 <code>outline</code>；<code>outline:4px solid #0051D6</code></td>
+<td>全绿</td>
+</tr>
+<tr>
+<td>18</td>
+<td>动效兜底</td>
+<td><code>@media (prefers-reduced-motion: reduce){…}</code>，且<strong>静止态写成默认样式</strong></td>
+<td>chrome 74 / ff 63 / safari 10.1</td>
+</tr>
+<tr>
+<td>19</td>
+<td>对比度达标</td>
+<td>白底主红用 <code>#C8102E</code>（5.88:1）或 <code>#AD2A07</code>（6.75:1），<strong>别用纯 <code>#FF0000</code>（4.00 不达 AA）</strong></td>
+<td>—</td>
+</tr>
+<tr>
+<td>20</td>
+<td>高对比兜底</td>
+<td><code>@media (forced-colors: active){ .tex{display:none} }</code></td>
+<td>chrome 89 / ff 89 / safari 16</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="_1">➕ 加分（有则更"印刷/历史"，但要么需要降级方案、要么支持面窄）<a class="headerlink" href="#_1" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>特性</th>
+<th>一行实现</th>
+<th>风险 / 基线</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>21</td>
+<td>文字沿斜线 / 绕圆</td>
+<td>SVG <code>&lt;textPath href="#arc" startOffset="25%" textLength="300" lengthAdjust="spacingAndGlyphs"&gt;</code></td>
+<td>保守子集全绿（chrome1/ff2/safari3.1）；<code>side</code>/<code>spacing</code> 支持参差；<strong>必须配 <code>role="img" aria-label</code></strong></td>
+</tr>
+<tr>
+<td>22</td>
+<td>逐字绕圆（CSS）</td>
+<td><code>offset-path: circle(8rem at 50% 50%); offset-rotate: auto; offset-distance: calc(var(--i)*9%)</code></td>
+<td>chrome 55 / ff 72 / safari 15.4；需 JS 生成 span</td>
+</tr>
+<tr>
+<td>23</td>
+<td>竖排边栏</td>
+<td><code>writing-mode: vertical-rl; text-orientation: mixed</code></td>
+<td>chrome 48 / ff 41 / safari 10.1；<strong>改用逻辑属性</strong></td>
+</tr>
+<tr>
+<td>24</td>
+<td>多行标题配平</td>
+<td><code>text-wrap: balance</code></td>
+<td>chrome 114 / ff 121 / safari 17.5</td>
+</tr>
+<tr>
+<td>25</td>
+<td>去行距留白</td>
+<td><code>text-box: trim-both cap alphabetic</code></td>
+<td>chrome 133 / ff 154 / safari 18.2 —— <strong>必须有 fallback</strong></td>
+</tr>
+<tr>
+<td>26</td>
+<td>射线 / 扇形</td>
+<td><code>repeating-conic-gradient(from 0deg, #111 0 6deg, transparent 6deg 14deg)</code></td>
+<td>全绿；圆心有接缝，叠 <code>radial-gradient</code> 遮盖</td>
+</tr>
+<tr>
+<td>27</td>
+<td>套印错位 + 真混合</td>
+<td>伪元素 + <code>mix-blend-mode: multiply</code>（<strong>第二层用 <code>&lt;span aria-hidden&gt;</code>，不要用 <code>content: attr()</code></strong>）</td>
+<td>全绿；⚠️ Blink/WebKit 渲染有差</td>
+</tr>
+<tr>
+<td>28</td>
+<td>SVG 滤镜错位</td>
+<td><code>feOffset</code>×2 + <code>feColorMatrix</code>×2 + <code>feBlend mode="multiply"</code>，<strong>显式写滤镜区域 + <code>color-interpolation-filters="sRGB"</code></strong></td>
+<td>chrome 53 / ff 35 / safari 9.1；滤镜区域默认只有 ±10%</td>
+</tr>
+<tr>
+<td>29</td>
+<td>纸纹叠印</td>
+<td><code>background-blend-mode: multiply</code>（<strong>只混自己的背景层，不出血到子元素</strong>）</td>
+<td>chrome 35 / ff 30 / safari 8</td>
+</tr>
+<tr>
+<td>30</td>
+<td>真·半调（按明暗变点径）</td>
+<td>Canvas 逐格算 → <code>toBlob()</code> 缓存 WebP</td>
+<td>全绿；注意 CORS taint + 主线程阻塞</td>
+</tr>
+<tr>
+<td>31</td>
+<td>中文 fallback 校准</td>
+<td><code>@font-face{…;size-adjust:96%}</code></td>
+<td>chrome 92 / ff 92 / safari 17</td>
+</tr>
+<tr>
+<td>32</td>
+<td>中文按需分包</td>
+<td><code>@font-face{…;unicode-range:U+4E00-9FFF}</code></td>
+<td>chrome 1 / ff 36 / safari 3.1</td>
+</tr>
+<tr>
+<td>33</td>
+<td>可变字体窄体</td>
+<td><code>font-stretch: 87.5%; font-variation-settings:"wdth" 87.5</code></td>
+<td>chrome 62 / ff 62 / safari 11</td>
+</tr>
+<tr>
+<td>34</td>
+<td>滚动驱动动效</td>
+<td><code>animation-timeline: view()</code></td>
+<td>chrome 115 / <strong>safari 26</strong> / <strong>ff 仍 preview</strong> → <strong>必须静态回退</strong></td>
+</tr>
+<tr>
+<td>35</td>
+<td>容器查询做斜向版式自适应</td>
+<td><code>container-type: inline-size</code></td>
+<td>chrome 105 / ff 110 / safari 16</td>
+</tr>
+<tr>
+<td>36</td>
+<td>相对配色</td>
+<td><code>color-mix(in oklab, var(--red), #000 40%)</code></td>
+<td>❓本次未取到 BCD 版本号，请查 MDN <code>color-mix()</code> 页</td>
+</tr>
+<tr>
+<td>37</td>
+<td>毛玻璃（若用）</td>
+<td><code>backdrop-filter: blur(6px)</code></td>
+<td>chrome 76 / ff 103 / <strong>safari 18</strong>（iOS 长期需 <code>-webkit-</code> 前缀）</td>
+</tr>
+<tr>
+<td>38</td>
+<td>胶片颗粒可被关闭</td>
+<td><code>@media (prefers-reduced-transparency: reduce){.grain{display:none}}</code></td>
+<td>chrome 118 / ff 113 / <strong>safari ❌</strong></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="url">附：本方案用到的全部 URL 与实测状态<a class="headerlink" href="#url" aria-hidden="true">#</a></h2>
+<p><strong>✅ 实测 200（可直接引用）</strong></p>
+<p>MDN：<code>mix-blend-mode</code>・<code>isolation</code>・<code>background-blend-mode</code>・<code>clip-path</code>・<code>basic-shape/polygon</code>・<code>shape-outside</code>・<code>mask-image</code>・<code>mask-composite</code>・<code>text-wrap-style</code>・<code>text-wrap</code>・<code>text-box-trim</code>・<code>@font-face/size-adjust</code>・<code>@font-face/ascent-override</code>・<code>@font-face/unicode-range</code>・<code>@media/prefers-reduced-motion</code>・<code>feTurbulence</code>・<code>feColorMatrix</code>・<code>feComponentTransfer</code>・<code>feTile</code>・<code>feMorphology</code>・<code>feDisplacementMap</code>・<code>textPath</code>・<code>writing-mode</code>・<code>text-orientation</code>・<code>offset-path</code>・<code>filter</code>・<code>text-shadow</code>・<code>paint-order</code>・<code>font-variation-settings</code>・<code>forced-color-adjust</code>・<code>background-clip</code>・<code>repeating-radial-gradient</code>・<code>repeating-linear-gradient</code>・<code>conic-gradient</code>・<code>SVG/pattern</code>・<code>SVG/filter</code>・<code>CanvasRenderingContext2D/getImageData</code>・<code>A11y/Colors_and_Luminance</code>・<code>A11y/.../Color_contrast</code>
+CSS-Tricks：<code>creating-patterns-with-svg-filters</code>・<code>grainy-gradients</code>・<code>almanac/functions/p/polygon</code>・<code>almanac/properties/s/shape-outside</code>
+其它：<code>web.dev/learn/css/blend-modes</code>・<code>ibelick.com/blog/create-grainy-backgrounds-with-css</code>・<code>w3.org/TR/WCAG22/</code>・<code>w3.org/WAI/WCAG22/Understanding/contrast-minimum.html</code>・<code>w3.org/TR/SVG2/text.html</code>・<code>drafts.csswg.org/css-masking/</code>
+字体：<code>github.com/adobe-fonts/source-han-sans</code>・<code>github.com/notofonts/noto-cjk</code>・<code>github.com/lxgw/LxgwWenKai</code>・<code>github.com/lxgw/LxgwWenKai-Screen</code>・<code>github.com/atelier-anchor/smiley-sans</code>・<code>github.com/welai/glow-sans</code>・<code>github.com/TrionesType/zhuque</code>・<code>github.com/google/fonts/tree/main/ofl/notosanssc</code>・<code>fonts.google.com/noto/specimen/Noto+Sans+SC</code>
+站点：<code>wtower.ru</code>・<code>redavantgarde.com</code>・<code>tatlin.ru/about</code>・<code>therodina.com</code>・<code>jewish-museum.ru</code>・<code>garagemca.org</code>・<code>garagemca.org/en/news/2015-12-21-…</code>・<code>charmerstudio.com/work/garage</code>・<code>supabsmin.blogspot.com</code>・<code>klim.co.nz/collections/american-grotesk/</code>・<code>by-kin.com</code>・<code>shuka.design</code>・<code>bureauborsche.com</code>・<code>studiovonm.com/works/museum-ludwig</code>・<code>pentagram.com</code>・<code>zakgroup.com</code>・<code>mucho.com</code>・<code>studiodumbar.com</code>・<code>order.design</code>・<code>neubau.net</code>・<code>cargo.site</code>・<code>vam.ac.uk</code>・<code>tretyakovgallery.ru</code>・<code>awwwards.com/websites/sites_of_the_day/</code>・<code>awwwards.com/sites/composition-24</code>・<code>awwwards.com/sites/webvr-site-for-the-white-tower</code>・<code>commarts.com/webpicks/composition-24</code>・<code>godly.website</code>・<code>httpster.net</code>・<code>fontsinuse.com</code>・<code>fireart.studio/blog/the-best-web-design-trends/</code>・<code>hontran.dev/blog/best-award-winning-websites-2026</code>・<code>wetch.co.jp</code> 趋势文・<code>vam.ac.uk/blog/digital/…</code>・<code>1c-bitrix.ru/products/cms/projects/1335541/</code></p>
+<p><strong>⚠️ 403（真实存在，自动化被拦）</strong>：<code>codepen.io/thebabydino/pen/JjqPWNW</code>・<code>codepen.io/thebabydino/pen/GRNKqRv</code>・<code>codepen.io/thebabydino/details/gOpMeWv</code>・<code>stackoverflow.com/questions/76079382/halftone-image-effect-with-svg-filters</code>・<code>moma.org/calendar/exhibitions/5072</code>・<code>codepen.io/thebabydino/embed/*</code></p>
+<p><strong>❌ 实测已失效（勿用）</strong>：<code>k24moscow.ru</code>（404）・<code>grainy-gradients.vercel.app</code>（402）・<code>ultimatedesigntools.com/tools/noise-generator/</code>（404）</p>
+<p><strong>❓ 明确未取得权威数据（本文已标注）</strong>：<code>shape()</code> 函数的 BCD 版本号・<code>color-mix()</code> 的 BCD 版本号・SVG 滤镜做"照片半调"的可靠教程（两处来源均 403，<strong>故只给原语清单、不给可复制代码</strong>）・MiSans/HarmonyOS Sans/阿里巴巴普惠体的官方授权页・Behance/SiteInspire 等目录站的逐页核实</p>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="04-技术实现手册.html">← 04-技术实现手册</a>
+    <a href="index.html">目录</a>
+    <a href="06-素材情报报告.html">06-素材情报报告 →</a>
+  </nav>
+</div>
+
+</body>
+</html>

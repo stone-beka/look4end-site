@@ -1,0 +1,474 @@
+/* ============================================================================
+   KV — 构成主义 Web 设计系统
+   Constructivist Design System / v0.1
+   ----------------------------------------------------------------------------
+   用法：<link rel="stylesheet" href="kv.css">  然后套 .kv-* 类名
+   所有色值经过 WCAG 对比度实测；所有字体经过西里尔覆盖核实。
+   详见 ../docs/constructivism/02-设计系统规格.md
+   ========================================================================== */
+
+/* ---------- 1. 字体 ---------- */
+/* 只加载确定支持西里尔且气质对路的字体。
+   注意：Anton / Bebas Neue / Archivo Black / Barlow Condensed 无西里尔支持，
+   页面若出现俄文会掉字体 —— 故不采用。 */
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Unbounded:wght@400;600;800;900&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=PT+Mono&family=JetBrains+Mono:wght@400;700&display=swap");
+/* 中文：得意黑（标题，OFL-1.1）/ 思源黑体 或 系统黑体（正文）
+   得意黑未在 Google Fonts 上，请本地自托管：
+   https://github.com/atelier-anchor/smiley-sans  (14,905★, OFL-1.1)
+@font-face {
+  font-family: "Smiley Sans";
+  src: url("./fonts/SmileySans-Oblique.woff2") format("woff2");
+  font-weight: 400; font-display: swap;
+}
+*/
+
+/* ---------- 2. 设计令牌 ---------- */
+:root {
+  /* -- 纸 -- */
+  --kv-paper:      #EFE9DC;
+  --kv-paper-dim:  #E3DBC9;
+  --kv-paper-lift: #F7F3EA;
+
+  /* -- 墨 -- */
+  --kv-ink:        #12100E;
+  --kv-ink-soft:   #3A352E;
+
+  /* -- 朱红：两个变体用途不同，别混用 --
+     --kv-red      4.15:1 于纸 → 仅图形与 ≥24px 标题
+     --kv-red-ink  5.63:1 于纸 → 唯一可用于正文字号的红 */
+  --kv-red:        #D6281F;
+  --kv-red-ink:    #B31B12;
+  --kv-red-deep:   #8E1B14;
+
+  /* -- 至上主义点缀（面积 ≤ 3%） -- */
+  --kv-blue:       #16407A;
+  --kv-yellow:     #E8B31A;
+  --kv-gray:       #8A8377;
+
+  /* -- 字体栈 -- */
+  --kv-font-display: "Oswald", "Smiley Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --kv-font-alt:     "Unbounded", "Smiley Sans", "Noto Sans SC", sans-serif;
+  --kv-font-body:    "PT Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --kv-font-mono:    "JetBrains Mono", "PT Mono", ui-monospace, "Courier New", monospace;
+
+  /* -- 字号：极端对比是核心，标题:正文 ≥ 6:1 -- */
+  --kv-size-mega:  clamp(3.5rem, 15vw, 16rem);
+  --kv-size-h1:    clamp(2.5rem, 8vw, 7rem);
+  --kv-size-h2:    clamp(1.75rem, 3.6vw, 3rem);
+  --kv-size-h3:    clamp(1.25rem, 2vw, 1.75rem);
+  --kv-size-lead:  clamp(1.125rem, 1.6vw, 1.5rem);
+  --kv-size-body:  clamp(1rem, 1.05vw, 1.125rem);
+  --kv-size-label: 0.75rem;
+
+  /* -- 字距与行高：大字收紧，小字放开 -- */
+  --kv-track-mega:  -0.045em;
+  --kv-track-h:     -0.02em;
+  --kv-track-label:  0.18em;
+  --kv-leading-mega: 0.82;
+  --kv-leading-h:    0.95;
+  --kv-leading-body: 1.55;
+
+  /* -- 网格与间距 -- */
+  --kv-gutter: 1.5rem;
+  --kv-margin: clamp(1rem, 4vw, 4rem);
+  --kv-hairline: 1px;
+  --kv-rule: 6px;
+  --kv-axis-angle: -15deg;
+
+  --kv-space-1: 0.25rem;
+  --kv-space-2: 0.5rem;
+  --kv-space-3: 1rem;
+  --kv-space-4: 1.5rem;
+  --kv-space-5: 2.5rem;
+  --kv-space-6: 4rem;
+  --kv-space-7: 7rem;
+  --kv-space-8: 12rem;
+
+  /* -- 形状：零圆角，不可协商 -- */
+  --kv-radius: 0;
+  --kv-border: 2px solid var(--kv-ink);
+  --kv-border-thick: 6px solid var(--kv-ink);
+  --kv-shadow-hard: 8px 8px 0 var(--kv-ink);
+  --kv-shadow-red:  8px 8px 0 var(--kv-red);
+
+  /* -- 动效：机械化，禁止回弹 -- */
+  --kv-ease-mech: cubic-bezier(0.85, 0, 0.15, 1);
+  --kv-dur-fast: 120ms;
+  --kv-dur-base: 200ms;
+  --kv-dur-slow: 320ms;
+
+  /* -- 印刷颗粒 -- */
+  --kv-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+/* ---------- 3. 重置 ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--kv-font-body);
+  font-size: var(--kv-size-body);
+  line-height: var(--kv-leading-body);
+  color: var(--kv-ink);
+  background-color: var(--kv-paper);
+  /* ⚠️ 性能警告：下面这行是**内联 SVG feTurbulence**。它每次重绘/缩放/滚动合成
+     都要重新光栅化滤镜，**全屏常驻使用在生产环境是有代价的**。
+     生产建议：换成一张无缝的 PNG/WebP 颗粒贴图（GPU 平铺，成本极低）：
+       :root { --kv-grain: url("./grain-160.png"); }
+     小面积元素（卡片、Hero）用 SVG 版本完全没问题。
+     另外：**不要用 background-attachment: fixed**（移动端会强制全屏重绘）。 */
+  background-image: var(--kv-grain);
+  background-size: 160px 160px;   /* 固定 px，不要用 % / cover，否则滤镜被反复重算 */
+  background-blend-mode: multiply;
+  text-wrap: pretty;              /* Firefox 目前不支持，会优雅降级为默认断行 */
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 需要独立全屏颗粒层时（务必 pointer-events:none，否则挡住所有点击）：
+.kv-grain-layer {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background-image: var(--kv-grain); background-size: 160px 160px;
+  mix-blend-mode: multiply; opacity: .5;
+}
+*/
+
+img, svg, video { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+/* 全局零圆角 */
+*, *::before, *::after { border-radius: var(--kv-radius); }
+
+/* ---------- 4. 排版 ---------- */
+.kv-mega, .kv-h1, .kv-h2, .kv-h3 {
+  font-family: var(--kv-font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.kv-mega {
+  font-size: var(--kv-size-mega);
+  line-height: var(--kv-leading-mega);
+  letter-spacing: var(--kv-track-mega);
+}
+.kv-h1 { font-size: var(--kv-size-h1); line-height: var(--kv-leading-h); letter-spacing: var(--kv-track-h); }
+.kv-h2 { font-size: var(--kv-size-h2); line-height: var(--kv-leading-h); letter-spacing: var(--kv-track-h); }
+.kv-h3 {
+  font-size: var(--kv-size-h3); line-height: 1.15;
+  font-weight: 600; letter-spacing: 0.005em;
+}
+.kv-alt  { font-family: var(--kv-font-alt); }
+.kv-lead { font-size: var(--kv-size-lead); line-height: 1.45; max-width: 62ch; }
+.kv-body { max-width: 68ch; }
+.kv-small{ font-size: 0.875rem; }
+
+/* 标签：小字必须放开字距，否则挤成一团 */
+.kv-label {
+  font-family: var(--kv-font-mono);
+  font-size: var(--kv-size-label);
+  font-weight: 600;
+  letter-spacing: var(--kv-track-label);
+  text-transform: uppercase;
+  color: var(--kv-ink-soft);
+}
+
+/* 红色文字的两种合法用法 */
+.kv-red-large { color: var(--kv-red); }      /* 仅 ≥24px 或 ≥18.66px 粗体 */
+.kv-red-text  { color: var(--kv-red-ink); }  /* 任意字号，AA 合格 */
+
+.kv-mono { font-family: var(--kv-font-mono); font-variant-numeric: tabular-nums; }
+
+/* 引文 */
+.kv-quote {
+  font-family: var(--kv-font-alt);
+  font-size: clamp(1.375rem, 3vw, 2.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  border-left: var(--kv-rule) solid var(--kv-red);
+  padding-left: var(--kv-space-4);
+  margin: 0;
+  text-wrap: balance;
+}
+.kv-quote cite {
+  display: block; margin-top: var(--kv-space-3);
+  font-family: var(--kv-font-mono); font-size: var(--kv-size-label);
+  font-style: normal; letter-spacing: var(--kv-track-label);
+  text-transform: uppercase; color: var(--kv-ink-soft);
+}
+
+/* 链接：粗野主义 Web 的诚实原则 —— 必须默认带下划线 */
+.kv-link {
+  color: var(--kv-ink); text-decoration: underline;
+  text-decoration-thickness: 2px; text-underline-offset: 3px;
+  transition: background-color var(--kv-dur-fast) var(--kv-ease-mech);
+}
+.kv-link:hover { background: var(--kv-yellow); }
+.kv-link:focus-visible { outline: 3px solid var(--kv-blue); outline-offset: 2px; }
+
+/* ---------- 5. 布局 ---------- */
+.kv-shell { padding-inline: var(--kv-margin); }
+.kv-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--kv-gutter);
+}
+.kv-section { padding-block: clamp(3rem, 9vw, var(--kv-space-8)); }
+.kv-rule { border: 0; border-top: var(--kv-border); margin-block: var(--kv-space-6); }
+.kv-rule--thick { border-top-width: 6px; }
+.kv-rule--double { border-top: 6px double var(--kv-ink); }
+
+/* 可见网格底纹（"暴露构造"） */
+.kv-gridlines {
+  background-image:
+    repeating-linear-gradient(90deg, rgba(18,16,14,.07) 0 1px, transparent 1px calc(100%/12)),
+    repeating-linear-gradient(0deg,  rgba(18,16,14,.05) 0 1px, transparent 1px 48px);
+}
+
+/* ---------- 6. 几何原语 ---------- */
+.kv-wedge {
+  aspect-ratio: 16 / 7;              /* 锁死比例，防止尖角变形 */
+  background: var(--kv-red);
+  clip-path: polygon(0% 100%, 100% 6%, 100% 42%, 0% 100%);
+}
+.kv-block { background: var(--kv-red); color: var(--kv-paper); padding: var(--kv-space-5); }
+.kv-block--ink { background: var(--kv-ink); color: var(--kv-paper); }
+.kv-block--yellow { background: var(--kv-yellow); color: var(--kv-ink); }
+
+.kv-circle {
+  width: min(38vw, 320px); aspect-ratio: 1; border-radius: 50%;
+  background: var(--kv-ink);
+  /* 注意：这里的 border-radius 是几何原语本身，不是 UI 圆角 */
+}
+
+.kv-bar { height: 14px; background: var(--kv-ink); }
+
+/* 主斜轴：贯穿页面的"主梁"
+   注意 z-index：设为低于内容层，斜轴才会在透明的区块背景处透出来，
+   而不会压在正文上。若确实想要"印在文字之上"的效果，
+   请把 z-index 提到内容之上，但务必先把 bar 做细（<=8px）
+   并确认它交叉的区域内没有正文，否则可读性会明显下降。 */
+.kv-axis {
+  position: fixed; inset: -20% -10%;
+  width: 140%; height: 14px;
+  background: var(--kv-ink);
+  transform: rotate(var(--kv-axis-angle));
+  pointer-events: none; z-index: 0;
+  mix-blend-mode: multiply;
+}
+
+/* ---------- 7. 印刷质感 ---------- */
+/* 套印错位（misregistration）
+   ⚠️ 无障碍硬约束：**不要**用伪元素 `content: attr(data-text)` 复制文字。
+   部分屏幕阅读器会朗读伪元素内容 → 标题被念两遍。
+   正确做法：用一个真实的 <span aria-hidden="true"> 承载重影。
+
+   用法：
+   <h2 class="kv-misreg">КНИГИ<span class="kv-misreg__ghost" aria-hidden="true">КНИГИ</span></h2>
+
+   偏移量 ≤3px。超过 5px 就从"印刷错版"变成"故障艺术"，那是另一种风格。 */
+.kv-misreg {
+  position: relative;
+  display: inline-block;          /* 让重影层有确定的包含块 */
+  isolation: isolate;             /* 把 multiply 锁在组件内，避免混到 body 背景 */
+}
+.kv-misreg__ghost {
+  position: absolute;
+  inset: 0;
+  color: var(--kv-red);
+  mix-blend-mode: multiply;
+  transform: translate(3px, -2px);
+  pointer-events: none;
+  user-select: none;
+}
+/* 若父元素已有背景色、或需要重影压在本体之上，把重影提到上面：
+   .kv-misreg__ghost--over { z-index: 1; } 并把本体改为 position:relative;z-index:0 */
+
+/* ⚠️ 兼容性提醒：Blink(Chrome) 与 WebKit(Safari) 的 mix-blend-mode 实现有可见差异，
+   错位量不要卡在临界值，建议留 ±1px 冗余。 */
+
+/* 半调网点 */
+.kv-halftone {
+  background-image: radial-gradient(var(--kv-ink) 1.5px, transparent 1.6px);
+  background-size: 6px 6px;
+}
+
+/* 双色调照片 */
+.kv-duotone { position: relative; display: block; isolation: isolate; }
+.kv-duotone img {
+  display: block; width: 100%;
+  filter: grayscale(1) contrast(1.15) brightness(1.03);
+  mix-blend-mode: luminosity;
+}
+.kv-duotone::after {
+  content: ""; position: absolute; inset: 0;
+  background: var(--kv-red);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.kv-duotone--ink::after {
+  background: linear-gradient(160deg, var(--kv-ink) 0%, var(--kv-red) 100%);
+  mix-blend-mode: lighten;
+}
+
+/* 硬边阴影 */
+.kv-hard { box-shadow: var(--kv-shadow-hard); }
+.kv-hard--red { box-shadow: var(--kv-shadow-red); }
+
+/* ---------- 8. 组件 ---------- */
+.kv-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px;                 /* 触控目标红线 */
+  padding: 0.75rem 1.5rem;
+  font-family: var(--kv-font-display);
+  font-weight: 600; letter-spacing: var(--kv-track-label);
+  text-transform: uppercase; font-size: 0.9375rem;
+  background: var(--kv-ink); color: var(--kv-paper);
+  border: var(--kv-border);
+  cursor: pointer; text-decoration: none;
+  transition: background-color var(--kv-dur-fast) var(--kv-ease-mech),
+              color var(--kv-dur-fast) var(--kv-ease-mech),
+              border-color var(--kv-dur-fast) var(--kv-ease-mech);
+}
+/* hover 用深红而非朱红：确保 5.63:1，AA 正文级也能达标 */
+.kv-btn:hover { background: var(--kv-red-ink); border-color: var(--kv-red-ink); }
+.kv-btn:focus-visible { outline: 4px solid var(--kv-blue); outline-offset: 3px; }
+.kv-btn:active { transform: translate(2px, 2px); }
+.kv-btn[disabled], .kv-btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+.kv-btn--ghost { background: transparent; color: var(--kv-ink); }
+.kv-btn--ghost:hover { background: var(--kv-red-ink); color: var(--kv-paper); border-color: var(--kv-red-ink); }
+.kv-btn--red { background: var(--kv-red); border-color: var(--kv-red); }
+.kv-btn--red:hover { background: var(--kv-red-ink); border-color: var(--kv-red-ink); }
+
+.kv-card {
+  border: var(--kv-border);
+  background: var(--kv-paper-lift);
+  padding: var(--kv-space-4);
+}
+.kv-card--hard { box-shadow: var(--kv-shadow-hard); }
+.kv-card__num {
+  font-family: var(--kv-font-mono); font-size: var(--kv-size-label);
+  letter-spacing: var(--kv-track-label); color: var(--kv-red-ink);
+}
+
+/* 编号区块头：暴露"构造"的分节系统 */
+.kv-head {
+  display: flex; align-items: baseline; gap: var(--kv-space-3);
+  border-bottom: var(--kv-rule) solid var(--kv-ink);
+  padding-bottom: var(--kv-space-2);
+  margin-bottom: var(--kv-space-4);
+}
+.kv-head__idx { font-family: var(--kv-font-mono); font-size: var(--kv-size-label); letter-spacing: var(--kv-track-label); }
+.kv-head__title { flex: 1; }
+
+/* 表格：印刷感表格 */
+.kv-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.kv-table th, .kv-table td { border-bottom: 1px solid var(--kv-ink); padding: var(--kv-space-2) var(--kv-space-3); text-align: left; }
+.kv-table th {
+  font-family: var(--kv-font-display); text-transform: uppercase;
+  font-size: var(--kv-size-label); letter-spacing: var(--kv-track-label);
+  border-bottom: var(--kv-rule) solid var(--kv-ink);
+}
+
+/* 色板展示 */
+.kv-swatch { border: var(--kv-border); }
+.kv-swatch__chip { height: 88px; }
+.kv-swatch__meta { padding: var(--kv-space-2); font-family: var(--kv-font-mono); font-size: 0.6875rem; line-height: 1.5; }
+
+/* 标签块 */
+.kv-tag {
+  display: inline-block; padding: 0.2rem 0.6rem;
+  font-family: var(--kv-font-mono); font-size: var(--kv-size-label);
+  letter-spacing: var(--kv-track-label); text-transform: uppercase;
+  border: 1px solid var(--kv-ink);
+}
+.kv-tag--red { background: var(--kv-red); color: var(--kv-paper); border-color: var(--kv-red); }
+.kv-tag--ink { background: var(--kv-ink); color: var(--kv-paper); }
+
+/* 竖排
+   ⚠️ writing-mode 会**交换 inline 与 block 轴**。使用竖排的容器内部，
+   所有 margin/padding/width/height 都必须改用逻辑属性
+   （margin-block / padding-inline / inline-size / block-size），
+   否则左右与上下的语义会整体错位。
+   ⚠️ text-orientation: upright 会让拉丁字母变成"一堆正立字母"，几乎不可读，
+   只用于装饰性短标签；正文/标签用 mixed。 */
+.kv-vertical { writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 0.14em; }
+
+/* ⚠️⚠️ clip-path 的两个致命陷阱（本项目最容易踩的两个坑）⚠️⚠️
+
+   ① **`clip-path` 会把 `outline` 一起裁掉 → 键盘焦点环不可见 → WCAG 2.4.7 失败。**
+      凡是"可交互"的元素（a / button / input），**不要**在它自己身上用 clip-path。
+      正确做法：把 clip-path 交给一个 `aria-hidden="true"` 的装饰子层，
+      交互元素本体不做裁剪，outline 就正常了：
+
+      <button class="kv-wedge-btn">
+        <span class="kv-wedge-btn__decor" aria-hidden="true"></span>
+        <span class="kv-wedge-btn__label">按此</span>
+      </button>
+
+      .kv-wedge-btn { position: relative; background: none; border: 0; padding: 0; }
+      .kv-wedge-btn__decor { position: absolute; inset: 0; background: var(--kv-red);
+        clip-path: polygon(0% 100%, 100% 6%, 100% 100%); z-index: 0; }
+      .kv-wedge-btn__label { position: relative; z-index: 1; display: block;
+        padding: 1rem 2rem; color: var(--kv-paper); }
+      .kv-wedge-btn:focus-visible { outline: 4px solid var(--kv-blue); outline-offset: 3px; }
+
+   ② **非 `none` 的 `clip-path` 会新建 stacking context**，这会**截断 `mix-blend-mode`
+      的混合范围** —— 这就是"明明写了 multiply 却没变暗"的头号原因。
+      同理会新建 stacking context 的属性还有：`opacity < 1`、`transform`、`filter`、
+      `mask`、`will-change`、`contain: paint`、`position: fixed/sticky`。
+      构成主义页面里 transform 和 clip-path 到处都是 → 混合范围容易被切得七零八落。
+      对策：把混合锁在**同一层**里，并用 `isolation: isolate` 显式划出作用域。
+
+   ③ `clip-path` 的参考盒默认是 **border-box**（不是 padding-box）；
+      百分比相对参考盒解析。想画随元素缩放的斜切，用 `polygon()` / `shape()`，
+      **不要用 `path()`** —— `path()` 里是 px，不会随元素缩放。 */
+
+/* ---------- 9. 动效 ---------- */
+@keyframes kv-reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes kv-jump   { to { opacity: 1; transform: none; } }
+
+.kv-reveal { animation: kv-reveal var(--kv-dur-slow) var(--kv-ease-mech) both; }
+
+.kv-stagger > * { opacity: 0; transform: translateY(0.6em); animation: kv-jump var(--kv-dur-base) var(--kv-ease-mech) forwards; }
+.kv-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.kv-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.kv-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.kv-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.kv-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.kv-stagger > *:nth-child(6) { animation-delay: 250ms; }
+
+/* ⚠️ 动效原则：**静止态必须是默认样式，动效只做增强**。
+   `.kv-stagger` 上面把 opacity:0 写成了默认态，所以下面 reduced-motion 里
+   必须同时复位 opacity 与 transform —— 只写 `animation: none` 会让元素永远隐形。 */
+
+/* ---------- 10. 无障碍与降级 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .kv-stagger > * { opacity: 1; transform: none; }
+}
+
+/* 高对比偏好：关掉所有质感叠加，保证可读性 */
+@media (prefers-contrast: more) {
+  body { background-image: none; }
+  .kv-misreg::before { display: none; }
+  .kv-duotone::after { opacity: .55; }
+}
+
+/* 强制高对比模式（Windows 高对比）下不依赖背景色传达信息 */
+@media (forced-colors: active) {
+  .kv-btn { border: 2px solid ButtonText; }
+  .kv-axis, .kv-halftone { display: none; }
+}
+
+@media print {
+  body { background: #fff; background-image: none; }
+  .kv-axis { display: none; }
+}

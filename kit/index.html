@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KV — 构成主义 Web 设计系统 · 样式指南</title>
+<link rel="stylesheet" href="kv.css">
+<style>
+  /* ===== 仅本样式指南页面使用的布局，不属于设计系统本身 ===== */
+  /* 内容层抬到斜轴之上，保证 14px 主梁不压住正文 */
+  .pd-page { max-width: 1440px; margin-inline: auto; position: relative; z-index: 1; }
+
+  .pd-hero {
+    position: relative;
+    min-height: 92svh;
+    display: grid;
+    align-content: end;
+    padding-block: var(--kv-space-6) var(--kv-space-5);
+    overflow: clip;
+    border-bottom: var(--kv-rule) solid var(--kv-ink);
+  }
+  .pd-hero__wedge {
+    position: absolute; inset: auto -6% 22% -6%;
+    height: 46vh; background: var(--kv-red);
+    clip-path: polygon(0% 100%, 100% 0%, 100% 26%, 0% 100%);
+    z-index: 0;
+  }
+  .pd-hero__inner { position: relative; z-index: 2; }
+  .pd-hero__meta {
+    display: flex; flex-wrap: wrap; gap: var(--kv-space-3) var(--kv-space-5);
+    align-items: baseline; margin-bottom: var(--kv-space-4);
+  }
+  .pd-hero__title { margin: 0 0 var(--kv-space-3); }
+  .pd-hero__ru {
+    font-family: var(--kv-font-alt); font-weight: 900;
+    font-size: clamp(1.5rem, 4.6vw, 4.5rem);
+    line-height: .95; letter-spacing: -.03em; text-transform: uppercase;
+    color: var(--kv-ink); margin: 0 0 var(--kv-space-3);
+  }
+  .pd-hero__lead { max-width: 46ch; }
+
+  .pd-sec { padding-block: clamp(3rem, 8vw, 7rem); border-bottom: 1px solid rgba(18,16,14,.22); }
+  .pd-sec:last-of-type { border-bottom: 0; }
+
+  .pd-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--kv-space-3); }
+  .pd-type-spec { display: grid; gap: var(--kv-space-5); }
+  .pd-type-row { border-top: 1px solid rgba(18,16,14,.22); padding-top: var(--kv-space-3); }
+  .pd-type-row__note { display: flex; flex-wrap: wrap; gap: var(--kv-space-4); margin-bottom: var(--kv-space-2); }
+
+  .pd-geo { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--kv-space-4); }
+  .pd-geo__cell { border: var(--kv-border); padding: var(--kv-space-3); background: var(--kv-paper-lift); }
+  .pd-geo__stage { aspect-ratio: 4/3; position: relative; overflow: clip; margin-bottom: var(--kv-space-3); background: var(--kv-paper-dim); }
+
+  .pd-tex { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--kv-space-4); }
+  .pd-tex__cell { border: var(--kv-border); padding: var(--kv-space-3); }
+  .pd-tex__stage { aspect-ratio: 4/3; margin-bottom: var(--kv-space-3); position: relative; overflow: clip; }
+
+  .pd-comps { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--kv-space-5); align-items: start; }
+
+  .pd-motion { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--kv-space-4); }
+  .pd-motion__cell { border: var(--kv-border); padding: var(--kv-space-3); }
+  .pd-motion__stage { height: 130px; background: var(--kv-paper-dim); display: grid; place-items: center; margin-bottom: var(--kv-space-3); overflow: clip; }
+  .pd-motion__box { width: 78%; height: 56px; background: var(--kv-red); }
+
+  .pd-a11y { display: grid; gap: 0; border-top: var(--kv-rule) solid var(--kv-ink); }
+  .pd-a11y__row {
+    display: grid; grid-template-columns: minmax(150px, 1fr) 3fr;
+    gap: var(--kv-space-4); padding-block: var(--kv-space-3);
+    border-bottom: 1px solid rgba(18,16,14,.22); align-items: baseline;
+  }
+  @media (max-width: 640px) { .pd-a11y__row { grid-template-columns: 1fr; gap: var(--kv-space-1); } }
+
+  .pd-badge { font-family: var(--kv-font-mono); font-size: .6875rem; letter-spacing: .1em; text-transform: uppercase; border: 1px solid currentColor; padding: .1rem .4rem; white-space: nowrap; }
+  .pd-ok   { color: #1F6B33; }
+  .pd-warn { color: var(--kv-red-ink); }
+  .pd-bad  { color: var(--kv-red-ink); text-decoration: line-through; }
+
+  .pd-marquee { overflow: clip; white-space: nowrap; border-block: var(--kv-rule) solid var(--kv-ink); background: var(--kv-ink); color: var(--kv-paper); padding-block: .5rem; }
+  .pd-marquee__track { display: inline-block; animation: pd-scroll 26s linear infinite; font-family: var(--kv-font-display); text-transform: uppercase; font-size: clamp(1.1rem, 2.4vw, 2rem); letter-spacing: .08em; }
+  @keyframes pd-scroll { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .pd-marquee__track { animation: none; } }
+
+  .pd-foot { padding-block: var(--kv-space-6); }
+
+  .pd-note { font-size: .875rem; color: var(--kv-ink-soft); max-width: 66ch; }
+</style>
+</head>
+<body>
+
+<!-- 贯穿全页的主斜轴 -->
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="pd-page kv-shell">
+
+  <!-- ============ HERO ============ -->
+  <header class="pd-hero">
+    <div class="pd-hero__wedge" aria-hidden="true"></div>
+    <div class="pd-hero__inner">
+      <div class="pd-hero__meta">
+        <span class="kv-label">KV / Design System</span>
+        <span class="kv-label">v0.1</span>
+        <span class="kv-label">1920&thinsp;/&thinsp;2026</span>
+      </div>
+
+      <h1 class="pd-hero__title">
+        <span class="kv-mega kv-red-large kv-misreg">构成主义<span class="kv-misreg__ghost" aria-hidden="true">构成主义</span></span>
+      </h1>
+      <p class="pd-hero__ru">Конструктивизм<br>Web Design</p>
+      <p class="kv-lead pd-hero__lead">
+        米黄纸底、黑墨压结构、朱红引爆点。四种几何原语、一条斜轴、极端的字号对比、
+        可见的网格、被加工过的照片，以及机械化的动效。
+      </p>
+      <p style="margin-top:var(--kv-space-5); display:flex; gap:var(--kv-space-3); flex-wrap:wrap;">
+        <a class="kv-btn" href="#palette">开始查阅</a>
+        <a class="kv-btn kv-btn--ghost" href="#a11y">无障碍红线</a>
+      </p>
+    </div>
+  </header>
+
+  <!-- 滚动字幕条 -->
+  <div class="pd-marquee" aria-hidden="true">
+    <span class="pd-marquee__track">КНИГИ · ПОСТРОИМ БУДУЩЕЕ · ART INTO LIFE · PROUN · КНИГИ · ПОСТРОИМ БУДУЩЕЕ · ART INTO LIFE · PROUN ·&nbsp;</span>
+  </div>
+
+  <!-- ============ 01 色彩 ============ -->
+  <section class="pd-sec" id="palette">
+    <div class="kv-head">
+      <span class="kv-head__idx">01</span>
+      <h2 class="kv-h2 kv-head__title">色彩系统</h2>
+      <span class="kv-label">面积配比是硬约束</span>
+    </div>
+
+    <p class="kv-body" style="margin-bottom:var(--kv-space-5);">
+      构成主义海报是 <strong>双色油墨印在廉价纸上</strong>。所以色板以「纸」为基准，而不是以「白」为基准。
+      纸占 60–75%，墨占 20–30%，<strong>朱红只占 5–15%</strong> 且必须出现在最关键的一两处。
+    </p>
+
+    <div class="pd-swatches" style="margin-bottom:var(--kv-space-6);">
+      <div class="kv-swatch">
+        <div class="kv-swatch__chip" style="background:#EFE9DC"></div>
+        <div class="kv-swatch__meta"><strong>--kv-paper</strong><br>#EFE9DC<br>主纸色 · 60–75%</div>
+      </div>
+      <div class="kv-swatch">
+        <div class="kv-swatch__chip" style="background:#E3DBC9"></div>
+        <div class="kv-swatch__meta"><strong>--kv-paper-dim</strong><br>#E3DBC9<br>纸的暗面 · 分层</div>
+      </div>
+      <div class="kv-swatch">
+        <div class="kv-swatch__chip" style="background:#12100E"></div>
+        <div class="kv-swatch__meta" style="color:var(--kv-ink)"><strong>--kv-ink</strong><br>#12100E<br>油墨黑 · 20–30%</div>
+      </div>
+      <div class="kv-swatch">
+        <div class="kv-swatch__chip" style="background:#D6281F"></div>
+        <div class="kv-swatch__meta"><strong>--kv-red</strong><br>#D6281F<br>印刷朱红 · 5–15%<br><span class="pd-warn">仅大字/图形</span></div>
+      </div>
+      <div class="kv-swatch">
+        <div class="kv-swatch__chip" style="background:#B31B12"></div>
+        <div class="kv-swatch__meta"><strong>--kv-red-ink</strong><br>#B31B12<br>深红 · 小字专用<br><span class="pd-ok">AA 合格</span></div>
+      </div>
+      <div class="kv-swatch">
+        <div class="kv-swatch__chip" style="background:#8E1B14"></div>
+        <div class="kv-swatch__meta"><strong>--kv-red-deep</strong><br>#8E1B14<br>压印层<br><span class="pd-bad">墨底上禁用</span></div>
+      </div>
+      <div class="kv-swatch">
+        <div class="kv-swatch__chip" style="background:#16407A"></div>
+        <div class="kv-swatch__meta"><strong>--kv-blue</strong><br>#16407A<br>至上主义点缀 · ≤3%</div>
+      </div>
+      <div class="kv-swatch">
+        <div class="kv-swatch__chip" style="background:#E8B31A"></div>
+        <div class="kv-swatch__meta"><strong>--kv-yellow</strong><br>#E8B31A<br>至上主义点缀 · ≤3%</div>
+      </div>
+    </div>
+
+    <h3 class="kv-h3" style="margin-bottom:var(--kv-space-3);">实测对比度与使用授权</h3>
+    <p class="pd-note" style="margin-bottom:var(--kv-space-3);">
+      下表由 WCAG 2.x 相对亮度公式精算得出，不是目测。判定线：≥4.5:1 为 AA 正文合格；≥3:1 仅限 ≥24px 或 ≥18.66px 粗体。
+    </p>
+
+    <div style="overflow-x:auto;">
+      <table class="kv-table">
+        <thead>
+          <tr><th>前景</th><th>背景</th><th>对比度</th><th>结论</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>墨 #12100E</td><td>纸 #EFE9DC</td><td>15.69 : 1</td><td><span class="pd-badge pd-ok">AA 正文</span></td></tr>
+          <tr><td>纸 #EFE9DC</td><td>墨底</td><td>15.69 : 1</td><td><span class="pd-badge pd-ok">AA 正文</span></td></tr>
+          <tr><td>黄 #E8B31A</td><td>墨底</td><td>9.85 : 1</td><td><span class="pd-badge pd-ok">AA 正文</span></td></tr>
+          <tr><td>蓝 #16407A</td><td>纸</td><td>8.47 : 1</td><td><span class="pd-badge pd-ok">AA 正文</span></td></tr>
+          <tr><td><strong>深红 #B31B12</strong></td><td>纸</td><td><strong>5.63 : 1</strong></td><td><span class="pd-badge pd-ok">AA 正文</span></td></tr>
+          <tr><td>朱红 #D6281F</td><td>纸</td><td>4.15 : 1</td><td><span class="pd-badge pd-warn">仅大字</span></td></tr>
+          <tr><td>纸</td><td>朱红底</td><td>4.15 : 1</td><td><span class="pd-badge pd-warn">仅大字</span></td></tr>
+          <tr><td>朱红</td><td>墨底</td><td>3.78 : 1</td><td><span class="pd-badge pd-warn">仅大字</span></td></tr>
+          <tr><td>灰 #8A8377</td><td>纸</td><td>3.10 : 1</td><td><span class="pd-badge pd-warn">仅装饰</span></td></tr>
+          <tr><td>暗红 #8E1B14</td><td>墨底</td><td>2.79 : 1</td><td><span class="pd-badge pd-bad">任何字号禁用</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="pd-note" style="margin-top:var(--kv-space-4);">
+      <strong>由此得出的硬规则：</strong>①正文字号的红字必须用 <code>--kv-red-ink</code>；
+      ②朱红只用于大面积色块、几何图形与 ≥24px 标题；③灰色只能做网点装饰，不能承载文字；
+      ④不要用 <code>opacity</code> 制造「浅色文字」——那会绕过全部上述结论。
+    </p>
+  </section>
+
+  <!-- ============ 02 字体 ============ -->
+  <section class="pd-sec" id="type">
+    <div class="kv-head">
+      <span class="kv-head__idx">02</span>
+      <h2 class="kv-h2 kv-head__title">字体系统</h2>
+      <span class="kv-label">已核实西里尔覆盖</span>
+    </div>
+
+    <p class="kv-body" style="margin-bottom:var(--kv-space-5);">
+      气质要求：<strong>窄、重、几何、全大写、工业怪诞体</strong>。
+      以下是逐字族查询 Google Fonts 官方元数据（1950 个字族）后的核实结果 ——
+      <strong>Anton / Bebas Neue / Archivo Black / Barlow Condensed 均不支持西里尔字母</strong>，
+      页面一旦出现俄文就会掉字体，因此本系统不采用。
+    </p>
+
+    <div class="pd-type-spec" style="margin-bottom:var(--kv-space-6);">
+      <div class="pd-type-row">
+        <div class="pd-type-row__note">
+          <span class="kv-label">--kv-size-mega · Oswald 700 · clamp(3.5rem, 15vw, 16rem)</span>
+          <span class="pd-badge pd-ok">西里尔 ✓</span>
+        </div>
+        <div class="kv-mega" style="font-size:clamp(2.4rem,9vw,7rem);">ПОСТРОИМ</div>
+      </div>
+
+      <div class="pd-type-row">
+        <div class="pd-type-row__note">
+          <span class="kv-label">--kv-size-h1 · Unbounded 800</span>
+          <span class="pd-badge pd-ok">西里尔 ✓ · 可变 200–900</span>
+        </div>
+        <div class="kv-h1 kv-alt" style="font-size:clamp(1.9rem,5.5vw,4.2rem);">Art Into Life</div>
+      </div>
+
+      <div class="pd-type-row">
+        <div class="pd-type-row__note">
+          <span class="kv-label">--kv-size-h2 · Oswald 700 · 全大写 + 负字距</span>
+        </div>
+        <div class="kv-h2">用红色楔子打击白军</div>
+      </div>
+
+      <div class="pd-type-row">
+        <div class="pd-type-row__note">
+          <span class="kv-label">正文 · PT Sans · max-width 68ch · line-height 1.55</span>
+          <span class="pd-badge pd-ok">俄罗斯本土设计</span>
+        </div>
+        <p class="kv-body" style="margin:0;">
+          材料成形应当取代审美的组合。对象应被当作一个整体来处理，因而没有可辨认的「风格」，
+          只是像汽车、飞机那样的工业秩序产物。构成主义是纯粹的技术性掌控与材料组织。
+          <span class="kv-red-text">需要红色正文时用 --kv-red-ink（5.63:1，AA 合格）</span>，
+          而 <span class="kv-red-large" style="font-size:1.25rem;">朱红 #D6281F 只适合 ≥24px 的标题</span>。
+        </p>
+      </div>
+
+      <div class="pd-type-row">
+        <div class="pd-type-row__note">
+          <span class="kv-label">--kv-size-label · JetBrains Mono · letter-spacing .18em</span>
+        </div>
+        <p class="kv-label" style="margin:0;">01 / 04 &nbsp;·&nbsp; MOSCOW 1924 &nbsp;·&nbsp; OFL-1.1 &nbsp;·&nbsp; 12 COL</p>
+      </div>
+    </div>
+
+    <h3 class="kv-h3" style="margin-bottom:var(--kv-space-3);">中文选字（许可证已核实）</h3>
+    <div style="overflow-x:auto;">
+      <table class="kv-table">
+        <thead><tr><th>字体</th><th>仓库</th><th>Star</th><th>许可证</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><strong>得意黑 Smiley Sans</strong></td><td class="kv-mono">atelier-anchor/smiley-sans</td><td class="kv-mono">14,905</td><td class="kv-mono">OFL-1.1</td><td>中文标题首选 · 窄斜骨架与构成主义高度契合</td></tr>
+          <tr><td>霞鹜文楷</td><td class="kv-mono">lxgw/LxgwWenKai</td><td class="kv-mono">26,243</td><td class="kv-mono">OFL-1.1</td><td>引文 · 楷体，气质偏温，作对比</td></tr>
+          <tr><td>思源黑体</td><td class="kv-mono">adobe-fonts/source-han-sans</td><td class="kv-mono">17,331</td><td class="kv-mono">OFL-1.1</td><td>正文兜底 · 多字重</td></tr>
+          <tr><td>Noto CJK</td><td class="kv-mono">notofonts/noto-cjk</td><td class="kv-mono">4,093</td><td class="kv-mono">OFL-1.1</td><td>兜底</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 03 几何原语 ============ -->
+  <section class="pd-sec" id="geometry">
+    <div class="kv-head">
+      <span class="kv-head__idx">03</span>
+      <h2 class="kv-h2 kv-head__title">几何原语</h2>
+      <span class="kv-label">只用四种</span>
+    </div>
+
+    <p class="kv-body" style="margin-bottom:var(--kv-space-5);">
+      圆、矩形、三角楔、线。<strong>不用曲线、不用渐变、不用柔和阴影、不用圆角。</strong>
+      楔形（尖角三角）是识别度最高的符号 —— 它来自李西茨基 1919 年的《用红色楔子打击白军》。
+    </p>
+
+    <div class="pd-geo">
+      <div class="pd-geo__cell">
+        <div class="pd-geo__stage">
+          <div style="position:absolute; inset:0; background:var(--kv-red); clip-path:polygon(0% 100%, 100% 0%, 100% 30%, 0% 100%);"></div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem">WEDGE 楔形</p>
+        <p class="pd-note" style="margin:0"><code>clip-path: polygon()</code>，必须锁 <code>aspect-ratio</code> 防止尖角变形。</p>
+      </div>
+
+      <div class="pd-geo__cell">
+        <div class="pd-geo__stage" style="display:grid; place-items:center;">
+          <div style="width:56%; aspect-ratio:1; border-radius:50%; background:var(--kv-ink);"></div>
+          <div style="position:absolute; inset:0; background:var(--kv-red); clip-path:polygon(46% 0%, 58% 0%, 52% 100%, 40% 100%); mix-blend-mode:multiply;"></div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem">CIRCLE + BAR 圆与斜梁</p>
+        <p class="pd-note" style="margin:0">红楔刺入圆 —— 直接用 <code>mix-blend-mode: multiply</code> 叠印。</p>
+      </div>
+
+      <div class="pd-geo__cell">
+        <div class="pd-geo__stage" style="display:grid; align-content:center; gap:10px; padding:14px;">
+          <div style="height:14px; background:var(--kv-ink);"></div>
+          <div style="height:6px; background:var(--kv-ink);"></div>
+          <div style="height:2px; background:var(--kv-ink);"></div>
+          <div style="height:14px; background:var(--kv-red);"></div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem">RULE 线</p>
+        <p class="pd-note" style="margin:0">粗线 6px 是构成主义特征，与瑞士风格的 1px 细线形成对比。</p>
+      </div>
+
+      <div class="pd-geo__cell">
+        <div class="pd-geo__stage kv-gridlines" style="background:var(--kv-paper);">
+          <div class="kv-gridlines" style="position:absolute; inset:0;"></div>
+          <div style="position:absolute; inset:0; background:var(--kv-ink); clip-path:polygon(0 0, 34% 0, 0 100%);"></div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem">VISIBLE GRID 可见网格</p>
+        <p class="pd-note" style="margin:0">瑞士风格隐藏网格；构成主义<strong>炫耀</strong>网格 —— 这是最大的差别。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 04 印刷质感 ============ -->
+  <section class="pd-sec" id="texture">
+    <div class="kv-head">
+      <span class="kv-head__idx">04</span>
+      <h2 class="kv-h2 kv-head__title">印刷质感</h2>
+      <span class="kv-label">必须极轻</span>
+    </div>
+
+    <p class="kv-body" style="margin-bottom:var(--kv-space-5);">
+      目标是「这是印出来的」，不是「这是做旧滤镜」。
+      <strong>判断阈值：把页面缩到 50% 看 —— 如果颗粒依然明显，就是太重了。</strong>
+    </p>
+
+    <div class="pd-tex">
+      <div class="pd-tex__cell">
+        <div class="pd-tex__stage" style="background:var(--kv-paper-dim);">
+          <div style="position:absolute; inset:0; background:var(--kv-ink); display:grid; place-items:center; color:var(--kv-paper);">
+            <span class="kv-h3 kv-misreg" style="color:var(--kv-paper);">КНИГИ<span class="kv-misreg__ghost" aria-hidden="true">КНИГИ</span></span>
+          </div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem">MISREGISTRATION 套印错位</p>
+        <p class="pd-note" style="margin:0">伪元素 + <code>mix-blend-mode: multiply</code>，偏移 <strong>≤3px</strong>。超过 5px 就变成故障艺术了。</p>
+      </div>
+
+      <div class="pd-tex__cell">
+        <div class="pd-tex__stage" style="background:var(--kv-paper-dim);">
+          <div style="position:absolute; inset:0; background:linear-gradient(140deg,#12100E,#4A443B);"></div>
+          <div class="kv-halftone" style="position:absolute; inset:0;"></div>
+          <div style="position:absolute; left:12px; bottom:10px; color:var(--kv-paper);" class="kv-label">HALFTONE</div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem">HALFTONE 半调网点</p>
+        <p class="pd-note" style="margin:0"><code>radial-gradient</code> 重复，间距 <strong>3–6px</strong>。绝不能覆盖正文。</p>
+      </div>
+
+      <div class="pd-tex__cell">
+        <div class="pd-tex__stage" style="background:var(--kv-paper-dim); display:grid; place-items:center;">
+          <div class="kv-block kv-hard" style="padding:var(--kv-space-3) var(--kv-space-4);">
+            <span class="kv-label" style="color:var(--kv-paper); margin:0;">HARD SHADOW</span>
+          </div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem">HARD SHADOW 硬边阴影</p>
+        <p class="pd-note" style="margin:0"><code>box-shadow</code> 模糊值为 <strong>0</strong>。任何 blur &gt; 0 都会破坏风格。</p>
+      </div>
+
+      <div class="pd-tex__cell">
+        <div class="pd-tex__stage" style="background:var(--kv-paper); background-image:var(--kv-grain); background-size:160px; background-blend-mode:multiply; display:grid; place-items:center;">
+          <span class="kv-label" style="margin:0;">PAPER GRAIN 纸颗粒</span>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem">PAPER GRAIN 纸颗粒</p>
+        <p class="pd-note" style="margin:0">SVG <code>feTurbulence</code> 内联 data-URI，<code>opacity</code> 压到 <strong>0.04–0.08</strong>。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 组件 ============ -->
+  <section class="pd-sec" id="components">
+    <div class="kv-head">
+      <span class="kv-head__idx">05</span>
+      <h2 class="kv-h2 kv-head__title">组件</h2>
+      <span class="kv-label">零圆角 · 触控 ≥44px</span>
+    </div>
+
+    <div class="pd-comps">
+      <div>
+        <p class="kv-label" style="margin-bottom:var(--kv-space-3);">按钮</p>
+        <p style="display:flex; gap:var(--kv-space-3); flex-wrap:wrap; margin:0 0 var(--kv-space-3);">
+          <button class="kv-btn">主要操作</button>
+          <button class="kv-btn kv-btn--ghost">次要操作</button>
+          <button class="kv-btn kv-btn--red">朱红</button>
+          <button class="kv-btn" disabled>禁用</button>
+        </p>
+        <p class="pd-note" style="margin:0;">
+          hover 用 <code>--kv-red-ink</code>（5.63:1）而非朱红 —— 朱红底白字只有 4.15:1，卡在大字阈值上。
+          焦点环用蓝色 4px，确保键盘用户可见。
+        </p>
+      </div>
+
+      <div>
+        <p class="kv-label" style="margin-bottom:var(--kv-space-3);">卡片与编号</p>
+        <div class="kv-card kv-card--hard">
+          <span class="kv-card__num">01 / 04</span>
+          <p class="kv-h3" style="margin:var(--kv-space-2) 0;">生产主义</p>
+          <p style="margin:0; font-size:.9375rem;">艺术家即工程师。放弃架上绘画，进入工厂与印刷所。</p>
+        </div>
+      </div>
+
+      <div>
+        <p class="kv-label" style="margin-bottom:var(--kv-space-3);">标签与引文</p>
+        <p style="display:flex; gap:var(--kv-space-2); flex-wrap:wrap; margin:0 0 var(--kv-space-4);">
+          <span class="kv-tag">OFL-1.1</span>
+          <span class="kv-tag kv-tag--red">西里尔 ✓</span>
+          <span class="kv-tag kv-tag--ink">MIT</span>
+        </p>
+        <blockquote class="kv-quote">
+          艺术不能集中在叫做博物馆的死寂神殿里。
+          <cite>— 弗拉基米尔·马雅可夫斯基</cite>
+        </blockquote>
+      </div>
+
+      <div>
+        <p class="kv-label" style="margin-bottom:var(--kv-space-3);">链接（必须默认带下划线）</p>
+        <p style="margin:0; line-height:2;">
+          <a class="kv-link" href="#type">字体系统</a> ·
+          <a class="kv-link" href="#texture">印刷质感</a> ·
+          <a class="kv-link" href="#a11y">无障碍红线</a>
+        </p>
+        <p class="pd-note" style="margin-top:var(--kv-space-3);">
+          来自「粗野主义 Web」原则：链接必须看起来像链接，只有链接和按钮响应点击。
+        </p>
+
+        <p class="kv-label" style="margin:var(--kv-space-5) 0 var(--kv-space-3);">竖排标签</p>
+        <span class="kv-vertical kv-label" style="height:150px;">ПРОУН · 1923</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 动效 ============ -->
+  <section class="pd-sec" id="motion">
+    <div class="kv-head">
+      <span class="kv-head__idx">06</span>
+      <h2 class="kv-h2 kv-head__title">动效</h2>
+      <span class="kv-label">机械化，禁止回弹</span>
+    </div>
+
+    <p class="kv-body" style="margin-bottom:var(--kv-space-5);">
+      工业时代的机器是<strong>分段、突然、有阻尼</strong>的，不是苹果式的丝滑缓动。
+      统一使用 <code>cubic-bezier(0.85, 0, 0.15, 1)</code>，时长 120–320ms，
+      <strong>禁止</strong>弹性缓动与超过 400ms 的动画。把鼠标移到方块上试试。
+    </p>
+
+    <div class="pd-motion">
+      <div class="pd-motion__cell">
+        <div class="pd-motion__stage">
+          <div class="pd-motion__box" id="mv1" style="transition: transform var(--kv-dur-base) var(--kv-ease-mech);"></div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem;">硬切位移</p>
+        <p class="pd-note" style="margin:0;">transform + 机械缓动，无淡入。</p>
+      </div>
+
+      <div class="pd-motion__cell">
+        <div class="pd-motion__stage">
+          <div class="pd-motion__box" id="mv2" style="clip-path:inset(0 100% 0 0); transition: clip-path var(--kv-dur-slow) var(--kv-ease-mech);"></div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem;">裁切框扫过</p>
+        <p class="pd-note" style="margin:0;">用 <code>clip-path: inset()</code> 揭示，像印刷机的过版。</p>
+      </div>
+
+      <div class="pd-motion__cell">
+        <div class="pd-motion__stage" id="mv3">
+          <div class="pd-motion__box" style="background:var(--kv-ink); height:34px; transition:none;"></div>
+        </div>
+        <p class="kv-label" style="margin:0 0 .35rem;">色块硬切</p>
+        <p class="pd-note" style="margin:0;">120ms 内完成颜色切换，几乎无过渡感。</p>
+      </div>
+    </div>
+
+    <p class="pd-note" style="margin-top:var(--kv-space-5);">
+      <strong>降级：</strong>本页所有动效都遵守 <code>prefers-reduced-motion</code>。
+      开启该偏好后，动画时长被压到 0.01ms、滚动字幕停止。
+      实测：本系统全部关键 CSS 特性（<code>clip-path</code> / <code>mix-blend-mode</code> /
+      <code>background-blend-mode</code> / <code>text-wrap</code> / <code>shape-outside</code> /
+      <code>mask</code> / <code>writing-mode</code> / <code>font-variant-numeric</code> /
+      SVG <code>feTurbulence</code> / <code>textPath</code>）在 MDN 上均为
+      <strong>Baseline: Widely available</strong>。
+    </p>
+  </section>
+
+  <!-- ============ 07 无障碍 ============ -->
+  <section class="pd-sec" id="a11y">
+    <div class="kv-head">
+      <span class="kv-head__idx">07</span>
+      <h2 class="kv-h2 kv-head__title">无障碍红线</h2>
+      <span class="kv-label">这套风格的固有风险</span>
+    </div>
+
+    <div class="pd-a11y">
+      <div class="pd-a11y__row">
+        <span class="kv-label">斜排文字</span>
+        <span>旋转不改变 DOM 顺序，屏幕阅读器不受影响，但<strong>视觉阅读效率</strong>显著下降。
+          <strong>规则：斜排只用于 ≤3 个词的短标签，正文永远水平。</strong></span>
+      </div>
+      <div class="pd-a11y__row">
+        <span class="kv-label">红色对比度</span>
+        <span>朱红在纸上仅 <strong>4.15:1</strong>，小字不合格。正文字号的红必须换成
+          <code>--kv-red-ink</code>（5.63:1）。</span>
+      </div>
+      <div class="pd-a11y__row">
+        <span class="kv-label">全大写</span>
+        <span>用 <code>text-transform: uppercase</code> 做<strong>视觉</strong>大写，
+          HTML 里保持正常大小写 —— 否则部分读屏软件会逐字母拼读。</span>
+      </div>
+      <div class="pd-a11y__row">
+        <span class="kv-label">极端字号</span>
+        <span><code>vw</code> 单位不感知容器宽度。组件放进窄栏时应改用 <code>cqw</code> 容器查询单位，
+          并始终配 <code>overflow-wrap: anywhere</code> 与容器 <code>overflow: clip</code>。</span>
+      </div>
+      <div class="pd-a11y__row">
+        <span class="kv-label">质感叠加</span>
+        <span>颗粒与网点会降低文字清晰度。<strong>质感层必须 <code>pointer-events: none</code>，
+          且不得覆盖正文区域。</strong>开启「高对比」偏好时本系统会自动关闭质感。</span>
+      </div>
+      <div class="pd-a11y__row">
+        <span class="kv-label">动效</span>
+        <span>硬切与闪动可能触发前庭不适，必须遵守 <code>prefers-reduced-motion</code>。</span>
+      </div>
+      <div class="pd-a11y__row">
+        <span class="kv-label">触控目标</span>
+        <span>零圆角按钮在视觉上容易做小，<strong>触控目标必须 ≥44×44px</strong>（已写入
+          <code>.kv-btn</code> 的 <code>min-height</code>）。</span>
+      </div>
+      <div class="pd-a11y__row">
+        <span class="kv-label">套印错位的伪元素</span>
+        <span>伪元素内容可能被读屏软件朗读造成重复。<strong>介意时改用
+          <code>aria-hidden="true"</code> 的独立 span 承载重影。</strong></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 结尾 ============ -->
+  <footer class="pd-foot">
+    <hr class="kv-rule kv-rule--thick">
+    <div style="display:flex; flex-wrap:wrap; gap:var(--kv-space-5); justify-content:space-between; align-items:flex-end;">
+      <div>
+        <p class="kv-h3" style="margin:0 0 var(--kv-space-2);">KV — 构成主义 Web 设计系统 v0.1</p>
+        <p class="pd-note" style="margin:0;">
+          数据来源：Google Fonts 官方元数据（字体子集核实）、GitHub REST API（许可证与 star 实测）、
+          MDN（Baseline 兼容性实测）、Tate / TheArtStory（史料）。
+          色值对比度由 WCAG 2.x 相对亮度公式精算。
+        </p>
+      </div>
+      <p style="margin:0;">
+        <a class="kv-btn kv-btn--ghost" href="#palette">回到顶部</a>
+      </p>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // 交互演示：hover 触发，而不是仅靠 CSS，便于在触屏上也验证
+  const bind = (id, on, off) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('pointerenter', on);
+    el.addEventListener('pointerleave', off);
+    el.addEventListener('focus', on, true);
+    el.addEventListener('blur', off, true);
+  };
+  bind('mv1',
+    () => { const e = document.getElementById('mv1'); e.style.transform = 'translateX(18%) rotate(-4deg)'; },
+    () => { const e = document.getElementById('mv1'); e.style.transform = 'none'; });
+  bind('mv2',
+    () => { const e = document.getElementById('mv2'); e.style.clipPath = 'inset(0 0 0 0)'; },
+    () => { const e = document.getElementById('mv2'); e.style.clipPath = 'inset(0 100% 0 0)'; });
+  bind('mv3',
+    () => { const e = document.getElementById('mv3').firstElementChild; e.style.transition = 'background-color 120ms cubic-bezier(.85,0,.15,1)'; e.style.background = 'var(--kv-red)'; },
+    () => { const e = document.getElementById('mv3').firstElementChild; e.style.background = 'var(--kv-ink)'; });
+</script>
+</body>
+</html>

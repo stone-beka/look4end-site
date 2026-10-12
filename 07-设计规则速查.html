@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>设计规则速查 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="设计规则速查">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">07 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="07">07 · 设计规则速查</h1>
+<blockquote>
+<p>本文件只记录<strong>能跨项目复用</strong>的规则与数值。具体到「构成主义」这一风格的美学考据在
+<a href="./01-美学谱系与形式法则.html"><code>01-美学谱系与形式法则.md</code></a>，实现配方在 <a href="./04-技术实现手册.html"><code>04-技术实现手册.md</code></a>。
+全目录导航见 <a href="./README.html"><code>README.md</code></a>。
+所有对比度都是 WCAG 2.x 相对亮度公式<strong>精算值</strong>，不是目测。</p>
+</blockquote>
+<hr />
+<h2 id="1">1. 色彩纪律<a class="headerlink" href="#1" aria-hidden="true">#</a></h2>
+<h3 id="11">1.1 先算，再选色<a class="headerlink" href="#11" aria-hidden="true">#</a></h3>
+<p><strong>规则：任何前景/背景配对，在写进 CSS 之前先算对比度。</strong> 目测在深色和低饱和色上极不可靠。</p>
+<p>判定线（WCAG 2.1 AA）：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>用途</th>
+<th>最低对比度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>正文（&lt; 24px 或 &lt; 18.66px 粗体）</td>
+<td><strong>4.5 : 1</strong></td>
+</tr>
+<tr>
+<td>大字（≥ 24px 或 ≥ 18.66px 粗体）</td>
+<td><strong>3 : 1</strong></td>
+</tr>
+<tr>
+<td>非文本（图标、控件边界、图形）</td>
+<td><strong>3 : 1</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>可复制的计算器（PowerShell，无依赖）：</p>
+<pre><code class="language-powershell">function Lum([string]$hex){
+  $hex=$hex.TrimStart('#')
+  $v=@(0,2,4)|ForEach-Object{
+    $c=[Convert]::ToInt32($hex.Substring($_,2),16)/255.0
+    if($c -le 0.03928){$c/12.92}else{[Math]::Pow((($c+0.055)/1.055),2.4)}
+  }
+  0.2126*$v[0]+0.7152*$v[1]+0.0722*$v[2]
+}
+function Ratio([string]$a,[string]$b){
+  $la=Lum $a; $lb=Lum $b
+  $hi=[Math]::Max($la,$lb); $lo=[Math]::Min($la,$lb)
+  [Math]::Round((($hi+0.05)/($lo+0.05)),2)
+}
+Ratio '#cc0000' '#f2e8d5'   # → 4.84
+</code></pre>
+<h3 id="12">1.2 反直觉的实测结论（都很容易被"看起来还行"骗过）<a class="headerlink" href="#12" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>配对</th>
+<th>对比度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>#cc0000</code> 苏维埃红 on <code>#f2e8d5</code> 泛黄纸</td>
+<td><strong>4.84</strong></td>
+<td>✅ <strong>过 AA 正文线</strong> —— 深红在暖底上比直觉更好</td>
+</tr>
+<tr>
+<td><code>#D6281F</code> 朱红 on <code>#EFE9DC</code> 米黄纸</td>
+<td>4.15</td>
+<td>⚠️ 仅大字。<strong>看起来更亮反而更差</strong></td>
+</tr>
+<tr>
+<td><code>#FF0000</code> 纯红 on 白</td>
+<td><strong>4.00</strong></td>
+<td>❌ <strong>连 AA 大字都过不了</strong>（大字要 3:1，它过了；但正文不过）</td>
+</tr>
+<tr>
+<td><code>#cc0000</code> 红 on <code>#1a1a1a</code> 纯黑</td>
+<td><strong>2.96</strong></td>
+<td>❌ <strong>禁止在黑底上用红字</strong></td>
+</tr>
+<tr>
+<td><code>#d4a843</code> 金星 on 纸</td>
+<td><strong>1.82</strong></td>
+<td>❌ 完全不能承载文字，只能做图形</td>
+</tr>
+<tr>
+<td><code>#d4a843</code> 金星 on 纯黑</td>
+<td>7.86</td>
+<td>✅ 同样一枚金色，换底就翻盘</td>
+</tr>
+<tr>
+<td><code>#8b4513</code> 棕 on 纸</td>
+<td>5.84</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><code>#8b4513</code> 棕 on 纯黑</td>
+<td>2.45</td>
+<td>❌</td>
+</tr>
+<tr>
+<td><code>#8E1B14</code> 暗红 on 纯黑</td>
+<td>2.79</td>
+<td>❌ 看起来"够深"，实际任何字号都不合格</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>结论：同一个颜色在不同底色上的可用性可以完全反转。必须逐对计算，不能给颜色本身打标签。</strong></p>
+<h3 id="13">1.3 强调色的面积预算<a class="headerlink" href="#13" aria-hidden="true">#</a></h3>
+<p><strong>强调色占画面 5–15%，不是 50%。</strong> 超出这个范围，强调色就不再是强调，而且会挤掉底色承载文字的能力。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>角色</th>
+<th>面积</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>底色</td>
+<td>60–75%</td>
+<td>可读性的地基</td>
+</tr>
+<tr>
+<td>主结构色（墨/深灰）</td>
+<td>20–30%</td>
+<td>正文、分隔、压重</td>
+</tr>
+<tr>
+<td>强调色</td>
+<td><strong>5–15%</strong></td>
+<td>只出现在最关键的 1–2 处</td>
+</tr>
+<tr>
+<td>点缀色</td>
+<td>0–3%</td>
+<td>可选，用于破局</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="14">1.4 焦点环必须自己设计<a class="headerlink" href="#14" aria-hidden="true">#</a></h3>
+<p><code>outline</code> 的默认值在深色/彩色底上经常不可见。<strong>浅底用深色环、深底用浅色环</strong>，或用双轨：</p>
+<pre><code class="language-css">:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
+.on-dark:focus-visible { outline-color: var(--paper); }
+</code></pre>
+<p>不要依赖"颜色变化"来传达状态（色盲 + 强制色模式会吞掉它）。</p>
+<hr />
+<h2 id="2">2. 尺寸与密度<a class="headerlink" href="#2" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>阈值</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>正文起始字号</td>
+<td><strong>16–18px</strong></td>
+<td>低于 16px 在移动端要捏合</td>
+</tr>
+<tr>
+<td>触控目标</td>
+<td><strong>≥ 44 × 44px</strong></td>
+<td>写进 <code>min-height</code>，别靠 padding 碰运气</td>
+</tr>
+<tr>
+<td>标题 : 正文 字号比</td>
+<td>普通 2.5–3 : 1；<strong>要冲击力则 ≥ 6 : 1</strong></td>
+<td>比例决定"气质"，不是字号绝对值</td>
+</tr>
+<tr>
+<td>长文行宽</td>
+<td><strong>60–75 <code>ch</code></strong></td>
+<td><code>ch</code> 对中文约等于半个字宽</td>
+</tr>
+<tr>
+<td>行高</td>
+<td>标题 0.8–1.0，正文 1.5–1.75</td>
+<td>标题紧、正文松</td>
+</tr>
+<tr>
+<td>大标题字距</td>
+<td><strong>负值</strong>（-0.02 ~ -0.05em）</td>
+<td>字号越大越要收紧</td>
+</tr>
+<tr>
+<td>小标签字距</td>
+<td><strong>正值</strong>（0.12 ~ 0.22em）</td>
+<td>小字不放开就挤成一团</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="3">3. 质感与纹理的强度上限<a class="headerlink" href="#3" aria-hidden="true">#</a></h2>
+<p>纹理很容易做过。<strong>判断阈值：把页面缩到 50% 看 —— 如果纹理依然明显，就是太重了。</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>效果</th>
+<th>强度上限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>纸张颗粒（<code>feTurbulence</code>）</td>
+<td><code>opacity</code> <strong>0.04 – 0.08</strong></td>
+</tr>
+<tr>
+<td>半调网点</td>
+<td>网点间距 <strong>3 – 6px</strong>（&lt; 3px 高分屏摩尔纹；&gt; 6px 变装饰画）</td>
+</tr>
+<tr>
+<td>纹理层</td>
+<td>必须 <code>pointer-events: none</code>，且在正文<strong>之下</strong></td>
+</tr>
+<tr>
+<td>阴影</td>
+<td>硬阴影模糊值恒 <strong>0</strong>；柔和阴影才用 blur</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="4">4. 形状与阴影<a class="headerlink" href="#4" aria-hidden="true">#</a></h2>
+<pre><code class="language-css">/* 零圆角体系里的&quot;硬阴影&quot;：模糊值必须是 0 */
+--shadow-hard: 4px 4px 0 0 var(--ink);
+
+/* 底部抽屉的&quot;悬浮&quot;：抬升带不能用单一颜色 ——
+   如果抬升带和背后的内容同色，等于没有。至少一层用对比色。 */
+box-shadow:
+  0 -5px  0 0 var(--red),    /* 贴边棱：风格色 */
+  0 -17px 0 0 var(--ink);    /* 外层：无论背后是什么颜色都读得出来 */
+</code></pre>
+<p><strong>斜向体系要统一一个角度</strong>：全站一个 <code>--tilt</code>，不要每块换角度（每块换角度看起来是"随机歪了"而不是"设计过"）。</p>
+<hr />
+<h2 id="5">5. 动效<a class="headerlink" href="#5" aria-hidden="true">#</a></h2>
+<h3 id="51">5.1 机械语汇（缺省规则）<a class="headerlink" href="#51" aria-hidden="true">#</a></h3>
+<pre><code class="language-css">--ease-mech: linear;      /* 不要 ease-in-out：那是最没有性格的缓动 */
+--dur-fast: 75ms;         /* hover / active */
+--dur-base: 100ms;        /* 状态切换 */
+</code></pre>
+<p><strong>这组值对"硬边、机械"的风格成立，对"柔和、呼吸感"的风格不成立。</strong> 后者需要更长的时长和缓动曲线。</p>
+<h3 id="52">5.2 页面转场是例外，要单独开令牌<a class="headerlink" href="#52" aria-hidden="true">#</a></h3>
+<p>页面级转场需要的时长比微交互长一个量级（否则只是"闪一下"）。<strong>不要复用微交互的令牌</strong>，单独开：</p>
+<pre><code class="language-css">--dur-curtain: 280ms;
+--ease-curtain: cubic-bezier(.85, 0, .15, 1);   /* 前快后慢，不是 ease-in-out */
+</code></pre>
+<p>隔离好处：换风格时改一处，不会连带影响所有 hover。</p>
+<h3 id="53">5.3 动效的三个硬约束<a class="headerlink" href="#53" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>静止态必须是默认样式，动效只做增强。</strong> 如果初始位移写在 <code>@keyframes</code> 的 <code>from</code> 里，用户在 <code>prefers-reduced-motion</code> 下关掉动画后会<strong>卡在屏幕外</strong>。</li>
+<li><strong><code>prefers-reduced-motion</code> 下显式复位</strong> <code>opacity</code> 与 <code>transform</code>，只写 <code>animation: none</code> 不够。</li>
+<li><strong>转场结束后必须验证元素归位</strong>（见 <a href="./10-验证工作流.html"><code>04-验证工作流.md</code></a> 的"擦除层归位"检查）—— 否则会有一层东西永久盖在页面上。</li>
+</ol>
+<hr />
+<h2 id="6">6. 字体<a class="headerlink" href="#6" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>决策</th>
+<th>规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中英混排</td>
+<td>西文在前、中文在后（<code>font-family: "Oswald", "Noto Sans SC", ...</code>）</td>
+</tr>
+<tr>
+<td>字重对齐</td>
+<td>中西文字重不能直接照抄数值 —— 视觉重量差很大，要单独调</td>
+</tr>
+<tr>
+<td>兜底</td>
+<td>中文全量字体有数 MB，<strong>必须 <code>unicode-range</code> 分包</strong>（Google Fonts 自动做，自托管要手动）</td>
+</tr>
+<tr>
+<td>大写</td>
+<td>用 <code>text-transform: uppercase</code> 做<strong>视觉</strong>大写，<strong>不要写进 DOM</strong> —— 否则部分读屏软件逐字母朗读</td>
+</tr>
+<tr>
+<td>小 caps</td>
+<td>只在字体<strong>真有</strong> small-caps 字形时用 <code>font-variant-caps: all-small-caps</code>；否则浏览器伪造成缩小的大写，很难看</td>
+</tr>
+<tr>
+<td>西里尔/多语种</td>
+<td><strong>不要凭字体气质猜覆盖范围</strong>，要实测（见 <a href="./10-验证工作流.html"><code>04-验证工作流.md</code></a> 第 5 节的 <code>cmap</code> / subsets 判定方法）</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="7">7. 一份可直接用的规则速查（贴墙版）<a class="headerlink" href="#7" aria-hidden="true">#</a></h2>
+<pre><code>颜色：先算对比度 → 正文 ≥4.5:1、大字 ≥3:1；强调色面积 5–15%
+字体：正文 ≥16px；标题:正文 要冲击就 ≥6:1；大写写在 CSS 不写 DOM
+尺寸：触控 ≥44px；行宽 60–75ch
+质感：颗粒 0.04–0.08；网点 3–6px；纹理层放正文之下 + pointer-events:none
+形状：硬阴影 blur 恒 0；全站统一一个斜角
+动效：微交互 linear 75/100ms；页面转场单独开令牌；静止态即默认态
+无障碍：焦点环自己设计（浅底深环/深底浅环）；不靠颜色单独传达信息
+</code></pre>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="06-素材情报报告.html">← 06-素材情报报告</a>
+    <a href="index.html">目录</a>
+    <a href="08-交互模式.html">08-交互模式 →</a>
+  </nav>
+</div>
+
+</body>
+</html>

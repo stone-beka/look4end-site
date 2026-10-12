@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML 设计 · 美学经验库 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="HTML 设计 · 美学经验库">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">11 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="html">HTML 设计 · 美学经验库</h1>
+<blockquote>
+<p><strong>这个文件夹装的是「设计 HTML」这件事本身的经验</strong>：一个具体风格（构成主义）的美学考据，
+加上从实现过程中沉淀出来的、可跨项目复用的规则与踩坑。</p>
+<p><strong>边界</strong>：<strong>动画 / 视频那条线不在这里</strong>。动效短片、片头、motion 相关的美学积累属于独立轨道
+（在 <code>C:\Users\23077\Desktop\work_place\视频工作流\</code> 下的 <code>docs\constructivism-video\</code> 与
+<code>constructivism-motion-*.html</code>）。两者共享"构成主义"这个主题，但交付物、技术栈、
+评审标准都不同，所以分开。</p>
+</blockquote>
+<hr />
+<h2 id="_1">目录结构<a class="headerlink" href="#_1" aria-hidden="true">#</a></h2>
+<p><strong>工作目录和上线目录是分开的</strong>：<code>.md</code> 是源，<code>上线/</code> 里只有网页文件。</p>
+<pre><code>结构主义html/
+├── README.md                    本文件
+│
+│   ── A 组：构成主义美学考据（这个风格为什么长这样）──
+├── 01-美学谱系与形式法则.md        源流、代表作字典、九条形式法则、五个典型误用
+├── 02-设计系统规格.md             色板/字体/网格/质感/动效 + StyleKit 规则对照
+├── 03-资源清单.md                GitHub 资源、字体、史料、参考站点、公有领域素材
+├── 04-技术实现手册.md             逐条可复制 CSS 配方 + 兼容性 + 踩坑
+├── 05-前端技术方案.md             深度技术方案（BCD/caniuse 版本号、真实站点 CSS 取证）
+├── 06-素材情报报告.md             字体二进制 cmap 实测、授权原文、CC0 纹理源
+│
+│   ── B 组：可复用设计工程经验（跟风格无关，换项目照样用）──
+├── 07-设计规则速查.md             对比度纪律、尺寸阈值、质感上限、动效规则
+├── 08-交互模式.md                 history 驱动的多级返回（ESC = 后退键）
+├── 09-踩坑清单.md                 本次抓到的每个真实 bug：现象→原因→修法
+├── 10-验证工作流.md               什么该用什么手段验 + 可直接跑的流程
+│
+├── kit/                          可运行的样式套件与样式指南
+│   ├── kv.css                     完整设计系统实现（令牌 + 组件 + 无障碍降级）
+│   └── index.html                 活的样式指南页（浏览器直接打开）
+│
+├── verify/                       配套验证脚本
+│   ├── static-check.ps1           HTML/CSS/JS 静态检查 + id 引用 + 文档链接
+│   ├── shot.ps1                   多状态无头截图
+│   ├── flow-test.ps1              交互链路功能测试
+│   ├── example-flow-test.js       功能测试模板
+│   └── route-test.js              纯逻辑单元测试（不需要浏览器）
+│
+├── build.py                      把 .md 构建成上线目录
+│
+└── 上线/                          ★ 上线目录：只有 .html 和 .css
+    ├── index.html                 站点首页
+    ├── 01-…html … README.html     各篇文档（由 .md 生成）
+    ├── doc.css                    文章版面
+    └── kit/                       样式指南 + 设计系统
+</code></pre>
+<blockquote>
+<p><strong>上线时只传 <code>上线/</code> 这个目录。</strong> 里面只有 <code>.html</code> 和 <code>.css</code>，不含 Markdown 源、
+不含验证脚本、不含构建脚本 —— 工作用的东西不会跟着上公网。
+改完 <code>.md</code> 之后重跑一次 <code>python build.py</code> 即可重新生成。</p>
+</blockquote>
+<hr />
+<h2 id="_2">两组内容的关系<a class="headerlink" href="#_2" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>A 组（01–06）</th>
+<th>B 组（07–10）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>回答的问题</td>
+<td>「构成主义为什么长这样」</td>
+<td>「怎么把任何一个页面做对」</td>
+</tr>
+<tr>
+<td>换风格后还有用吗</td>
+<td>❌ 大部分作废</td>
+<td>✅ 全部可用</td>
+</tr>
+<tr>
+<td>典型内容</td>
+<td>李西茨基的红楔子、StyleKit 色板、公开素材版权判定</td>
+<td>对比度必须精算、<code>clip-path</code> 吃焦点环、多级返回怎么做</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>先读 B 组的 <a href="./09-踩坑清单.html"><code>09-踩坑清单.md</code></a></strong> —— 它是本次最硬的东西，20 多个真实 bug，每条都有现象、原因、修法。</p>
+<hr />
+<h2 id="_3">最快的上手路径<a class="headerlink" href="#_3" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>你有多少时间</th>
+<th>看什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2 分钟</td>
+<td><a href="./09-踩坑清单.html"><code>09-踩坑清单.md</code></a> 的「一句话总结」+ <a href="./07-设计规则速查.html"><code>07-设计规则速查.md</code></a> 第 7 节的贴墙速查</td>
+</tr>
+<tr>
+<td>10 分钟</td>
+<td>上面两份全文 + 打开 <a href="./kit/index.html"><code>kit/index.html</code></a> 看效果</td>
+</tr>
+<tr>
+<td>要动手了</td>
+<td>按 <a href="./01-美学谱系与形式法则.html"><code>01-美学谱系与形式法则.md</code></a> 的九条法则建立判断，用 <a href="./02-设计系统规格.html"><code>02-设计系统规格.md</code></a> 的令牌，直接引 <a href="./kit/kv.css"><code>kit/kv.css</code></a></td>
+</tr>
+<tr>
+<td>要改交互</td>
+<td><a href="./08-交互模式.html"><code>08-交互模式.md</code></a></td>
+</tr>
+<tr>
+<td>要做完验收</td>
+<td><a href="./10-验证工作流.html"><code>10-验证工作流.md</code></a> + <code>verify/</code> 里的脚本</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="_4">最重要的实测结论<a class="headerlink" href="#_4" aria-hidden="true">#</a></h2>
+<p><strong>这条是最容易被"看起来还行"骗过的</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>结论</th>
+<th>影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Anton / Bebas Neue / Archivo Black / Barlow Condensed 全都没有西里尔字形</strong></td>
+<td>页面一出现俄文就掉字体。这是设计师最顺手的四个"海报字体"。<code>League Gothic</code>、所有开源 slab 木活字字体也一样</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>同一个颜色在不同底色上的可用性可以完全反转</strong></td>
+<td><code>#d4a843</code> 金星 on 纸 = 1.82（废），on 黑 = 7.86（好）。<strong>必须逐对算，不能给颜色本身打标签</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>#cc0000</code> 苏维埃红在泛黄纸上 = 4.84:1，反而过 AA 正文线</strong></td>
+<td>而更亮的 <code>#D6281F</code> 只有 4.15（仅大字）。<strong>直觉不可靠</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong><code>#cc0000</code> on 纯黑只有 2.96:1</strong></td>
+<td>禁止在黑底上用红字</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong><code>multiply</code> 只会让结果变暗</strong></td>
+<td>浅色字用 <code>multiply</code> 等于把字抹掉 —— 本次真的这么干过，巨型标题直接消失</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong><code>clip-path</code> 会连 <code>outline</code> 一起裁掉</strong></td>
+<td>键盘焦点环消失，直接违反 WCAG 2.4.7。裁剪必须外移到装饰层</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>伪元素 <code>content: attr(...)</code> 的内容会被读屏软件朗读</strong></td>
+<td>"复制文字做效果"必须用带 <code>aria-hidden</code> 的真实节点，否则标题念两遍</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>GitHub 上不存在"构成主义 CSS 框架"</strong></td>
+<td><code>constructivist</code> 全站仅 78 个仓库，几乎全是教育学/机器学习。所以本项目自己写了 <code>kv.css</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>克卢西斯（Klutsis）不是"可自由使用"的公有领域</strong></td>
+<td>他 1938 年去世表面符合俄罗斯 PD，但模板有例外条款：<strong>若作者遭镇压并获死后平反，保护期自平反年起算</strong> → 可能到 2027。<strong>这条我早期搞错过，后来更正</strong></td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>能靠读代码发现的 bug 是少数</strong></td>
+<td>本次近 30 个问题，绝大多数靠<strong>截图逐张看</strong>或<strong>把数值算一遍</strong>才发现</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="_5">已落地的原型<a class="headerlink" href="#_5" aria-hidden="true">#</a></h2>
+<p>原型在<strong>另一个工作区</strong>（本目录刻意与它解耦，方便单独分享/带走）：</p>
+<pre><code>C:\Users\23077\Desktop\work_place\视频工作流\soviet-press\index.html
+</code></pre>
+<p>用 A 组美学 + B 组规则做的第一个页面：报纸首页 → 三个板块转场进入三张海报 → 底部挂着文章条 → 点击上滑展开 → <code>ESC</code> 收回文章 → 再按 <code>ESC</code> 退回报纸（与浏览器后退键同一条路径）。</p>
+<p>自包含，双击即可在浏览器打开。同目录的 <code>_shots\</code> 里有各状态截图。</p>
+<hr />
+<h2 id="vs">已验证 vs 未验证<a class="headerlink" href="#vs" aria-hidden="true">#</a></h2>
+<p><strong>已直接验证</strong>（有可复现的方式）：
+- 字体西里尔覆盖 —— Google Fonts 官方元数据 + 字体二进制 <code>cmap</code> 解析
+- 色彩对比度 —— WCAG 相对亮度公式精算
+- GitHub 仓库星数与许可证 —— <code>api.github.com</code> 实际返回
+- CSS 兼容性 —— MDN Baseline 标识 + MDN BCD / caniuse 原始 JSON
+- 公有领域图像 —— Wikimedia Commons API 逐件查询 + 直链实测 200
+- 参考站点技术令牌 —— 直接抓取其生产 CSS 提取字体/色板/<code>clip-path</code>
+- 交互链路 —— 无头浏览器 <code>--dump-dom</code> 功能测试 + 纯逻辑单元测试
+- 页面实际长相 —— 无头截图逐张审</p>
+<p><strong>未能验证</strong>：
+- 各作品逐件的精确版权状态（Commons 的 PD 标记是社区判定，不是法律意见）
+- 俄文论文《构成主义对现代网页设计的影响》全文（PDF 无法读取）
+- <code>@property</code> / <code>animation-timeline</code> / <code>text-spacing-trim</code> 的兼容性
+- 厂商中文字体（阿里普惠体 / MiSans / HarmonyOS Sans）的官方授权页
+- <strong>StyleKit 构成主义规则的原文</strong> —— 由用户提供并声明已抓取确认，本环境未二次核验，记为「用户实测来源」</p>
+<p>详见 <a href="./03-资源清单.html"><code>03-资源清单.md</code></a> 的「交付缺口清单」。</p>
+<hr />
+<h2 id="verify">怎么用 <code>verify/</code> 里的脚本<a class="headerlink" href="#verify" aria-hidden="true">#</a></h2>
+<blockquote>
+<p>⚠️ Windows 默认<strong>禁止运行未签名的 <code>.ps1</code></strong>。下面统一加 <code>-ExecutionPolicy Bypass</code>。
+脚本本身都带 UTF-8 BOM（PowerShell 5.1 读无 BOM 的 UTF-8 会乱码 —— 见 <a href="./09-踩坑清单.html"><code>09-踩坑清单.md</code></a> F6）。</p>
+</blockquote>
+<pre><code class="language-powershell">cd C:\Users\23077\Desktop\结构主义html
+
+# 原型页在另一个工作区 —— 用变量指过去，脚本本身与项目解耦
+$proj = 'C:\Users\23077\Desktop\work_place\视频工作流\soviet-press'
+
+# 静态检查（每次改完都跑）
+powershell -ExecutionPolicy Bypass -File .\verify\static-check.ps1 -Dir $proj
+
+# 纯逻辑单元测试（不需要浏览器）
+node .\verify\route-test.js
+
+# 交互链路 —— 先跑快路径验状态机
+powershell -ExecutionPolicy Bypass -File .\verify\flow-test.ps1 `
+  -Page &quot;$proj\index.html&quot; -TestScript .\verify\example-flow-test.js
+
+# 再跑一次真实动画路径
+powershell -ExecutionPolicy Bypass -File .\verify\flow-test.ps1 `
+  -Page &quot;$proj\index.html&quot; -TestScript .\verify\example-flow-test.js -NoStub
+
+# 截图（记得逐张看）
+powershell -ExecutionPolicy Bypass -File .\verify\shot.ps1 `
+  -Page &quot;$proj\index.html&quot; -Out &quot;$proj\_shots&quot;
+</code></pre>
+<p>脚本都以 <code>-Dir</code> / <code>-Page</code> 参数化，换项目直接改路径即可。</p>
+<h3 id="_6">这套脚本自身的实测状态<a class="headerlink" href="#_6" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>脚本</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>static-check.ps1</code></td>
+<td>✅ 实测通过（HTML/CSS/JS/变量/链接/id 引用七项全绿）</td>
+</tr>
+<tr>
+<td><code>route-test.js</code></td>
+<td>✅ 16/16 通过（含 8 个畸形输入用例 + 4 个往返一致性）</td>
+</tr>
+<tr>
+<td><code>flow-test.ps1</code></td>
+<td>✅ 快路径 7/7、真实动画路径 7/7</td>
+</tr>
+<tr>
+<td><code>shot.ps1</code></td>
+<td>✅ 实测生成截图正常</td>
+</tr>
+</tbody>
+</table></div>
+<p>开发这套脚本的过程本身踩了 4 个坑（测试桩注入顺序、异步断言没轮询、<code>.ps1</code> 丢 BOM、<code>-replace</code> 参数解析），
+全部记在 <a href="./09-踩坑清单.html"><code>09-踩坑清单.md</code></a> 的 F 节。</p>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="10-验证工作流.html">← 10-验证工作流</a>
+    <a href="index.html">目录</a>
+    <span></span>
+  </nav>
+</div>
+
+</body>
+</html>

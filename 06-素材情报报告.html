@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>构成主义 / 至上主义 / 包豪斯 —— 免费商用素材情报报告 · 构成主义 · HTML 设计美学经验</title>
+<meta name="description" content="构成主义 / 至上主义 / 包豪斯 —— 免费商用素材情报报告">
+<link rel="stylesheet" href="kit/kv.css">
+<link rel="stylesheet" href="doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="index.html">← 目录</a>
+    <span class="doc__no">06 / 11</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="_1">构成主义 / 至上主义 / 包豪斯 —— 免费商用素材情报报告</h1>
+<blockquote>
+<p>检索时间：2026-10-12（Asia/Shanghai）
+所有 URL 均为本次实际访问到的页面。凡无法验证的一律写「未找到」，不做记忆推测。</p>
+</blockquote>
+<hr />
+<h2 id="0">0. 方法与验证强度说明（请先读，决定了哪些结论可信）<a class="headerlink" href="#0" aria-hidden="true">#</a></h2>
+<p>本次一共用了 5 条互相独立的验证通道，强度从高到低：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>验证方式</th>
+<th>覆盖内容</th>
+<th>强度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>下载字体二进制 → 解析 <code>cmap</code> 表</strong></td>
+<td>逐个字体实测 U+0410–U+044F（А–я）+ Ё/ё + 乌克兰语字母</td>
+<td>★★★★★ 最硬证据</td>
+</tr>
+<tr>
+<td><code>cdn.jsdelivr.net/gh/google/fonts@main/&lt;ofl\|apache&gt;/&lt;slug&gt;/METADATA.pb</code></td>
+<td>Google Fonts 官方仓库的 <code>license</code> / <code>category</code> / <code>subsets</code> / <code>axes</code> 原始声明</td>
+<td>★★★★★</td>
+</tr>
+<tr>
+<td><code>fonts.googleapis.com/css2?family=…</code>（带 Chrome UA）</td>
+<td>实测返回的 <code>/* cyrillic */</code>、<code>/* cyrillic-ext */</code> 子集块</td>
+<td>★★★★☆</td>
+</tr>
+<tr>
+<td><code>api.fontsource.org/v1/fonts</code>、<code>api.fontshare.com/v2/fonts</code></td>
+<td>分发平台的许可证与 subsets 元数据（2103 / 100 条）</td>
+<td>★★★★☆</td>
+</tr>
+<tr>
+<td>Wikimedia Commons <code>api.php</code>（<code>imageinfo</code> + <code>extmetadata</code>）</td>
+<td>每个具体文件的 LicenseShortName / UsageTerms / 像素尺寸</td>
+<td>★★★★★</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>本机网络可达性实测（重要，影响下文标注）：</strong></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>主机</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fonts.googleapis.com</code> / <code>fonts.gstatic.com</code></td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td><code>cdn.jsdelivr.net</code></td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td><code>api.fontsource.org</code> / <code>api.fontshare.com</code></td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td><code>gitlab.com</code> + GitLab API</td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td><code>commons.wikimedia.org</code> + API</td>
+<td>✅ 200（高频请求会 reset，需节流）</td>
+</tr>
+<tr>
+<td><code>ambientcg.com</code> / <code>polyhaven.com</code></td>
+<td>✅ 200</td>
+</tr>
+<tr>
+<td><strong><code>fonts.google.com</code></strong></td>
+<td>❌ 连接超时 —— 所以「Google Fonts 页面上的 Cyrillic 语言标签」我是用 <strong>官方仓库 METADATA.pb + CSS API + 二进制 cmap 三重替代验证</strong> 的，结论比看网页标签更硬</td>
+</tr>
+<tr>
+<td><strong><code>en.wikipedia.org</code> / <code>www.wikidata.org</code></strong></td>
+<td>❌ 无法连接 —— 作者生卒年改用 Commons 分类页渲染结果（见 §4）</td>
+</tr>
+<tr>
+<td><strong><code>velvetyne.fr</code> 全站</strong></td>
+<td>❌ <strong>HTTP 500</strong>（<code>/</code>、<code>/fonts/</code>、<code>/sitemap.xml</code>、<code>/fonts/&lt;任何字体&gt;/</code> 全部 500；首页显示罢工公告 "EN GRÈVE"）。改用其 <strong>官方 GitLab 群组</strong> <code>gitlab.com/velvetyne</code> 取得一手授权文件</td>
+</tr>
+<tr>
+<td><strong><code>github.com</code></strong></td>
+<td>❌ 不可达（<code>api.github.com</code> 可用但 60 次/时限流）</td>
+</tr>
+<tr>
+<td><code>moma.org</code></td>
+<td>❌ 403</td>
+</tr>
+<tr>
+<td><code>metmuseum.org</code></td>
+<td>❌ 429（限流）</td>
+</tr>
+<tr>
+<td><code>rawpixel.com/legal/terms</code></td>
+<td>⚠️ 200 但只返回 340 字节的机器人拦截壳，条款正文未读到</td>
+</tr>
+<tr>
+<td><code>web.archive.org</code> / <code>archive.org</code></td>
+<td>❌ 不可达</td>
+</tr>
+<tr>
+<td><code>monoskop.org</code></td>
+<td>❌ 500</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>证据留存：</strong> 13 个 Velvetyne 字体 + 27 个 Google 字体二进制已下载，cmap 检测脚本与结果见文末附录 A。临时文件在 <code>%TEMP%\fontcheck\</code>。</p>
+<hr />
+<h2 id="1-display">1. Display 字体候选（标题 / 海报用）<a class="headerlink" href="#1-display" aria-hidden="true">#</a></h2>
+<h3 id="1a">1A. ✅ 有完整西里尔支持（做俄文 / 乌克兰文标题安全）<a class="headerlink" href="#1a" aria-hidden="true">#</a></h3>
+<p><code>cyr</code> 列：<strong>cmap</strong> = 我下载二进制实测；<strong>meta</strong> = Google Fonts 官方 METADATA.pb 声明。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>字体</th>
+<th>来源站</th>
+<th>URL（实际访问）</th>
+<th>许可证</th>
+<th>Cyrillic</th>
+<th>字重 / 宽度</th>
+<th>最适合角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Oswald</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/oswald/METADATA.pb</code> · <code>https://fonts.googleapis.com/css2?family=Oswald</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（А–я 31/31，cyr-ext +140 字形）</td>
+<td>Variable <code>wght 200–700</code></td>
+<td>★ 超大标题 / 全大写海报字，工业窄体怪诞（grotesque），本项目第一选择</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Unbounded</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/unbounded/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（31/31，总字形 1138）</td>
+<td>Variable <code>wght 200–900</code></td>
+<td>全大写几何展示字 / 先锋标语；唯一系统最完整的几何先锋体</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Russo One</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/russoone/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（31/31）</td>
+<td>Static 单字重</td>
+<td>工业科技标题 / 副标题，苏式机械感</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Rubik Mono One</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/rubikmonoone/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（31/31）</td>
+<td>Static 单字重</td>
+<td>等宽方块数字 / 编号 / 巨型短标题</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Stalinist One</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/stalinistone/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（31/31）</td>
+<td>Static 单字重</td>
+<td>宣传画 / 海报主标（气质最贴 1930s 苏联官方字体，注意它是"斯大林式"而非构成主义，慎用以免语义跑偏）</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Alumni Sans</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/alumnisans/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ meta（<code>cyrillic</code> + <code>cyrillic-ext</code>）</td>
+<td>Variable <code>wght 100–900</code></td>
+<td>超窄体全大写副标题 / 数据条，窄到能塞进竖直栏</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>Tektur</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/tektur/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（31/31，cyr-ext +86）</td>
+<td>Variable <code>wdth 75–100</code></td>
+<td>工程技术图纸感小标题 / 标签</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>Jost</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/jost/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>⚠️ cmap <strong>俄文全，乌克兰文不全</strong>（UA 26/31；缺 ґ/є/і/ї 等）</td>
+<td>Variable <code>wght 100–900</code></td>
+<td>★ <strong>包豪斯几何正解</strong>（Futura 血统），副标题 / 引文 / 短正文</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>Grotesk</strong>（Velvetyne）</td>
+<td>Velvetyne / GitLab</td>
+<td><code>https://gitlab.com/velvetyne/grotesk</code> · 授权原文 <code>https://gitlab.com/velvetyne/grotesk/-/raw/master/LICENSE.txt</code></td>
+<td><strong>OFL 1.1</strong>（Copyright © 2010–2023 Frank Adebiaye，"with Reserved Font Name Grotesk"）</td>
+<td>✅ cmap 全（31/31）</td>
+<td>4 字重（Extrafin / Mince / Regular / Gras）+ TTF/OTF</td>
+<td>★ "geometric sans serif with extra-large spacing" —— 字距极宽的几何无衬线，包豪斯版面感直接可用</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>Lack</strong>（Velvetyne）</td>
+<td>Velvetyne / GitLab</td>
+<td><code>https://gitlab.com/velvetyne/lack</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（А–я 31/31，<strong>cyr-ext +124</strong>，是本次测得西里尔覆盖最广的字体）</td>
+<td>Regular + Italic</td>
+<td>大标题与正文皆可（自述 "works well as a display typeface… also designed to perform in all kind of text sizes"）</td>
+</tr>
+<tr>
+<td>11</td>
+<td><strong>Le Murmure</strong>（Velvetyne）</td>
+<td>Velvetyne / GitLab</td>
+<td><code>https://gitlab.com/velvetyne/murmure</code> · <code>https://gitlab.com/api/v4/projects/velvetyne%2Fmurmure</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（31/31）</td>
+<td>单字重（otf/ttf + woff/woff2 已备）</td>
+<td>标题 / 短句，手写几何混合体</td>
+</tr>
+<tr>
+<td>12</td>
+<td><strong>Pilowlava</strong>（Velvetyne / StudioTriple）</td>
+<td>Velvetyne · StudioTriple</td>
+<td><code>https://gitlab.com/StudioTriple/pilowlava</code> · 授权 <code>https://gitlab.com/StudioTriple/pilowlava/-/raw/master/License.txt</code> · README <code>https://gitlab.com/StudioTriple/pilowlava/-/raw/master/README.md</code></td>
+<td><strong>OFL 1.1</strong>（Copyright © 2019–2022 Anton Moglia &amp; Jérémy Landes）</td>
+<td>✅ cmap 全（31/31）——<strong>README 原文："Support for Cyrillic was added in 2022 by Maksym Kobuzan"</strong></td>
+<td>单一字重（另有 <code>Pilowlava Atome</code> 打孔变体）</td>
+<td>先锋实验巨型字 / 单张海报的视觉爆点，全大写不行（它是圆滑液态立面体）</td>
+</tr>
+<tr>
+<td>13</td>
+<td><strong>Golos Text</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/golostext/METADATA.pb</code> · <code>https://api.fontsource.org/v1/fonts</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（31/31，cyr-ext +80）</td>
+<td>Variable <code>wght 400–900</code></td>
+<td>俄文优先的中性字体，可当"副标题字号"的标题层</td>
+</tr>
+<tr>
+<td>14</td>
+<td><strong>Onest</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/onest/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（31/31，cyr-ext +70）</td>
+<td>Variable <code>wght 100–900</code></td>
+<td>副标题 / 大段正文</td>
+</tr>
+<tr>
+<td>15</td>
+<td><strong>Manrope</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/manrope/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ cmap 全（31/31）</td>
+<td>Variable <code>wght 200–800</code></td>
+<td>UI / 副标题 / 正文，几何感干净</td>
+</tr>
+<tr>
+<td>16</td>
+<td><strong>Montserrat</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/montserrat/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ meta（<code>cyrillic</code>）</td>
+<td>Variable <code>wght 100–900</code></td>
+<td>几何无衬线正文 / 副标题（包豪斯城市字体血统）</td>
+</tr>
+<tr>
+<td>17</td>
+<td><strong>Roboto Condensed</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/robotocondensed/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ meta（<code>cyrillic</code>）</td>
+<td>Variable <code>wght 100–900</code></td>
+<td>工业窄体标题 / 表格 / 长列表</td>
+</tr>
+<tr>
+<td>18</td>
+<td><strong>Advent Pro</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/adventpro/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ meta（<code>cyrillic</code>）</td>
+<td>Variable <code>wdth 100–200</code></td>
+<td>极窄全大写标签 / 竖排</td>
+</tr>
+<tr>
+<td>19</td>
+<td><strong>Yanone Kaffeesatz</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/yanonekaffeesatz/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ meta（<code>cyrillic</code>）</td>
+<td>Variable <code>wght 200–700</code></td>
+<td>窄体木活字感标题</td>
+</tr>
+<tr>
+<td>20</td>
+<td><strong>Cuprum</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/cuprum/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ meta（<code>cyrillic</code>）</td>
+<td>Variable <code>wght 400–700</code></td>
+<td>工业窄体正文 / 图注</td>
+</tr>
+<tr>
+<td>21</td>
+<td><strong>Rubik</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/rubik/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ meta（<code>cyrillic</code> + <code>cyrillic-ext</code>）</td>
+<td>Variable <code>wght 300–900</code></td>
+<td>微圆角几何，标语 / 数字</td>
+</tr>
+<tr>
+<td>22</td>
+<td><strong>Ruslan Display</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/ruslandisplay/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ meta（<code>cyrillic</code>）</td>
+<td>Static</td>
+<td>古罗斯装饰体（与构成主义冲突，仅作"革命前"对照层）</td>
+</tr>
+<tr>
+<td>23</td>
+<td><strong>Yeseva One</strong></td>
+<td>Google Fonts</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/yesevaone/METADATA.pb</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>✅ meta（<code>cyrillic</code>）</td>
+<td>Static</td>
+<td>同上的"旧世界"对照层</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="1b">1B. ❌ 无西里尔支持（只能做拉丁文；<strong>这一节是本报告最需要你注意的结论</strong>）<a class="headerlink" href="#1b" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字体</th>
+<th>来源</th>
+<th>URL</th>
+<th>许可证</th>
+<th>Cyrillic</th>
+<th>字重/宽度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Anton</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/anton/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Static</td>
+<td>最常用的 Druk/Impact 类超粗展示体，<strong>没有西里尔</strong></td>
+</tr>
+<tr>
+<td><strong>Archivo Black</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/archivoblack/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Static</td>
+<td>同上</td>
+</tr>
+<tr>
+<td><strong>Archivo</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/archivo/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Variable <code>wdth 62–125</code> + <code>wght 100–900</code></td>
+<td>⚠️ <strong>"Archivo Expanded" 不是独立字体</strong>：它就是 Archivo 变量字体把 <code>wdth</code> 拉到 125 —— 但<strong>没有西里尔</strong></td>
+</tr>
+<tr>
+<td><strong>Bebas Neue</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/bebasneue/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Static</td>
+<td>Google 版无西里尔（网上流传的"Bebas 有西里尔"是第三方改版，未找到可商用授权出处）</td>
+</tr>
+<tr>
+<td><strong>Barlow Condensed</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/barlowcondensed/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Static（多字重）</td>
+<td>窄体，无西里尔</td>
+</tr>
+<tr>
+<td><strong>Big Shoulders Display</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/bigshouldersdisplay/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Variable <code>wght 100–900</code></td>
+<td>芝加哥工业风，无西里尔</td>
+</tr>
+<tr>
+<td><strong>League Gothic</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/leaguegothic/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌（meta 无 cyrillic）</td>
+<td>Variable <code>wdth 75–100</code></td>
+<td>经典木活字窄体，无西里尔</td>
+</tr>
+<tr>
+<td><strong>Syne</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/syne/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Variable <code>wght 400–800</code></td>
+<td>先锋艺术馆体（与构成主义气质很近，可惜无西里尔）</td>
+</tr>
+<tr>
+<td><strong>Space Grotesk</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/spacegrotesk/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Variable <code>wght 300–700</code></td>
+<td>技术怪诞体</td>
+</tr>
+<tr>
+<td><strong>Chivo</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/chivo/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Variable <code>wght 100–900</code></td>
+<td>怪诞体</td>
+</tr>
+<tr>
+<td><strong>Bricolage Grotesque</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/bricolagegrotesque/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌（meta 无 cyrillic）</td>
+<td>Variable <code>opsz 12–96</code> + <code>wdth 75–100</code> + <code>wght 200–800</code></td>
+<td>工业怪诞体，无西里尔</td>
+</tr>
+<tr>
+<td><strong>Instrument Sans</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/instrumentsans/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Variable <code>wdth 75–100</code> + <code>wght 400–700</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Anybody</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/anybody/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Variable <code>wdth 50–150</code> + <code>wght 100–900</code></td>
+<td>宽度轴极大，但无西里尔</td>
+</tr>
+<tr>
+<td><strong>Reem Kufi</strong></td>
+<td>Google Fonts</td>
+<td><code>…/ofl/reemkufi/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌（只有 arabic/latin）</td>
+<td>Variable <code>wght 400–700</code></td>
+<td>阿拉伯几何体，与西里尔无关</td>
+</tr>
+<tr>
+<td><strong>Saira Condensed / Teko / Antonio / Bungee / Familjen Grotesk / Public Sans / Space Mono / Archivo Narrow</strong></td>
+<td>Google Fonts</td>
+<td>同上规律</td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>—</td>
+<td>全部实测无西里尔</td>
+</tr>
+<tr>
+<td><strong>Format 1452</strong>（Velvetyne）</td>
+<td>GitLab</td>
+<td><code>https://gitlab.com/velvetyne/format-1452</code> · 授权 <code>…/-/raw/master/LICENSE.txt</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>❌ cmap 0/31</td>
+<td>单字重</td>
+<td>★ 自述 "a <strong>Din-like typeface built with modules, without any optical corrections</strong>" —— 气质是本次最贴构成主义的字体之一（模块化、零光学修正），<strong>但只有拉丁</strong></td>
+</tr>
+<tr>
+<td><strong>Sligoil</strong>（Velvetyne）</td>
+<td>GitLab</td>
+<td><code>https://gitlab.com/velvetyne/sligoil</code> · 授权 <code>…/-/raw/main/LICENSE.txt</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>❌ cmap 0/31</td>
+<td>Micro / MicroMedium / MicroBold + Variable</td>
+<td>★ 自述 "a <strong>monospace typeface with large inktraps</strong>" —— 工程感等宽，无西里尔</td>
+</tr>
+<tr>
+<td><strong>Sporting Grotesque</strong>（Velvetyne）</td>
+<td>GitLab</td>
+<td><code>https://gitlab.com/velvetyne/Sporting-Grotesque</code></td>
+<td><strong>OFL 1.1</strong></td>
+<td>❌ cmap 0/31</td>
+<td>Regular / Bold + 斜体</td>
+<td>怪诞体，无西里尔</td>
+</tr>
+<tr>
+<td><strong>Basteleur</strong>（Velvetyne）</td>
+<td>GitLab</td>
+<td><code>https://gitlab.com/velvetyne/basteleur</code> · <code>…/-/raw/master/LICENSE.txt</code></td>
+<td><strong>OFL 1.1</strong>（© 2021 Keussel）</td>
+<td>❌ cmap 0/31</td>
+<td>多字重 OTF</td>
+<td>塔罗牌启发的中世纪/Cooper 混合体，与项目方向不符</td>
+</tr>
+<tr>
+<td><strong>Avara</strong>（Velvetyne）</td>
+<td>GitLab</td>
+<td><code>https://gitlab.com/velvetyne/Avara</code></td>
+<td>仓库内含 <code>README.md</code>/<code>FONTLOG.txt</code>，<strong>未见独立 LICENSE 文件</strong> → 许可证<strong>未找到</strong>（Velvetyne 官网 500 无法核对）</td>
+<td>❌ cmap 0/31</td>
+<td>多字重</td>
+<td>过渡衬线无曲线体</td>
+</tr>
+<tr>
+<td><strong>Gulax / Mess / Compagnon / Lineal / mourier</strong>（Velvetyne）</td>
+<td>GitLab</td>
+<td><code>https://gitlab.com/velvetyne/&lt;slug&gt;</code></td>
+<td>Gulax ✅ OFL 1.1；Mourier ✅ OFL 1.1（© 1971 Eric Mourier）；Componon/Lineal/Mess <strong>未找到</strong>独立授权文件</td>
+<td>❌ cmap 0/31（已测 Gulax / Mess / Compagnon / Lineal）</td>
+<td>—</td>
+<td>实验体，无西里尔</td>
+</tr>
+<tr>
+<td><strong>Terminal Grotesque</strong></td>
+<td>GitLab（非 Velvetyne 命名空间）</td>
+<td><code>https://gitlab.com/raphaelbastide/Terminal-Grotesque</code> · <code>…/-/raw/main/LICENSE.md</code></td>
+<td><strong>OFL 1.1</strong>，但授权头写的是 <em>"Copyright (c) 2012, Tyler Finck，with Reserved Font Name: </em><em>"Blackout"</em><em>"</em> —— <strong>字体名与授权名不一致，属于仓库版权声明残留，商用前请人工确认</strong></td>
+<td>未测（仓库内无 ttf/otf，只有源码）</td>
+<td>—</td>
+<td>像素怪诞体</td>
+</tr>
+<tr>
+<td><strong>Fontshare 全部 100 款</strong></td>
+<td>Fontshare / ITF</td>
+<td><code>https://api.fontshare.com/v2/fonts</code>（实测返回 100 条）</td>
+<td>见 §1C</td>
+<td>❌ <strong>100 款中 0 款</strong> 的 <code>languages</code> 字段含 Russian / Ukrainian / Cyrillic / Bulgarian / Serbian(Cyrillic) / Belarusian / Macedonian</td>
+<td>—</td>
+<td>Clash Display / Clash Grotesk / Cabinet Grotesk / Satoshi / Switzer / Supreme / Technor / Tanker / Zina / Boxing / Kihim / Segment / Striper / Stardom 等——<strong>全部只有拉丁</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="1c-fontshare-itf">1C. Fontshare / ITF 授权（<strong>重要，与我预先的假设不同</strong>）<a class="headerlink" href="#1c-fontshare-itf" aria-hidden="true">#</a></h3>
+<p><code>https://www.fontshare.com/licenses/itf-ffl</code> 是纯 JS 单页，<code>web_fetch</code> 与 <code>curl</code> 只能拿到 1.7KB 空壳。我改为反查它自己的前端 bundle <code>https://www.fontshare.com/js/main.d962d2d8.js</code>（402KB），里面内联了<strong>渲染该页所用的完整 EULA 数据</strong>。实测原文摘录：</p>
+<ul>
+<li>许可证名：<strong>ITF Free Font License (FFL)，<code>Version 2.0 - 17 Aug 2026</code></strong>，<code>licenseType: "Closed Source"</code></li>
+<li>授予：「a non-exclusive, non-assignable, non-transferable and terminable license to access, download, install, store and use the Font Software for <strong>personal or commercial purposes, free of charge and for an unlimited period of time</strong>」</li>
+<li>媒介：「You may use the Font Software in any media, including <strong>Print, Websites, Mobile or Desktop Applications, Digital Images, Digital Advertising, Social Media, ePublishing, Video, Broadcasting and Games, at any scale</strong>」</li>
+<li><strong>允许自托管</strong>：「You <strong>may self-host</strong> the Font Software on your own servers or infrastructure for use on your own websites and applications, including through standard webfont technologies such as <strong>CSS <code>@font-face</code></strong>. Self-hosting by end users is permitted and recommended」</li>
+<li>署名：<strong>非强制</strong> —「You may, but are not required to, identify or credit Indian Type Foundry or Fontshare」</li>
+<li><strong>⛔ 明确禁止（对本项目影响很大）</strong>：</li>
+<li>「You may <strong>not</strong> modify, edit, adapt, translate, reverse engineer, decompile, disassemble or otherwise alter the Font Software… This includes modifying or replacing glyphs, <strong>subsetting, format conversion</strong>, or altering font names, copyright information… or other metadata.」</li>
+<li>不得再分发：「may not… be distributed, duplicated, loaned, resold, sublicensed, transferred, donated, given away or otherwise made available to any other person or entity… <strong>This includes distributing the Font Software through another font website, font library, marketplace, repository, download service, application or platform</strong>」</li>
+<li>「You may not create a <strong>Derivative Work</strong>… without the prior written consent of the Licensor.」</li>
+<li>同页自述：「All Fontshare fonts are 100% free for personal and commercial use.」两个层级：<strong>Closed Source</strong>（ITF FFL，ITF 自有）+ <strong>Open Source</strong>（SIL OFL，如 Archivo / Bebas Neue / Oswald / Anton / Manrope / Space Grotesk / Epilogue / Public Sans / Work Sans / Teko / Red Hat Display / Poppins / Montserrat / Literata / Crimson Pro / Fraunces? 等——这批在 Fontshare 上是 OFL）。</li>
+</ul>
+<blockquote>
+<p><strong>结论：</strong> Fontshare 的 OFL 字体可以像 Google Fonts 一样随便用；Fontshare 的 <strong>ITF FFL 字体（Clash Display 等）可以商用、可以 CSS 自托管，但「不许 subset、不许格式转换、不许放进你的 GitHub/仓库分发」</strong>——这会让 <code>next/font</code>、<code>Fontsource</code>、<code>glyphhanger</code> 这类常规前端工作流违规。<strong>加上它们 100% 没有西里尔</strong>，本项目的俄文场景建议直接排除 Fontshare 的 Closed Source 层。</p>
+</blockquote>
+<h3 id="1d-druk">1D. Druk 的免费替代——核实结果<a class="headerlink" href="#1d-druk" aria-hidden="true">#</a></h3>
+<p>Druk（Commercial Type 出品）本身<strong>未找到任何免费/开源授权</strong>，是纯商业零售字体。气质接近且<strong>授权明确免费商用</strong>的替代（按"窄 + 超重 + 全大写"排序）：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>替代</th>
+<th>许可证</th>
+<th>西里尔</th>
+<th>与 Druk 的差异</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Oswald 700</strong></td>
+<td>OFL 1.1</td>
+<td>✅</td>
+<td>最接近 Druk 的窄体压缩感，且<strong>是唯一同时满足"超窄 + 西里尔"的选择</strong></td>
+</tr>
+<tr>
+<td><strong>Anton</strong></td>
+<td>OFL 1.1</td>
+<td>❌</td>
+<td>更粗更方，拉丁专用</td>
+</tr>
+<tr>
+<td><strong>Archivo Black</strong></td>
+<td>OFL 1.1</td>
+<td>❌</td>
+<td>极粗怪诞，拉丁专用</td>
+</tr>
+<tr>
+<td><strong>Format 1452</strong>（Velvetyne）</td>
+<td>OFL 1.1</td>
+<td>❌</td>
+<td>模块化 DIN 体，工业感更强，拉丁专用</td>
+</tr>
+<tr>
+<td><strong>Big Shoulders Display</strong></td>
+<td>OFL 1.1</td>
+<td>❌</td>
+<td>高瘦窄体，拉丁专用</td>
+</tr>
+<tr>
+<td><strong>League Gothic</strong></td>
+<td>OFL 1.1</td>
+<td>❌</td>
+<td>木活字窄体，拉丁专用</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><code>fontalternatives.com</code> 上列有若干"Druk 免费替代"（搜索命中 <code>https://fontalternatives.com/alternatives/druk/</code>），但<strong>我没有在该站读到任何授权原文</strong>，且它推荐的多数是商业字体试用版 —— <strong>不建议据此使用，标记为未找到可核实的免费替代清单</strong>。</p>
+</blockquote>
+<h3 id="1e">1E. 字体分发渠道（已在本次核验）<a class="headerlink" href="#1e" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>渠道</th>
+<th>URL（实际访问）</th>
+<th>核验结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fontsource</strong></td>
+<td><code>https://fontsource.org/</code> · API：<code>https://api.fontsource.org/v1/fonts</code></td>
+<td>✅ 200，API 返回 <strong>2103</strong> 条。逐条含 <code>subsets</code> / <code>weights</code> / <code>license</code> / <code>variable</code>。实测：<code>oswald</code>（subsets 含 cyrillic+cyrillic-ext，OFL-1.1，variable）· <code>unbounded</code>（同）· <code>golos-text</code>（cyrillic+cyrillic-ext，OFL-1.1）· <code>jetbrains-mono</code>（OFL-1.1）· <code>geist-mono</code>（OFL-1.1）· <code>rubik-mono-one</code>（OFL-1.1）· <code>russo-one</code>（OFL-1.1）。<strong>这是把 OFL 字体以 npm 包引入 + 自托管的最干净路径</strong></td>
+</tr>
+<tr>
+<td>Google Fonts 官方仓库</td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/&lt;ofl\|apache&gt;/&lt;slug&gt;/METADATA.pb</code></td>
+<td>✅ 逐个字体返回 <code>license</code> / <code>category</code> / <code>subsets</code> / <code>axes</code> 原文</td>
+</tr>
+<tr>
+<td>Velvetyne Type Foundry</td>
+<td><code>https://velvetyne.fr/</code> → <strong>HTTP 500</strong></td>
+<td>❌ 官网当前不可用；改用 <code>https://gitlab.com/api/v4/groups/velvetyne/projects?per_page=100&amp;include_subgroups=true</code> → ✅ 返回 <strong>34 个项目</strong>（完整清单见附录 B）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="1f-velvetyne-gitlab-34">1F. Velvetyne 先锋派字体完整清单（从官方 GitLab 群组取得，34 项）<a class="headerlink" href="#1f-velvetyne-gitlab-34" aria-hidden="true">#</a></h3>
+<p>直接从 <code>https://gitlab.com/api/v4/groups/velvetyne/projects?per_page=100&amp;include_subgroups=true</code> 取得的 <strong>34 个</strong> 项目及官方描述（节选与项目相关者）：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>官方描述（原文）</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>grotesk</code></td>
+<td>"Grotesk is a geometric sans serif typeface with extra-large spacing."</td>
+<td><code>https://gitlab.com/velvetyne/grotesk</code></td>
+</tr>
+<tr>
+<td><code>format-1452</code></td>
+<td>"Format 1452 is a Din-like typeface built with modules, without any optical corrections."</td>
+<td><code>https://gitlab.com/velvetyne/format-1452</code></td>
+</tr>
+<tr>
+<td><code>sligoil</code></td>
+<td>"A monospace typeface with large inktraps."</td>
+<td><code>https://gitlab.com/velvetyne/sligoil</code></td>
+</tr>
+<tr>
+<td><code>Gulax</code></td>
+<td>"Again another \"experimental\" monolinear sans. Enjoy or not."</td>
+<td><code>https://gitlab.com/velvetyne/Gulax</code></td>
+</tr>
+<tr>
+<td><code>Sporting-Grotesque</code></td>
+<td>"A grotesque typeface by @LucasLeBihan"</td>
+<td><code>https://gitlab.com/velvetyne/Sporting-Grotesque</code></td>
+</tr>
+<tr>
+<td><code>mourier</code></td>
+<td>"Mourier is a quasi-abstract geometric typeface originally created by Eric Mourier in 1971."</td>
+<td><code>https://gitlab.com/velvetyne/mourier</code></td>
+</tr>
+<tr>
+<td><code>Facade-font</code></td>
+<td>"Façade is a typeface created from the architectural grid of the ÉSAD Orléans façade."</td>
+<td><code>https://gitlab.com/velvetyne/Facade-font</code></td>
+</tr>
+<tr>
+<td><code>cantique</code></td>
+<td>"The Cantique typeface marks the marriage between human calligraphy and geometric construction shapes with a modular approach."</td>
+<td><code>https://gitlab.com/velvetyne/cantique</code></td>
+</tr>
+<tr>
+<td><code>lack</code></td>
+<td>"Lack is a brave, contemporary and experimental typeface… works well as a display typeface, but is also designed to perform in all kind of texts sizes."</td>
+<td><code>https://gitlab.com/velvetyne/lack</code></td>
+</tr>
+<tr>
+<td><code>letters</code></td>
+<td>"Letters is a display typeface… Designed for experimental use, it performs best at large sizes."</td>
+<td><code>https://gitlab.com/velvetyne/letters</code></td>
+</tr>
+<tr>
+<td><code>murmure</code></td>
+<td>"Le Murmure is a custom open-source typeface designed by Jérémy Landes for the design agency Murmure…"</td>
+<td><code>https://gitlab.com/velvetyne/murmure</code></td>
+</tr>
+<tr>
+<td><code>Mess</code></td>
+<td>"An illegible typeface by Tezzo Suzuki."</td>
+<td><code>https://gitlab.com/velvetyne/Mess</code></td>
+</tr>
+<tr>
+<td><code>lineal</code>, <code>compagnon</code>, <code>lineal</code>, <code>interlope</code>, <code>anthony</code>, <code>kaerukaeru</code>, <code>backout</code>, <code>ouroboros</code>, <code>Trickster</code>, <code>vg5000</code>, <code>fungal</code>, <code>jgs</code>, <code>amdal</code>, <code>imago-mundi-mei</code>, <code>Happy-Times-at-the-IKOB</code>, <code>flor-des-ruina</code>, <code>feroniapi</code>, <code>Velvetyne-Notdef</code>, <code>Velvetyne-Standard-Character-Set</code>, <code>velvetyne-libre-friends</code></td>
+<td>（完整 34 项清单见附录 B）</td>
+<td><code>https://gitlab.com/velvetyne/&lt;slug&gt;</code></td>
+</tr>
+<tr>
+<td><code>StudioTriple/pilowlava</code></td>
+<td>"A sloppy open-source typeface released on Velvetyne Type Foundry"（<strong>2022 年加入西里尔</strong>）</td>
+<td><code>https://gitlab.com/StudioTriple/pilowlava</code></td>
+</tr>
+<tr>
+<td><code>velvetyne/pilowlava3D</code></td>
+<td>"3D models of the Pilowlava font glyphs"</td>
+<td><code>https://gitlab.com/velvetyne/pilowlava3D</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>关于 Cirrus：</strong> 用户点名的 <strong>Cirrus 未找到可验证的一手页面</strong>。<code>velvetyne.fr/fonts/cirrus/</code> 返回 <strong>HTTP 500</strong>；在 Velvetyne 官方 GitLab 群组的 34 个项目中<strong>没有</strong> Cirrus；GitLab 全站搜索 <code>cirrus</code> 返回 40 条结果中无任何字体项目。→ <strong>标记为「未找到」</strong>（注：<code>https://www.velvetyne.fr/fonts/terminal-grotesque/</code> 出现在搜索引擎索引里，但实测 500，同样无法作为授权依据）。</p>
+</blockquote>
+<hr />
+<h2 id="2">2. 正文 / 中性字体对 + 等宽字体<a class="headerlink" href="#2" aria-hidden="true">#</a></h2>
+<h3 id="2a">2A. 有西里尔的正文候选<a class="headerlink" href="#2a" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字体</th>
+<th>URL（实际访问）</th>
+<th>许可证</th>
+<th>Cyrillic</th>
+<th>字重</th>
+<th>角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Golos Text</strong></td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/golostext/METADATA.pb</code> · <code>https://api.fontsource.org/v1/fonts</code></td>
+<td>OFL 1.1</td>
+<td>✅ cmap 全（31/31，cyr-ext +80）</td>
+<td><code>wght 400–900</code></td>
+<td>★ 首选正文：俄文字形是第一语言设计的，中性、朴素、无文化错位</td>
+</tr>
+<tr>
+<td><strong>Onest</strong></td>
+<td><code>…/ofl/onest/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>✅ cmap 全（31/31，cyr-ext +70）</td>
+<td><code>wght 100–900</code></td>
+<td>正文 / UI，几何感略强</td>
+</tr>
+<tr>
+<td><strong>Manrope</strong></td>
+<td><code>…/ofl/manrope/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>✅ cmap 全（31/31）</td>
+<td><code>wght 200–800</code></td>
+<td>正文 / 副标题</td>
+</tr>
+<tr>
+<td><strong>Inter</strong></td>
+<td><code>…/ofl/inter/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>✅ meta（<code>cyrillic</code> + <code>cyrillic-ext</code>）</td>
+<td><code>opsz 14–32</code> + <code>wght 100–900</code></td>
+<td>万能 UI/正文（下载被限流，仅元数据验证）</td>
+</tr>
+<tr>
+<td><strong>Montserrat</strong></td>
+<td><code>…/ofl/montserrat/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>✅ meta（<code>cyrillic</code>）</td>
+<td><code>wght 100–900</code></td>
+<td>几何正文（包豪斯城市字体）</td>
+</tr>
+<tr>
+<td><strong>Raleway / Noto Sans / Open Sans / Nunito Sans / PT Sans / Commissioner / Wix Madefor Display / Exo 2 / Jura / Didact Gothic / Philosopher / Podkova / Tenor Sans</strong></td>
+<td><code>https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/&lt;slug&gt;/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>✅ meta 含 <code>cyrillic</code></td>
+<td>见各自 METADATA</td>
+<td>备用池</td>
+</tr>
+<tr>
+<td><strong>Lack</strong>（Velvetyne）</td>
+<td><code>https://gitlab.com/velvetyne/lack</code></td>
+<td>OFL 1.1</td>
+<td>✅ cmap 全 + cyr-ext 124</td>
+<td>Regular/Italic</td>
+<td>想用先锋体做正文时的唯一现实选择</td>
+</tr>
+<tr>
+<td><strong>Grotesk</strong>（Velvetyne）</td>
+<td><code>https://gitlab.com/velvetyne/grotesk</code></td>
+<td>OFL 1.1</td>
+<td>✅ cmap 全</td>
+<td>4 字重</td>
+<td>字距极宽，做小字正文偏浪费，适合引言/图注</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="2b">2B. 无西里尔的正文候选（拉丁项目可用）<a class="headerlink" href="#2b" aria-hidden="true">#</a></h3>
+<p><code>Instrument Sans</code>（<code>wdth 75–100</code>+<code>wght 400–700</code>）· <code>Public Sans</code>（<code>wght 100–900</code>）· <code>Bricolage Grotesque</code>（<code>opsz</code>+<code>wdth</code>+<code>wght</code> 三轴）· <code>Space Grotesk</code>（<code>wght 300–700</code>）· <code>Chivo</code>（<code>wght 100–900</code>）· <code>Familjen Grotesk</code>（<code>wght 400–700</code>）—— 全部 OFL 1.1，全部实测 cmap 无西里尔。</p>
+<h3 id="2c">2C. 等宽字体<a class="headerlink" href="#2c" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>字体</th>
+<th>URL（实际访问）</th>
+<th>许可证</th>
+<th>Cyrillic</th>
+<th>字重 / 宽度</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>JetBrains Mono</strong></td>
+<td><code>…/ofl/jetbrainsmono/METADATA.pb</code> · <code>https://api.fontsource.org/v1/fonts</code></td>
+<td>OFL 1.1</td>
+<td>✅ cmap 全（31/31，总字形 976）</td>
+<td>Variable <code>wght 100–800</code></td>
+<td>★ 首选：技术/工程图纸气质，西里尔完整，代码块可读性最好</td>
+</tr>
+<tr>
+<td><strong>Geist Mono</strong></td>
+<td><code>…/ofl/geistmono/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>✅ cmap 全（31/31，cyr-ext +38）</td>
+<td>Variable <code>wght 100–900</code></td>
+<td>次选，更冷静的瑞士感</td>
+</tr>
+<tr>
+<td><strong>Roboto Mono</strong></td>
+<td><code>…/ofl/robotomono/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>✅ cmap 全（31/31，<strong>cyr-ext +179</strong>，覆盖最广）</td>
+<td>Variable <code>wght 100–700</code></td>
+<td>西里尔扩展覆盖冠军</td>
+</tr>
+<tr>
+<td><strong>IBM Plex Mono</strong></td>
+<td><code>…/ofl/ibmplexmono/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>✅ meta（<code>cyrillic</code> + <code>cyrillic-ext</code>）</td>
+<td>Static 多字重</td>
+<td>企业级工程感（下载被限流，仅元数据验证）</td>
+</tr>
+<tr>
+<td><strong>PT Mono</strong></td>
+<td><code>…/ofl/ptmono/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>✅ meta（<code>cyrillic</code>）</td>
+<td>Static</td>
+<td>俄文字体厂 ParaType 出品</td>
+</tr>
+<tr>
+<td><strong>Space Mono</strong></td>
+<td><code>…/ofl/spacemono/METADATA.pb</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Static</td>
+<td>有怪诞味但无西里尔</td>
+</tr>
+<tr>
+<td><strong>Sligoil</strong>（Velvetyne）</td>
+<td><code>https://gitlab.com/velvetyne/sligoil</code></td>
+<td>OFL 1.1</td>
+<td>❌ cmap 0/31</td>
+<td>Micro / Medium / Bold + Variable</td>
+<td>★ 「large inktraps」的工程感等宽，视觉上最贴构成主义，<strong>但只有拉丁</strong>——可作纯英文/数字层的等宽</td>
+</tr>
+<tr>
+<td><strong>Tabular / RX100</strong>（Fontshare）</td>
+<td><code>https://api.fontshare.com/v2/fonts</code></td>
+<td>ITF FFL（Closed Source，禁 subset/再分发）</td>
+<td>❌</td>
+<td>Variable</td>
+<td>不推荐（见 §1C）</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="3">3. 纹理与效果素材源<a class="headerlink" href="#3" aria-hidden="true">#</a></h2>
+<h3 id="3a">3A. ✅ 已核验授权的一手来源<a class="headerlink" href="#3a" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>效果类别</th>
+<th>站点</th>
+<th>具体页面 URL（实际访问）</th>
+<th>授权（页面原文）</th>
+<th>格式 / 分辨率</th>
+<th>CSS/SVG 可替代？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>纸张 / 牛皮纸 / 新闻纸</strong></td>
+<td><strong>ambientCG</strong></td>
+<td><code>https://ambientcg.com/view?id=Paper001</code> · <code>Paper002</code> · <code>Paper003</code>（creaced 折痕） · <code>Paper004</code> · <code>Paper005</code>（cardboard packaging） · <code>Paper006</code> · <code>Cardboard001</code>–<code>Cardboard004</code> · <code>CardboardSet001</code> · <code>CardboardSubstance001</code></td>
+<td><strong>CC0 1.0</strong> — 授权页 <code>https://ambientcg.com/license</code> 原文：「All ambientCG assets are provided under the <strong>Creative Commons CC0 1.0 Universal License</strong>. This applies to the downloadable asset files and the material preview renders」「You can copy, modify, distribute and perform the assets, <strong>even for commercial purposes, all without asking permission</strong>」</td>
+<td>JPG + PBR 贴图组（含 PNG 置换/法线），素材编号经 <code>https://ambientcg.com/api/v1/full_json</code>（10.79 MB，2902 个资产）按 tag 过滤确认存在</td>
+<td>⚠️ 半可：SVG <code>feTurbulence</code> 能做出接近的纤维颗粒，但没有真实纸浆层次</td>
+</tr>
+<tr>
+<td><strong>纸张（通用）</strong></td>
+<td><strong>Poly Haven</strong></td>
+<td><code>https://polyhaven.com/textures</code></td>
+<td><strong>CC0</strong> — 授权页 <code>https://polyhaven.com/license</code> 原文：「Our assets are all licensed as <strong>CC0</strong>, which is effectively Public Domain even in jurisdictions that do not support the Public Domain… You can use our assets for <strong>any purpose, including commercial work</strong>. You <strong>do not need to give credit</strong>」</td>
+<td>4K–8K JPG/EXR，PBR</td>
+<td>⚠️ 半可</td>
+</tr>
+<tr>
+<td><strong>纸张纹理（浏览入口）</strong></td>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:Paper_textures</code>（实测该分类含 101 个文件）</td>
+<td>⚠️ <strong>分类内逐文件授权不一</strong>，必须逐个看文件页（我实测到 PD / CC BY / CC BY-SA 混排）</td>
+<td>混合，多为 JPG/TIF</td>
+<td>✅ 见 3B</td>
+</tr>
+<tr>
+<td><strong>半调网点（halftone）</strong></td>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Halftoning_introduction.svg</code></td>
+<td><strong>Public domain</strong>（<code>LicenseShortName: Public domain</code>，作者 "Slippens / derivative work: McSush"）</td>
+<td>SVG，260×310（3 KB）—— 是小图，当图例/纹理因子用</td>
+<td>✅ <strong>强烈建议用 CSS/SVG 生成</strong>（见 3B）</td>
+</tr>
+<tr>
+<td>半调网点（CMYK 网屏）</td>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Cmyk_AM_screen.png</code></td>
+<td><strong>CC BY-SA 4.0</strong>（需署名 + 相同方式共享 → 与"免费商用无义务"不符，<strong>谨慎</strong>）</td>
+<td>PNG，500×701</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>半调网点（历史原版）</td>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Autotypie_1882_Meisenbach.png</code></td>
+<td><strong>Public domain</strong>（页面原文：「The author died in 1912, so this work is in the public domain in its country of origin…」+ PD-Mark）</td>
+<td>PNG，250×261（很小）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>复古印刷套印错位 / 叠印色块</strong></td>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Blau_zusammendruck.jpg</code></td>
+<td><strong>Public domain</strong>（页面原文：「This work is <strong>ineligible for copyright</strong> and therefore in the public domain because it consists entirely of information that is common property」）</td>
+<td>JPG，250×705</td>
+<td>✅ <strong>首选 CSS 方案</strong>（<code>mix-blend-mode</code> + 位移，见 3B）</td>
+</tr>
+<tr>
+<td>印刷网点（浏览入口）</td>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:Halftone</code>（实测 73 个文件）</td>
+<td>⚠️ 逐文件授权不一</td>
+<td>混合</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>网格纸 / 工程绘图纸（毫米格）</strong></td>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Graph_paper_mm_green_A4.svg</code></td>
+<td><strong>CC0 1.0</strong>（<code>LicenseShortName: CC0</code>，<code>UsageTerms: Creative Commons Zero, Public Domain Dedication</code>，作者 László Németh）</td>
+<td><strong>SVG</strong>，744×1052（62 KB），A4 毫米格</td>
+<td>✅ 但 SVG 已是最优解（无损、可改色、体积极小）</td>
+</tr>
+<tr>
+<td>网格纸（无标尺版）</td>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/File:MmPapier_orange_no_scale.svg</code></td>
+<td><strong>CC0 1.0</strong>（作者 H005）</td>
+<td><strong>SVG</strong>，1052×744（1 KB）</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>工程图纸（浏览入口）</td>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:Graph_paper</code>（实测 84 个文件）</td>
+<td>⚠️ 逐文件授权不一</td>
+<td>混合</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="3b">3B. ⛔ 未能核验的来源（<strong>不要照用</strong>）<a class="headerlink" href="#3b" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>站点</th>
+<th>URL</th>
+<th>问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Rawpixel</strong></td>
+<td><code>https://www.rawpixel.com/category/53/public-domain</code>（HTTP 200）· <code>https://www.rawpixel.com/legal/terms</code>（HTTP 200，但正文只返回 340 字节机器人壳）</td>
+<td><strong>未找到可读的授权原文</strong> → 无法确认「public domain」条目内是否混有付费/CC BY 素材。<strong>标记未找到</strong></td>
+</tr>
+<tr>
+<td>NYPL Digital Collections</td>
+<td><code>https://digitalcollections.nypl.org/</code>（HTTP 200 / 212 字节，纯 JS 壳）</td>
+<td>单件 Rights Statement 未能读到 → <strong>未找到</strong></td>
+</tr>
+<tr>
+<td>The Met Open Access</td>
+<td><code>https://www.metmuseum.org/art/collection/search?showOnly=openAccess</code></td>
+<td><strong>HTTP 429</strong>（限流），未取得页面 → <strong>未找到</strong></td>
+</tr>
+<tr>
+<td>MoMA</td>
+<td><code>https://www.moma.org/artists/4970</code></td>
+<td><strong>HTTP 403</strong> → <strong>未找到</strong></td>
+</tr>
+<tr>
+<td>Getty</td>
+<td><code>https://www.getty.edu/art/collection/</code>（200）</td>
+<td>未定位到 1920s 苏联海报的 Open Content 条目 → <strong>未找到</strong></td>
+</tr>
+<tr>
+<td>Smithsonian Open Access</td>
+<td><code>https://www.si.edu/openaccess</code></td>
+<td><strong>HTTP 403</strong> → <strong>未找到</strong></td>
+</tr>
+<tr>
+<td>Lost &amp; Taken / Toptal Subtle Patterns</td>
+<td><code>https://lostandtaken.com/</code>、<code>https://www.toptal.com/designers/subtlepatterns/</code></td>
+<td>均 <strong>HTTP 403</strong> → 授权<strong>未找到</strong></td>
+</tr>
+<tr>
+<td>Transparent Textures</td>
+<td><code>https://www.transparenttextures.com/</code></td>
+<td>连接超时 → <strong>未找到</strong></td>
+</tr>
+<tr>
+<td>Hero Patterns</td>
+<td><code>https://heropatterns.com/</code>（200）</td>
+<td>站点可达，但<strong>本次未读到其授权页原文</strong> → 授权<strong>未找到</strong>（其模式为 CSS/SVG 内联，若要用请先自行核对）</td>
+</tr>
+<tr>
+<td><strong>扫描划痕 / 灰尘 / 复印机伪影</strong></td>
+<td>—</td>
+<td><strong>未找到</strong>任何授权可核实的高质量位图来源。该类效果本身也最适合程序化生成（见 3C-5）</td>
+</tr>
+<tr>
+<td><strong>噪点 / 胶片颗粒</strong></td>
+<td>—</td>
+<td><strong>未找到</strong>需要下载的理由：<code>feTurbulence</code> 方案在质量与体积上都优于位图（见 3C-3）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="3c-css-svg">3C. 不用图片：纯 CSS / SVG 实现同样的效果<a class="headerlink" href="#3c-css-svg" aria-hidden="true">#</a></h3>
+<blockquote>
+<p>本项目 <strong>6 类效果中有 5 类可以零字节实现</strong>。只有「真实纸张纤维」建议用 CC0 位图。</p>
+</blockquote>
+<p><strong>① 新闻纸 / 纸纤维（SVG <code>feTurbulence</code> 双层叠加）</strong></p>
+<pre><code class="language-html">&lt;svg width=&quot;0&quot; height=&quot;0&quot; aria-hidden=&quot;true&quot; style=&quot;position:absolute&quot;&gt;
+  &lt;filter id=&quot;paper&quot;&gt;
+    &lt;!-- 粗颗粒：纸浆纤维 --&gt;
+    &lt;feTurbulence type=&quot;fractalNoise&quot; baseFrequency=&quot;0.9&quot; numOctaves=&quot;4&quot; seed=&quot;7&quot; result=&quot;fiber&quot;/&gt;
+    &lt;!-- 细颗粒：印刷网点感 --&gt;
+    &lt;feTurbulence type=&quot;fractalNoise&quot; baseFrequency=&quot;0.04&quot; numOctaves=&quot;2&quot; seed=&quot;3&quot; result=&quot;blotch&quot;/&gt;
+    &lt;feMerge result=&quot;grain&quot;&gt;
+      &lt;feMergeNode in=&quot;fiber&quot;/&gt;&lt;feMergeNode in=&quot;blotch&quot;/&gt;
+    &lt;/feMerge&gt;
+    &lt;!-- 去色 + 压平对比，只保留灰度亮度扰动 --&gt;
+    &lt;feColorMatrix in=&quot;grain&quot; type=&quot;saturate&quot; values=&quot;0&quot; result=&quot;gray&quot;/&gt;
+    &lt;feComponentTransfer in=&quot;gray&quot;&gt;
+      &lt;feFuncA type=&quot;linear&quot; slope=&quot;0.22&quot; intercept=&quot;0&quot;/&gt;
+    &lt;/feComponentTransfer&gt;
+  &lt;/filter&gt;
+&lt;/svg&gt;
+&lt;style&gt;
+  .paper {
+    background-color: #efe7d6;              /* 底纸色，构成主义常用米白/土黄 */
+    position: relative;
+  }
+  .paper::after {                             /* 纹理层，不挡内容 */
+    content: &quot;&quot;; position: absolute; inset: 0;
+    filter: url(#paper);
+    mix-blend-mode: multiply;
+    opacity: .55; pointer-events: none;
+  }
+&lt;/style&gt;
+</code></pre>
+<p><strong>② 半调网点（halftone dots）—— 纯 CSS，两行搞定</strong></p>
+<pre><code class="language-css">/* 45° 旋转的圆点网屏，等效于 AM 印刷网 */
+.halftone {
+  background-image: radial-gradient(circle at center, #111 0 1.6px, transparent 1.7px);
+  background-size: 6px 6px;          /* 网屏线数：改这里控制粗细 */
+  background-position: 0 0;
+  /* 视觉上加角度（可选）：整层旋转 */
+  transform: rotate(0deg);
+}
+/* 需要真正的 45° 网屏（网点对角线排列）时，用 SVG pattern 更干净： */
+</code></pre>
+<pre><code class="language-html">&lt;svg width=&quot;100%&quot; height=&quot;100%&quot;&gt;
+  &lt;defs&gt;
+    &lt;pattern id=&quot;am45&quot; width=&quot;6&quot; height=&quot;6&quot; patternUnits=&quot;userSpaceOnUse&quot;
+             patternTransform=&quot;rotate(45)&quot;&gt;
+      &lt;circle cx=&quot;3&quot; cy=&quot;3&quot; r=&quot;1.6&quot; fill=&quot;currentColor&quot;/&gt;
+    &lt;/pattern&gt;
+  &lt;/defs&gt;
+  &lt;rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;url(#am45)&quot;/&gt;
+&lt;/svg&gt;
+</code></pre>
+<blockquote>
+<p>进阶：要「网点随明暗变化」的<strong>真半调</strong>（halftone screen），用 SVG 滤镜对图片做 <code>feImage</code>+<code>feTile</code>+<code>feComposite</code> 组合，或直接对图片套 <code>filter: url(#halftone)</code>（<code>feTurbulence</code> + <code>feComponentTransfer</code> 硬阈值）。纯 CSS 做不出随亮度变化的点径，这一点必须承认。</p>
+</blockquote>
+<p><strong>③ 噪点 / 胶片颗粒</strong></p>
+<pre><code class="language-css">/* 极轻量方案：CSS 渐变伪随机噪声（无需滤镜，GPU 友好） */
+.grain {
+  background-image:
+    repeating-conic-gradient(#0000 0% 25%, #0003 0% 50%);
+  background-size: 4px 4px;
+  mix-blend-mode: overlay;
+}
+</code></pre>
+<pre><code class="language-html">&lt;!-- 更好看的方案：SVG turbulence，可平铺、可动画（颗粒感&quot;呼吸&quot;） --&gt;
+&lt;filter id=&quot;grain&quot;&gt;
+  &lt;feTurbulence type=&quot;fractalNoise&quot; baseFrequency=&quot;0.75&quot; numOctaves=&quot;3&quot; stitchTiles=&quot;stitch&quot;/&gt;
+  &lt;feColorMatrix type=&quot;saturate&quot; values=&quot;0&quot;/&gt;
+  &lt;feComponentTransfer&gt;&lt;feFuncA type=&quot;table&quot; tableValues=&quot;0 0.35&quot;/&gt;&lt;/feComponentTransfer&gt;
+&lt;/filter&gt;
+</code></pre>
+<p><strong>④ 复古套印错位 / 叠印（misregistration）—— 强烈建议纯 CSS</strong></p>
+<pre><code class="language-css">.overprint { position: relative; color: #d33; font-weight: 900; letter-spacing: -.02em; }
+/* 用两个偏移的伪元素模拟青/品红/黄版套偏 */
+.overprint::before,
+.overprint::after {
+  content: attr(data-text);
+  position: absolute; inset: 0;
+  mix-blend-mode: multiply;   /* 关键：乘算 = 油墨叠印 */
+}
+.overprint::before { color: #06c; transform: translate(-2px, 1.5px); opacity: .85; }
+.overprint::after  { color: #fc0; transform: translate(2px, -1px);  opacity: .8;  }
+</code></pre>
+<pre><code class="language-css">/* 大色块的三色叠印：三层 + screen/multiply */
+.block        { background:#e8442c; mix-blend-mode: multiply; }
+.block--c     { background:#1b8fd0; mix-blend-mode: screen; transform: translate(3px,-2px); }
+.block--y     { background:#f2c200; mix-blend-mode: multiply; transform: translate(-3px,2px); }
+</code></pre>
+<blockquote>
+<p>构成主义的红/黑对角构图就是靠 <code>multiply</code> 叠出深色交叠区的，这比任何位图都干净、可响应式、可动画。</p>
+</blockquote>
+<p><strong>⑤ 扫描划痕 / 灰尘 / 复印机伪影</strong></p>
+<pre><code class="language-html">&lt;filter id=&quot;photocopy&quot;&gt;
+  &lt;!-- 高频噪声 → 硬阈值 → 变成划痕/斑点 --&gt;
+  &lt;feTurbulence type=&quot;fractalNoise&quot; baseFrequency=&quot;0.015 0.6&quot; numOctaves=&quot;2&quot; seed=&quot;12&quot; result=&quot;scratch&quot;/&gt;
+  &lt;feComponentTransfer in=&quot;scratch&quot; result=&quot;hard&quot;&gt;
+    &lt;feFuncA type=&quot;discrete&quot; tableValues=&quot;0 0 0 0 0 0 0 0 0 0.9&quot;/&gt;
+  &lt;/feComponentTransfer&gt;
+  &lt;feBlend in=&quot;SourceGraphic&quot; in2=&quot;hard&quot; mode=&quot;multiply&quot;/&gt;
+&lt;/filter&gt;
+</code></pre>
+<blockquote>
+<p><code>baseFrequency="0.015 0.6"</code> 的关键在于 <strong>x 方向极低、y 方向较高</strong> → 生成横向细长条纹 = 扫描线/划痕。改 <code>seed</code> 换一套划痕。比位图更可控、可无限随机。</p>
+</blockquote>
+<p><strong>⑥ 网格纸 / 工程绘图纸</strong></p>
+<pre><code class="language-css">/* 毫米格：细线 1mm + 粗线 5mm + 更粗 10mm，三层 repeating-linear-gradient */
+.graph {
+  --fine: rgba(0,90,140,.20);
+  --mid:  rgba(0,90,140,.35);
+  --bold: rgba(0,90,140,.55);
+  background-color: #f7fafc;
+  background-image:
+    repeating-linear-gradient(0deg,   var(--fine) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(90deg,  var(--fine) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(0deg,   var(--mid)  0 1px, transparent 1px 50px),
+    repeating-linear-gradient(90deg,  var(--mid)  0 1px, transparent 1px 50px),
+    repeating-linear-gradient(0deg,   var(--bold) 0 2px, transparent 2px 100px),
+    repeating-linear-gradient(90deg,  var(--bold) 0 2px, transparent 2px 100px);
+  background-size: 100px 100px, 100px 100px, 100px 100px, 100px 100px, 100px 100px, 100px 100px;
+}
+/* 蓝图（blueprint）变体：深蓝底 + 白线 */
+.blueprint { background-color:#0b3b6f; --fine:rgba(255,255,255,.18); --mid:rgba(255,255,255,.3); --bold:rgba(255,255,255,.5); }
+</code></pre>
+<h3 id="3d">3D. 效果实现方式选型建议<a class="headerlink" href="#3d" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>效果</th>
+<th>建议</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>半调网点</td>
+<td><strong>CSS/SVG</strong></td>
+<td>无损缩放、可改色、0 字节；位图网点在高 DPI 屏上会摩尔纹</td>
+</tr>
+<tr>
+<td>套印错位</td>
+<td><strong>CSS</strong></td>
+<td><code>mix-blend-mode</code> 语义正确，可响应式、可 hover 动画</td>
+</tr>
+<tr>
+<td>颗粒/噪点</td>
+<td><strong>SVG <code>feTurbulence</code></strong></td>
+<td>可平铺（<code>stitchTiles</code>）、可动画、体积极小</td>
+</tr>
+<tr>
+<td>网格纸</td>
+<td><strong>CSS 渐变 / CC0 SVG</strong></td>
+<td>CSS 完胜；若需可下载素材用 <code>Graph_paper_mm_green_A4.svg</code>（CC0）</td>
+</tr>
+<tr>
+<td>扫描划痕</td>
+<td><strong>SVG <code>feTurbulence</code> 非等向 <code>baseFrequency</code></strong></td>
+<td>唯一可控的方案；位图来源本次未找到</td>
+</tr>
+<tr>
+<td>真实纸张纤维</td>
+<td><strong>ambientCG / Poly Haven 位图（CC0）</strong></td>
+<td>纸浆层次与 PBR 凹凸是程序化生成做不出的</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="4">4. 公有领域构成主义图像素材<a class="headerlink" href="#4" aria-hidden="true">#</a></h2>
+<h3 id="4a-commons">4A. 版权规则原文（来自 Commons 官方模板，逐字读取）<a class="headerlink" href="#4a-commons" aria-hidden="true">#</a></h3>
+<p><strong><code>https://commons.wikimedia.org/wiki/Template:PD-Russia-1996</code></strong> → 英文正文在 <code>https://commons.wikimedia.org/w/index.php?title=Template:PD-Russia-1996/en&amp;action=raw</code>，原文：</p>
+<blockquote>
+<p>This work is in the public domain in Russia according to <strong>article 1281 of the Civil Code of the Russian Federation</strong>, articles 5 and 6 of <strong>Law No. 231-FZ of the Russian Federation of December 18, 2006</strong>（Implementation Act for Book IV of the Civil Code）。
+This usually means that one of the following conditions is fulfilled.
+1. <strong>The author of this work died: (a) before January 1, 1942 or (b) between January 1, 1942 and January 1, 1946, did not work during the Great Patriotic War and did not participate in it.</strong>
+2. This work was originally published anonymously or under a pseudonym: (a) before January 1, 1943 and the name of the author did not become known during 50 years after publication…
+3. This work is a film… (a) first shown before January 1, 1943 …
+4. This work is an information report (including photo report), created by an employee of <strong>TASS, ROSTA, or KarelfinTAG</strong> as part of official duties between <strong>July 10, 1925</strong> and January 1, 1946 …</p>
+<p>This work is in the <strong>public domain in the United States</strong>, because it was in the public domain in its home country (Russia) on the <strong>URAA date (January 1, 1996)</strong> — <em>explanation: January 1, 1946 (fix date) + 50 years (since death of author) = January 1, 1996</em> — and it wasn't re-published for 30 days following initial publications in the U.S.</p>
+</blockquote>
+<p>脚注（对 Klutsis 极其关键）：</p>
+<blockquote>
+<p>[2] <strong>If the author of this work was subjected to repression and rehabilitated posthumously, copyright term is counted from January 1 of the year following the year of rehabilitation.</strong></p>
+</blockquote>
+<p><strong><code>https://commons.wikimedia.org/wiki/Template:PD-Russia</code></strong>（现行 70 年通则，英文正文 <code>…/Template:PD-Russia/en&amp;action=raw</code>）：</p>
+<blockquote>
+<p>(a) The author died <strong>before January 1, {{CURRENTYEAR−74}}</strong> or (b) died between {{CURRENTYEAR−74}} and {{CURRENTYEAR−70}}…（模板运行时展开 → 2026 年即"死于 1952 年前"或"1952–1956 年间且未参加卫国战争"）</p>
+</blockquote>
+<p><strong><code>https://commons.wikimedia.org/wiki/Template:PD-old-70</code></strong>：</p>
+<blockquote>
+<p>This work is in the public domain in its country of origin and other countries and areas where the <strong>copyright term is the author's life plus 70 years or fewer</strong>.</p>
+</blockquote>
+<p><strong>美国规则（本次未直接访问美国版权局页面，仅依据上述 Commons 模板 + URAA 说明）：</strong> 1929 年及以前出版的作品在美国已进入公有领域（逐年递增：1930 → 2026-01-01 到期）；1929–1977 年出版且经 URAA 复权的作品，美国保护期为<strong>出版后 95 年</strong>。</p>
+<h3 id="4b-commons">4B. 作者生卒年（来自 Commons 分类页渲染结果，非记忆）<a class="headerlink" href="#4b-commons" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>艺术家</th>
+<th>分类页 URL（实际访问）</th>
+<th>生卒年（实测输出）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gustav Klutsis</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:Gustav_Klutsis</code></td>
+<td><strong>1895–1938</strong></td>
+</tr>
+<tr>
+<td>Alexander Rodchenko</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:Alexander_Rodchenko</code></td>
+<td><strong>1891–1956</strong></td>
+</tr>
+<tr>
+<td>El Lissitzky</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:El_Lissitzky</code></td>
+<td><strong>1890–1941</strong></td>
+</tr>
+<tr>
+<td>Varvara Stepanova</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:Varvara_Stepanova</code></td>
+<td><strong>1894–1958</strong></td>
+</tr>
+<tr>
+<td>Lyubov Popova</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:Lyubov_Popova</code></td>
+<td><strong>1889–1924</strong></td>
+</tr>
+<tr>
+<td>Kazimir Malevich</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:Kazimir_Malevich</code></td>
+<td><strong>1878–1935</strong> 与 <strong>1879–1935</strong> 两个值同时出现在页面（公历/儒略历换算差异）→ 通行说法 <strong>1879–1935</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠️ <code>Creator:</code> 命名空间页面（<code>Creator:Aleksandr_Rodchenko</code> 等）实测只含 <code>{{Creator | Wikidata = Q…}}</code>，日期由 Wikidata 动态带出，而 Wikidata 本机不可达 → 故改用分类页（其渲染结果内嵌了 <code>{{Creator}}</code> 展开后的年份）。</p>
+</blockquote>
+<h3 id="4c">4C. 风险表（俄罗斯规则 + 美国规则分开判定）<a class="headerlink" href="#4c" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>作品 / 艺术家</th>
+<th>卒年</th>
+<th><strong>俄罗斯 PD 年份</strong></th>
+<th><strong>美国 PD 年份</strong></th>
+<th>现在能商用吗</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Lyubov Popova</strong>（1889–1924）</td>
+<td>1924</td>
+<td><strong>2000-01-01</strong>（1924+70，且卒于 1942 前 → PD-Russia-1996）</td>
+<td>已 PD（1996-01-01 URAA 时已在俄 PD）</td>
+<td>✅ <strong>可自由商用</strong></td>
+<td>俄美双 PD，零风险</td>
+</tr>
+<tr>
+<td><strong>Kazimir Malevich</strong>（1879–1935）</td>
+<td>1935</td>
+<td><strong>2006-01-01</strong>（PD-Russia-1996，卒于 1942 前）</td>
+<td>已 PD（同上）</td>
+<td>✅ <strong>可自由商用</strong></td>
+<td>俄美双 PD，零风险</td>
+</tr>
+<tr>
+<td><strong>El Lissitzky</strong>（1890–<strong>1941-12-30</strong>）</td>
+<td>1941</td>
+<td><strong>2012-01-01</strong>；且卒于 <strong>1942-01-01 之前</strong> → 明确套用 PD-Russia-1996</td>
+<td>已 PD</td>
+<td>✅ <strong>可自由商用</strong></td>
+<td>死期只差 2 天，但恰好落在 1942-01-01 之前，规则适用无疑义 —— 这是本次最有价值的确认</td>
+</tr>
+<tr>
+<td><strong>Gustav Klutsis</strong>（1895–1938）</td>
+<td>1938</td>
+<td>表面 <strong>2009-01-01</strong>（卒于 1942 前 → PD-Russia-1996）；<strong>但</strong> 1938 年被捕处决、据信 1956 年平反，若适用「镇压后平反」脚注 → 期限改从平反年起算，<strong>1956+70 = 2027-01-01</strong></td>
+<td>已 PD（URAA 时点在俄 PD）</td>
+<td>⚠️ <strong>有风险</strong></td>
+<td><strong>俄罗斯境内可能仍受保护至 2027-01-01</strong>。他的平反年份我<strong>未能在可达页面核实（未找到）</strong>。若网站面向俄罗斯/欧盟发行，<strong>建议在 2027 年前避免使用 Klutsis，或仅使用美国视角合法的副本并保留免责说明</strong></td>
+</tr>
+<tr>
+<td><strong>Aleksandr Rodchenko</strong>（1891–1956）</td>
+<td>1956</td>
+<td><strong>2027-01-01</strong>（1956+70；卒于 1942 后 → <strong>不适用</strong> PD-Russia-1996）</td>
+<td><strong>仅 1930 年及以前出版的作品已 PD</strong>（1930+95=2025，2026-01-01 起安全）；1931 年后的作品仍在美国保护期内</td>
+<td>⚠️ <strong>部分可用 / 有风险</strong></td>
+<td>俄罗斯与欧盟 <strong>2027-01-01 前仍受保护</strong>。做全球站点有残余风险；只取 1930 年前出版物风险最低</td>
+</tr>
+<tr>
+<td><strong>Varvara Stepanova</strong>（1894–1958）</td>
+<td>1958</td>
+<td><strong>2029-01-01</strong>（1958+70）</td>
+<td>仅 1930 年及以前出版的作品已 PD</td>
+<td>⚠️ <strong>部分可用 / 有风险</strong></td>
+<td>与 Rodchenko 同期，风险略高（晚 2 年）</td>
+</tr>
+<tr>
+<td>Alexander Vesnin</td>
+<td>—</td>
+<td>分类页实测存在但<strong>未取到生卒年</strong>（HTTP reset）→ <strong>未找到</strong></td>
+<td>—</td>
+<td>未知</td>
+<td>未核实</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>给网页项目的实操结论：</strong></p>
+<ol>
+<li><strong>零风险池（可以直接用、可以商用、不需要署名）：Popova、Malevich、Lissitzky。</strong> 这三位已构成本次所需的全部视觉语言（至上主义方块/圆/十字、红楔子、PROUN 构成）。</li>
+<li><strong>有条件使用池：Rodchenko、Stepanova</strong> —— 只选 <strong>1930 年及以前出版</strong> 的作品，并在页脚注明「作品在作者母国可能仍受保护，本页依据美国公有领域规则使用」。2027 / 2029 年后完全无碍。</li>
+<li><strong>回避池：Klutsis</strong> —— 2027 年前存在俄罗斯法域风险；若要使用，<strong>只用美国法域逻辑并明确限定</strong>，或直接换 Lissitzky 的同类拼贴海报。</li>
+<li><strong>绝对不要用「现代摄影师翻拍海报」的照片当素材。</strong> 见下节实测证据。</li>
+</ol>
+<h3 id="4d">4D. 具体可下载页面 + 实测分辨率 + 授权<a class="headerlink" href="#4d" aria-hidden="true">#</a></h3>
+<p>全部通过 Commons <code>api.php?action=query&amp;prop=imageinfo&amp;iiprop=url|size|extmetadata</code> 逐条读取。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>作品</th>
+<th>艺术家 / 年份</th>
+<th>页面 URL（实际访问）</th>
+<th>实测分辨率</th>
+<th>文件大小</th>
+<th>页面授权（实测）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Beat the Whites with the Red Wedge</strong>（红楔子击败白军）</td>
+<td>El Lissitzky, 1919</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Beat_the_Whites_with_the_Red_Wedge.jpg</code></td>
+<td><strong>1920 × 1572</strong></td>
+<td>0.29 MB</td>
+<td><strong>Public domain</strong>（<code>UsageTerms: Public domain</code>，Artist: El Lissitzky，Date: 1919）</td>
+</tr>
+<tr>
+<td>Klinom Krasnim 变体</td>
+<td>El Lissitzky, 1919–1920</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Klinom_Krasnim_by_El_Lisitskiy_(1920).jpg</code></td>
+<td>849 × 685</td>
+<td>0.05 MB</td>
+<td><strong>Public domain</strong></td>
+</tr>
+<tr>
+<td><strong>Soviet Power plus Electrification</strong></td>
+<td>Gustav Klutsis, 1929</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Klutsis_(1929)_Soviet_Power_plus_electrification.png</code></td>
+<td>496 × 686</td>
+<td>0.63 MB</td>
+<td><strong>Public domain</strong>（但见 §4C Klutsis 风险警告）</td>
+</tr>
+<tr>
+<td><strong>Under the Banner of Lenin for Socialist Construction</strong></td>
+<td>Gustav Klutsis, 1930</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Under_the_banner_of_Lenin_for_socialist_construction_Poster_-_Gustavs_Klucis.jpg</code></td>
+<td><strong>4000 × 5516</strong></td>
+<td><strong>3.19 MB</strong></td>
+<td><strong>Public domain</strong>（Credit: Google Arts &amp; Culture）—— <strong>本次找到的最高清苏联海报</strong></td>
+</tr>
+<tr>
+<td>Black Square（黑方块）</td>
+<td>Kazimir Malevich</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Malevich,_Kazimir_Severinovich_-_Black_Square.jpg</code></td>
+<td><strong>8032 × 8000</strong></td>
+<td><strong>52.14 MB</strong></td>
+<td><strong>Public domain</strong>（Date 字段记 "1930 or 1932"，与通行的 1915 年版不同 → <strong>使用前请核对你是哪一个版本</strong>）</td>
+</tr>
+<tr>
+<td>Stepanova 台球手</td>
+<td>Varvara Stepanova, 1920</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Varvara_stepanova,_giocatori_di_biliardo,_1920.jpg</code></td>
+<td>4230 × 2394</td>
+<td>5.51 MB</td>
+<td>⚠️ <strong>CC BY-SA 4.0</strong>，<code>Artist: Francesco Bini</code>，<code>Credit: Own work</code> —— <strong>这是 2022 年现代摄影师的翻拍照片，不是原作的 PD 扫描件</strong></td>
+</tr>
+<tr>
+<td>Long Live the USSR!（Klutsis 蓝图）</td>
+<td>1935 海报</td>
+<td><code>https://commons.wikimedia.org/wiki/File:Long_Live_the_USSR!_Blueprint_for_the_Brotherhood_of_all_Working_Classes_of_all_the_World%27s_Nationalities!_1935_(51724375511).jpg</code></td>
+<td>3433 × 2497</td>
+<td>1.36 MB</td>
+<td>⚠️ <strong>CC BY 2.0</strong>，<code>Artist: Steve Knight from Halstead, United Kingdom</code>，Date 2021-12-04 —— <strong>同为现代翻拍</strong></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>🔴 本节最关键的一条警告：</strong> Commons 上大量「构成主义海报」的 <code>Artist</code> 字段写的是<strong>21 世纪的摄影师</strong>，授权是 <strong>CC BY / CC BY-SA</strong>。这类文件的版权属于摄影师（翻拍的<strong>摄影</strong>有新版权，即使原作已 PD）。上表最后两行就是实证。<strong>筛选方法：看 <code>Artist</code> 字段是不是画家本人 + <code>DateTimeOriginal</code> 是不是 1920s。</strong> 只有像 <code>Beat the Whites…</code>（Artist: El Lissitzky, Date: 1919）和 <code>Under the banner of Lenin…</code>（Credit: Google Arts &amp; Culture）这种才是真·PD 扫描件。</p>
+</blockquote>
+<h3 id="4e">4E. 博物馆 / 图书馆来源核验结果<a class="headerlink" href="#4e" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>来源</th>
+<th>URL</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wikimedia Commons</td>
+<td><code>https://commons.wikimedia.org/wiki/Category:&lt;artist&gt;</code> · <code>https://commons.wikimedia.org/wiki/Template:PD-Russia-1996</code> · <code>Template:PD-old-70</code></td>
+<td>✅ <strong>本次唯一完整核验通过的高清 PD 来源</strong>。分类规模实测：Rodchenko 22 文件/41 子分类 · Lissitzky 22/34 · Klutsis <strong>7/40</strong> · Malevich 15/53 · Stepanova 6/36 · Popova 5/43</td>
+</tr>
+<tr>
+<td>MoMA</td>
+<td><code>https://www.moma.org/artists/4970</code></td>
+<td>❌ <strong>HTTP 403</strong> → 未找到</td>
+</tr>
+<tr>
+<td>Getty</td>
+<td><code>https://www.getty.edu/art/collection/</code></td>
+<td>HTTP 200，但未定位到 1920s 苏联海报的 Open Access 条目 → <strong>未找到</strong></td>
+</tr>
+<tr>
+<td>NYPL Digital Collections</td>
+<td><code>https://digitalcollections.nypl.org/</code></td>
+<td>HTTP 200 / 212 字节 JS 壳，单件 Rights Statement 读不到 → <strong>未找到</strong></td>
+</tr>
+<tr>
+<td>The Met Open Access</td>
+<td><code>https://www.metmuseum.org/art/collection/search?showOnly=openAccess</code></td>
+<td>❌ <strong>HTTP 429</strong> → 未找到</td>
+</tr>
+<tr>
+<td>Smithsonian Open Access</td>
+<td><code>https://www.si.edu/openaccess</code></td>
+<td>❌ <strong>HTTP 403</strong> → 未找到</td>
+</tr>
+<tr>
+<td>Monoskop</td>
+<td><code>https://monoskop.org/Monoskop</code></td>
+<td>❌ <strong>HTTP 500</strong> → 未找到（另注：Monoskop 自身并非版权许可方，其 PDF 多为转载，不宜作为授权依据）</td>
+</tr>
+<tr>
+<td>Yale / Beinecke、俄罗斯国立图书馆、ROSIZO、David King Collection</td>
+<td>—</td>
+<td><strong>未找到</strong>（本次未取得可访问的授权页；建议后续单独核查）</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="5">5. 推荐组合<a class="headerlink" href="#5" aria-hidden="true">#</a></h2>
+<h3 id="_2">🏆 主推（俄文 / 多语言均安全）<a class="headerlink" href="#_2" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>角色</th>
+<th>字体</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>标题</strong></td>
+<td><strong>Oswald</strong>（Variable <code>wght 200–700</code>）<br>OFL 1.1 · <code>…/ofl/oswald/METADATA.pb</code> · Fontsource <code>oswald</code></td>
+<td>① 唯一同时满足「<strong>工业窄体压缩感</strong>（最接近 Druk）+ <strong>完整西里尔</strong>」的字体；② cmap 实测西里尔 + <strong>cyr-ext 140 个字形</strong>，俄/乌/保加利亚文全覆盖；③ 一个变量字体覆盖 200–700，从巨型海报字到小标签只加载一个文件；④ OFL 允许 subset → 可裁到只用大写西里尔 + 数字，体积极小</td>
+</tr>
+<tr>
+<td><strong>正文</strong></td>
+<td><strong>Golos Text</strong>（Variable <code>wght 400–900</code>）<br>OFL 1.1 · <code>…/ofl/golostext/METADATA.pb</code></td>
+<td>① 俄文字形是<strong>第一语言</strong>设计的（不是拉丁字体硬塞西里尔），小字可读性最好；② 中性朴素，不与 Oswald 抢戏；③ Cyrillic + cyrillic-ext 80 字形；④ 与 Oswald 形成「窄 vs 常规」的清晰层级对立，这正是构成主义版面「对比而非渐变」的排版原则</td>
+</tr>
+<tr>
+<td><strong>等宽</strong></td>
+<td><strong>JetBrains Mono</strong>（Variable <code>wght 100–800</code>）<br>OFL 1.1 · <code>…/ofl/jetbrainsmono/METADATA.pb</code> · Fontsource <code>jetbrains-mono</code></td>
+<td>① 技术/工程图纸气质与「网格纸 + 蓝图」纹理天然同构；② 西里尔完整（31/31）；③ 连字可关，做数据/编号/坐标标签很干净</td>
+</tr>
+<tr>
+<td><strong>纹理方案 A（位图，真实材质）</strong></td>
+<td><strong>ambientCG <code>Paper003</code>（折痕纸）+ <code>Paper006</code>（米黄纸）</strong><br>CC0 1.0 · <code>https://ambientcg.com/view?id=Paper003</code> · <code>https://ambientcg.com/license</code></td>
+<td>① CC0 = 商用无需署名、可改、可再分发，法务零负担；② 含 PBR 凹凸贴图，<code>background-blend-mode: multiply</code> 叠一层就有真实纸浆凹陷；③ <code>Paper003</code> 的折痕正好呼应构成主义「被折叠过的宣传单」质感</td>
+</tr>
+<tr>
+<td><strong>纹理方案 B（零字节，程序化）</strong></td>
+<td><strong>纯 CSS/SVG 组合：<code>feTurbulence</code> 纸纤维 + <code>radial-gradient</code> 半调网点 + <code>mix-blend-mode: multiply</code> 三色套印错位</strong>（代码见 §3C-①②④）</td>
+<td>① 0 KB 请求、无损缩放、完美适配任何 DPI；② 可随主题变量换色（红→黑主题切换零成本）；③ 可做滚动/hover 动画（颗粒呼吸、套印位移），位图做不到；④ 与方案 A <strong>互补而非重复</strong>：B 负责「印刷工艺」，A 负责「纸张材质」</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>为什么这套组合成立：</strong> 构成主义的版面语法是「<strong>窄体重字 + 巨大尺度对比 + 网格 + 红黑对角</strong>」。Oswald 提供窄体重字，Golos Text 提供中性对照，JetBrains Mono 提供网格/工程语义；纹理层用「程序化套印错位」承担最构成主义的那部分（错位、叠印、网屏），用 CC0 纸材质托底，全部授权无义务。</p>
+<h3 id="_3">若项目只在拉丁语环境（无需西里尔）<a class="headerlink" href="#_3" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>角色</th>
+<th>字体</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标题</td>
+<td><strong>Format 1452</strong>（Velvetyne，OFL 1.1）</td>
+<td>「Din-like, built with modules, without any optical corrections」——<strong>模块化 + 零光学修正</strong>就是构成主义字体观本身。比 Anton 更有观念性</td>
+</tr>
+<tr>
+<td>备选标题</td>
+<td><strong>Anton</strong> 或 <strong>Archivo Black</strong></td>
+<td>更粗暴直接的 Druk 替代</td>
+</tr>
+<tr>
+<td>正文</td>
+<td><strong>Instrument Sans</strong>（OFL 1.1，双轴 <code>wdth 75–100</code> + <code>wght 400–700</code>）</td>
+<td>可以在正文层直接收窄，与标题的窄体呼应而不重复</td>
+</tr>
+<tr>
+<td>等宽</td>
+<td><strong>Sligoil</strong>（Velvetyne，OFL 1.1）</td>
+<td>「monospace with large inktraps」——inktrap 是印刷工艺的自我暴露，与半调网点同一套语义</td>
+</tr>
+<tr>
+<td>纹理</td>
+<td>同上方案 A + B</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="_4">⚠️ 三条必须遵守的使用纪律<a class="headerlink" href="#_4" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>不要碰 Fontshare 的 Closed Source 字体</strong>（Clash Display / Cabinet Grotesk / Satoshi…）：虽然商用免费，但 ITF FFL v2.0 明文禁止 <strong>subset、格式转换、放进仓库分发</strong>，而它们 <strong>100% 没有西里尔</strong>。</li>
+<li><strong>不要用 Commons 上现代摄影师翻拍的苏联海报</strong>（<code>Artist</code> 字段是 2021/2022 年的摄影师、授权为 CC BY / CC BY-SA 的）——翻拍照片本身有独立版权。只取 <code>Artist</code> 是画家本人、<code>Date</code> 是 1920s 的文件。</li>
+<li><strong>Rodchenko / Stepanova 只选 1930 年及以前出版的作品，Klutsis 在 2027 年前回避。</strong> 零风险的选择是 Popova + Malevich + Lissitzky。</li>
+</ol>
+<hr />
+<h2 id="acyrillic-cmap">附录 A：Cyrillic cmap 实测原始数据<a class="headerlink" href="#acyrillic-cmap" aria-hidden="true">#</a></h2>
+<p>方法：从 <code>fonts.gstatic.com</code>（不指定 UA 时 Google 返回<strong>完整单文件 TTF</strong>）与 GitLab raw（OTF）下载二进制，Python 手写解析 <code>cmap</code> 表 format 4 / 6 / 12，统计 U+0410–U+044F ∪ {U+0401, U+0451} 共 64 个西里尔基本字母的命中数，以及 31 个乌克兰语扩展字母（Ґ ґ Є є І і Ї ї 等）。</p>
+<pre><code>GF__Anybody.ttf                        NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=658
+GF__Archivo.ttf                        NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=653
+GF__Archivo_Black.ttf                  NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=423
+GF__Barlow_Condensed.ttf               NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=525
+GF__Bebas_Neue.ttf                     NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=461
+GF__Big_Shoulders_Display.ttf          NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=718
+GF__Chivo.ttf                          NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=644
+GF__Instrument_Sans.ttf                NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=343
+GF__Saira_Condensed.ttf                NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=608
+GF__Space_Grotesk.ttf                  NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=735
+GF__Space_Mono.ttf                     NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=624
+GF__Syne.ttf                           NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=470
+GF__Teko.ttf                           NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=424
+GF__Geist_Mono.ttf                     CYRILLIC-YES  UA=31/31  cyr_ext=38   total_cp=889
+GF__Golos_Text.ttf                     CYRILLIC-YES  UA=31/31  cyr_ext=80   total_cp=566
+GF__JetBrains_Mono.ttf                 CYRILLIC-YES  UA=31/31  cyr_ext=6    total_cp=976
+GF__Jost.ttf                           CYRILLIC-YES  UA=26/31  cyr_ext=0    total_cp=524   &lt;-- 俄文完整，乌克兰文不全
+GF__Manrope.ttf                        CYRILLIC-YES  UA=31/31  cyr_ext=8    total_cp=678
+GF__Onest.ttf                          CYRILLIC-YES  UA=31/31  cyr_ext=70   total_cp=780
+GF__Oswald.ttf                         CYRILLIC-YES  UA=31/31  cyr_ext=140  total_cp=850
+GF__Roboto_Mono.ttf                    CYRILLIC-YES  UA=31/31  cyr_ext=179  total_cp=876
+GF__Rubik_Mono_One.ttf                 CYRILLIC-YES  UA=31/31  cyr_ext=2    total_cp=528
+GF__Russo_One.ttf                      CYRILLIC-YES  UA=31/31  cyr_ext=2    total_cp=410
+GF__Stalinist_One.ttf                  CYRILLIC-YES  UA=31/31  cyr_ext=2    total_cp=333
+GF__Tektur.ttf                         CYRILLIC-YES  UA=31/31  cyr_ext=86   total_cp=962
+GF__Unbounded.ttf                      CYRILLIC-YES  UA=31/31  cyr_ext=2    total_cp=1138
+StudioTriple__pilowlava_Pilowlava-Atome.otf   CYRILLIC-YES  UA=31/31  cyr_ext=2    total_cp=360
+velvetyne__grotesk_Grotesk-01Extrafin.otf     CYRILLIC-YES  UA=31/31  cyr_ext=2    total_cp=474
+velvetyne__lack_Lack-Italic.otf               CYRILLIC-YES  UA=31/31  cyr_ext=124  total_cp=667
+velvetyne__murmure_le-murmure.otf             CYRILLIC-YES  UA=31/31  cyr_ext=2    total_cp=504
+velvetyne__Avara_Avara-Black.otf              NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=234
+velvetyne__Gulax_Gulax-Regular.otf            NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=315
+velvetyne__Mess_Mess.otf                      NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=189
+velvetyne__Sporting-Grotesque_...Bold.otf     NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=336
+velvetyne__basteleur_Basteleur-Bold.otf       NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=454
+velvetyne__compagnon_Compagnon-Bold.otf       NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=304
+velvetyne__format-1452_Format_1452.otf        NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=177
+velvetyne__lineal_Lineal-Black.otf            NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=353
+velvetyne__sligoil_Sligoil-Micro.otf          NO-CYRILLIC   UA=0/31   cyr_ext=0    total_cp=784
+</code></pre>
+<p><strong>未取得二进制（受 <code>fonts.googleapis.com</code> 限流），仅以官方 METADATA.pb 的 <code>subsets</code> 判定：</strong>
+Anton(无) · Alumni Sans(有 cyrillic+cyrillic-ext) · Inter(有) · Bricolage Grotesque(无) · League Gothic(无) · Montserrat(有) · Roboto Condensed(有) · IBM Plex Mono(有) · PT Mono(有) · Prosto One(无) · Rubik(有) · Cuprum(有) · Yanone Kaffeesatz(有) · Advent Pro(有)</p>
+<h2 id="bvelvetyne-gitlab-34-apiv4groupsvelvetyneprojects">附录 B：Velvetyne GitLab 群组完整 34 项（<code>/api/v4/groups/velvetyne/projects</code> 实测）<a class="headerlink" href="#bvelvetyne-gitlab-34-apiv4groupsvelvetyneprojects" aria-hidden="true">#</a></h2>
+<p><code>flor-des-ruina</code> · <code>feroniapi</code> · <code>interlope</code> · <code>letters</code> · <code>lineal</code> · <code>Facade-font</code> · <code>velvetyne-libre-friends</code> · <code>grotesk</code> · <code>jgs</code> · <code>fungal</code> · <code>sligoil</code> · <code>amdal</code> · <code>Gulax</code> · <code>Trickster</code> · <code>Sporting-Grotesque</code> · <code>basteleur</code> · <code>anthony</code> · <code>pilowlava3D</code> · <code>Mess</code> · <code>mourier</code> · <code>imago-mundi-mei</code> · <code>cantique</code> · <code>lack</code> · <code>backout</code> · <code>kaerukaeru</code> · <code>format-1452</code> · <code>Velvetyne-Standard-Character-Set</code> · <code>Velvetyne-Notdef</code> · <code>Avara</code> · <code>vg5000</code> · <code>ouroboros</code> · <code>murmure</code> · <code>compagnon</code> · <code>Happy-Times-at-the-IKOB</code></p>
+<p>各项目 URL 形如 <code>https://gitlab.com/velvetyne/&lt;slug&gt;</code>；授权文件位于仓库根目录的 <code>LICENSE.txt</code>（少数为 <code>LICENSE.md</code> 或无独立文件）。</p>
+<h2 id="c">附录 C：可复现的验证命令<a class="headerlink" href="#c" aria-hidden="true">#</a></h2>
+<pre><code class="language-powershell"># 1) Google Fonts 官方 METADATA（许可证 / subsets / 变量轴）
+curl.exe -sS --ssl-no-revoke &quot;https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/oswald/METADATA.pb&quot;
+
+# 2) 官方 CSS API 实测子集（需带 Chrome UA 才会输出 /* cyrillic */ 注释）
+curl.exe -sS --ssl-no-revoke -A &quot;Mozilla/5.0 ... Chrome/124&quot; `
+  &quot;https://fonts.googleapis.com/css2?family=Oswald&amp;display=swap&quot;
+
+# 3) Fontsource 全量目录（2103 条，含 subsets/license/variable）
+curl.exe -sS --ssl-no-revoke &quot;https://api.fontsource.org/v1/fonts&quot;
+
+# 4) Fontshare 全量目录（100 条，含 license_type/axes/languages）
+curl.exe -sS --ssl-no-revoke &quot;https://api.fontshare.com/v2/fonts&quot;
+
+# 5) Velvetyne 官方群组项目清单
+curl.exe -sS --ssl-no-revoke `
+  &quot;https://gitlab.com/api/v4/groups/velvetyne/projects?per_page=100&amp;include_subgroups=true&quot;
+
+# 6) Commons 俄罗斯 PD 规则原文
+curl.exe -sS --ssl-no-revoke `
+  &quot;https://commons.wikimedia.org/w/index.php?title=Template:PD-Russia-1996/en&amp;action=raw&quot;
+
+# 7) Commons 单文件授权 + 分辨率
+curl.exe -sS --ssl-no-revoke `
+  &quot;https://commons.wikimedia.org/w/api.php?action=query&amp;prop=imageinfo&amp;iiprop=url%7Csize%7Cextmetadata&amp;format=json&amp;titles=File:Beat%20the%20Whites%20with%20the%20Red%20Wedge.jpg&quot;
+</code></pre>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="05-前端技术方案.html">← 05-前端技术方案</a>
+    <a href="index.html">目录</a>
+    <a href="07-设计规则速查.html">07-设计规则速查 →</a>
+  </nav>
+</div>
+
+</body>
+</html>
