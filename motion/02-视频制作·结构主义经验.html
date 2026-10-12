@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>视频制作 · 结构主义经验 · 视频设计</title>
+<meta name="description" content="视频制作 · 结构主义经验">
+<link rel="stylesheet" href="../notes/kit/kv.css">
+<link rel="stylesheet" href="../notes/doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="README.html">← 视频设计</a>
+    <span class="doc__no">03 / 03</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="_1">视频制作 · 结构主义经验</h1>
+<blockquote>
+<p>「结构主义」在本项目里指构成主义（Constructivism，俄语 Конструктивизм）；
+站内笔记与 look4end 上的文档统一用「构成主义」，是同一件事。</p>
+<p>这份文档回答一件事：<strong>要做一支结构主义动效视频，照什么做。</strong>
+分工：<strong>01 讲「为什么」</strong>（设计理念、媒介差异、三类卡顿的原理）；
+<strong>本文讲「怎么做 + 踩过什么」</strong>（速查经验、可复用管线、命令、验收脚本、本机环境的坑）。</p>
+<p>全部结论来自本次实做（2026-10-12/13），实测数字原样保留，没有凭印象写的部分。</p>
+</blockquote>
+<hr />
+<h2 id="0-8">0. 一页速查：结构主义视频的 8 条硬经验<a class="headerlink" href="#0-8" aria-hidden="true">#</a></h2>
+<p>下次直接照这张表做。每条都标了实测依据与原理出处。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>经验</th>
+<th>实测依据</th>
+<th>原理详见</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>红是"色场"，不是点缀</strong>——整幅朱红铺底，不按单帧面积克制</td>
+<td>四幕单帧红占 <strong>62–69%</strong>，全片平均 <strong>≈45%</strong>；对照版按网页法则压到 5–15% 后力量感直接消失</td>
+<td>01 §1 决策 1、§3</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>按时间平均管红色，不按单帧构图管</strong></td>
+<td>红/纸交替本身就是节拍器：红 → 纸 → 红 → 红 → 纸 → 红</td>
+<td>01 §1</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>动效时长按"镜头级"给：400–1200ms</strong></td>
+<td>网页那档 120–320ms 是交互反馈阈值，放视频里读作卡帧</td>
+<td>01 §3</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>机械化 ≠ 数值量化</strong>：靠连续缓动 + 硬切 + 时长节奏，不靠把进度切成台阶</td>
+<td>量化 6 段时，某段 21 帧里 <strong>14 帧画面完全没变（67% 静止）</strong></td>
+<td>01 §8.4</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>每一幕从入场结束到落幕，不许定格</strong>——必须有持续动势</td>
+<td>四幕保持段相邻帧像素差 <strong>= 0</strong>（完全冻结）；唯一整段在动的第 04 幕反被反馈"不卡"</td>
+<td>01 §8.2</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>每帧在动的元素只许动 <code>transform</code> / <code>opacity</code></strong></td>
+<td><code>clip-path</code> / <code>width</code> / <code>background-position</code> 逐帧变化会让该元素每帧重新栅格化（主线程不掉帧，帧率指标查不出来）</td>
+<td>01 §8.1</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>循环点留 ≥0.4s 纯黑</strong>（30fps 下 12 帧），且首末帧像素一致</td>
+<td>最初只有 <strong>50ms（1.5 帧）</strong>，成片里读作故障闪帧</td>
+<td>01 §4</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>巨字必须实测宽高</strong></td>
+<td><code>КОНСТРУКТИВИЗМ</code> 在 188px 时溢出画框切掉末字；收到 164px 仍占画幅宽 86%</td>
+<td>01 §1 决策 3</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="1">1. 五轮排查复盘：一次"感觉卡"的完整诊断<a class="headerlink" href="#1" aria-hidden="true">#</a></h2>
+<p>结论先放：<strong>我们花了四轮去优化"怎么画得更快"，真正的元凶是"数值本来就在跳"。</strong>
+下表按实际发生的顺序，把误判也一起记下来——<strong>这张表比结论更有用</strong>。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>轮</th>
+<th>症状</th>
+<th>当时的判断</th>
+<th>实测证据</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>"感觉卡一卡的"</td>
+<td>怀疑性能掉帧</td>
+<td>真实窗口（RTX 5060 + Intel 核显，165Hz）：<code>p50=6.1ms / p95=6.2ms</code>，垂直同步本身就是 6.06ms，长帧 ~1%，<code>render()</code> JS 仅 <code>0.10ms</code></td>
+<td>❌ 不是掉帧</td>
+</tr>
+<tr>
+<td>2</td>
+<td>依旧卡</td>
+<td>怀疑颗粒层：每 50ms 平移同一张噪点贴图</td>
+<td>改为 4 张<strong>独立</strong>噪点贴图轮换（12.5Hz），并把内联 <code>feTurbulence</code> 换成 canvas 预生成位图</td>
+<td>⚠️ 是缺陷之一，但不是主因</td>
+</tr>
+<tr>
+<td>3</td>
+<td>依旧卡（用户："红色格子那幕不卡"）</td>
+<td>怀疑<strong>节奏</strong>：动作做完就定格、然后硬切</td>
+<td>逐帧像素差：四幕保持段 <code>changed = 0 px</code>（画面完全冻结）；唯一整段在动的第 04 幕（红格子波次）反而不卡</td>
+<td>✅ 真因之一：<strong>任何一幕都不许定格</strong></td>
+</tr>
+<tr>
+<td>4</td>
+<td>依旧卡（用户："移动中自身也在变化的元素卡，变化完成后就顺"）</td>
+<td>怀疑<strong>光栅滞后</strong>：元素每帧重新栅格化</td>
+<td><code>clip-path</code> 揭示 / <code>width</code> / <code>background-position</code> 都是逐帧重绘，主线程不掉帧所以帧率指标查不出来</td>
+<td>✅ 真因之二：换成合成器友好写法</td>
+</tr>
+<tr>
+<td>5</td>
+<td>渲染成 mp4 后<strong>仍然卡</strong>（用户："说明不是渲染的问题"）</td>
+<td>——</td>
+<td>从成品 mp4 逐帧量 S1 红斜带 21 帧：<strong>14 帧画面完全没变（67% 静止）</strong>，其余帧一次跳 12 万～25 万像素</td>
+<td>✅ <strong>真凶：量化跳步写进了数值</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="11">1.1 三条最值得记的教训<a class="headerlink" href="#11" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>判别口诀：离线逐帧渲染出来的视频仍然卡 → 不是渲染/时序问题，是数值里写了台阶。</strong>
+   去查 <code>Math.floor(p*n)/n</code>、<code>steps()</code>、离散取整。这条一句话就能省下几轮性能优化。</li>
+<li><strong>rAF 帧间隔指标看不见两类问题</strong>：① 逐帧重栅格化导致的光栅滞后；② 数值台阶。
+   它们主线程都正常。<strong>用户的眼睛在这两类问题上是比指标更可靠的仪器。</strong></li>
+<li><strong>诊断顺序固定下来</strong>（照这个顺序走，不要跳步）：
+   <code>① 看节奏：有没有"完全冻结"的帧对（逐帧像素差）
+   ② 查属性：正在动的元素有没有动非合成属性（clip-path / width / height / background-position）
+   ③ 查数值：进度有没有被量化成台阶
+   ④ 以上都不成立，才去怀疑性能（掉帧）</code></li>
+</ol>
+<hr />
+<h2 id="2">2. 出片管线：离线逐帧渲染（可复用）<a class="headerlink" href="#2" aria-hidden="true">#</a></h2>
+<p>在线播放要同时跟合成器、光栅线程、垂直同步赛跑，损失<strong>永远不可能归零</strong>。
+离线逐帧渲染把"时间"变成参数：每帧按精确 <code>t</code> 单独渲染，编码器按固定帧率输出。</p>
+<h3 id="21">2.1 本机实测的工具路径<a class="headerlink" href="#21" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>用途</th>
+<th>路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node</td>
+<td><code>C:\Program Files\nodejs\node.exe</code>（v24，自带全局 <code>WebSocket</code> / <code>fetch</code>，够写 CDP 客户端）</td>
+</tr>
+<tr>
+<td>Chrome</td>
+<td><code>C:\Program Files\Google\Chrome\Application\chrome.exe</code></td>
+</tr>
+<tr>
+<td>ffmpeg / ffprobe</td>
+<td><code>C:\Users\23077\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0.2-full_build\bin\</code></td>
+</tr>
+<tr>
+<td>Python（Pillow / numpy）</td>
+<td><code>C:\Users\23077\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe</code></td>
+</tr>
+<tr>
+<td>抓帧脚本</td>
+<td><code>tools/render-frames.cjs</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>ffmpeg 不在 PATH 上，本机另有多处副本（剪映自带、<code>D:\google_download\</code>、<code>E:\ai-movie\node_modules\ffmpeg-static\</code>）。
+Windows 下可用 <code>Get-ChildItem &lt;根&gt; -Filter ffmpeg.exe -Recurse -Depth 4</code> 找。</p>
+</blockquote>
+<h3 id="22">2.2 四步流程<a class="headerlink" href="#22" aria-hidden="true">#</a></h3>
+<pre><code class="language-powershell"># ① 把要渲染的页面复制到纯 ASCII 临时目录（中文路径传给 Chrome 会被破坏，见 §4）
+$tmp = &quot;$env:TEMP\cstv-render&quot;
+Copy-Item &lt;页面.html&gt; &quot;$tmp\base.html&quot; -Force
+
+# ② 启动带调试端口的无头 Chrome（注意：--window-size 是窗口不是视口，见 §4）
+#    窗口开起来后不用管它，脚本通过 CDP 驱动
+Start-Process chrome.exe -ArgumentList @(
+  &quot;--headless=new&quot;,&quot;--no-sandbox&quot;,&quot;--disable-breakpad&quot;,&quot;--disable-crashpad&quot;,&quot;--disable-dev-shm-usage&quot;,
+  &quot;--hide-scrollbars&quot;,&quot;--no-first-run&quot;,&quot;--window-size=1920,1080&quot;,&quot;--force-device-scale-factor=1&quot;,
+  &quot;--remote-debugging-port=9223&quot;,&quot;--user-data-dir=$tmp\prof&quot;,
+  &quot;file:///$tmp/base.html?pure=1&amp;hud=0&quot;)
+
+# ③ 逐帧渲染（帧 i 对应 t = i/fps；30fps × 20s = 600 帧）
+node tools/render-frames.cjs 9223 &quot;$tmp\frames&quot; 30 600 0 600 1920 1080
+
+# ④ 编码
+$ff = &quot;&lt;ffmpeg 路径&gt;\ffmpeg.exe&quot;
+&amp; $ff -y -framerate 30 -i &quot;$tmp\frames\frame_%04d.png&quot; `
+      -c:v libx264 -preset medium -crf 14 -pix_fmt yuv420p -tune animation -g 15 `
+      -movflags +faststart out.mp4
+</code></pre>
+<h3 id="23">2.3 实测性能与参数<a class="headerlink" href="#23" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>指标</th>
+<th>实测值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>渲染速度</td>
+<td><strong>0.43 s/帧</strong>（600 帧 ≈ 4.3 分钟，1920×1080 PNG）</td>
+</tr>
+<tr>
+<td>帧序列体积</td>
+<td>600 帧 ≈ <strong>0.45 GB</strong> PNG</td>
+</tr>
+<tr>
+<td>编码耗时</td>
+<td><strong>6.2 秒</strong>（libx264 medium / crf 14）</td>
+</tr>
+<tr>
+<td>成片体积</td>
+<td>1920×1080 / 30fps / 20.000s ≈ <strong>16.9 MB</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>编码参数选择：</p>
+<ul>
+<li><strong>纯色为主的画面</strong>（构成主义大红/黑/纸）用 <code>-tune animation -crf 14</code>；担心纯朱红渐层色带可降到 <code>-crf 12</code>。</li>
+<li><code>-g 15</code>（每 0.5 秒一个关键帧）便于拖动预览。</li>
+<li><code>-pix_fmt yuv420p</code> 保证兼容性；代价是纯红边缘有轻微色度抽样，可接受。</li>
+<li><strong>帧率选 30fps 就够</strong>：屏幕即使是 165Hz，播放器也会把每帧稳定显示约 5.5 次刷新。</li>
+</ul>
+<hr />
+<h2 id="3">3. 验收清单（出片前必跑）<a class="headerlink" href="#3" aria-hidden="true">#</a></h2>
+<h3 id="31">3.1 静态检查<a class="headerlink" href="#31" aria-hidden="true">#</a></h3>
+<pre><code class="language-powershell"># 内联 JS 语法（用 node 按 UTF-8 提取，别用 Get-Content -Raw，见 §4）
+node tools/extract-and-check.cjs &lt;页面.html&gt;   # 或自己写 8 行：regex 取 &lt;script&gt; → node --check
+</code></pre>
+<ul>
+<li>[ ] <code>node --check</code> 退出码 0</li>
+<li>[ ] 逐帧非合成属性残留扫描：<code>clip-path</code> / <code>width</code> / <code>height</code> / <code>background-position</code> 有没有出现在<strong>每帧都在更新</strong>的语句里</li>
+<li>[ ] 量化台阶残留扫描：<code>Math.floor(p*n)/n</code> / <code>steps(</code> 有没有用在连续运动上</li>
+</ul>
+<h3 id="32">3.2 动态检查（三条硬指标）<a class="headerlink" href="#32" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>检查</th>
+<th>方法</th>
+<th>本次实测结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>定格检查</strong></td>
+<td>相邻帧像素差，任一幕<strong>不得出现静止帧对</strong></td>
+<td>连续化后五幕静止帧对 = 0（改前 67% 静止）</td>
+</tr>
+<tr>
+<td><strong>循环无缝</strong></td>
+<td>首帧 vs 末帧像素差</td>
+<td><code>changed(&gt;8) = 0 px, max = 0</code></td>
+</tr>
+<tr>
+<td><strong>帧尺寸</strong></td>
+<td>单帧必须等于目标画幅</td>
+<td>1920×1080（修掉 CDP 视口陷阱前是 1898×926）</td>
+</tr>
+</tbody>
+</table></div>
+<p>可直接复用的检查脚本（Python + Pillow + numpy）：</p>
+<pre><code class="language-python">import glob, numpy as np
+from PIL import Image
+
+def load(p): return np.asarray(Image.open(p).convert(&quot;RGB&quot;)).astype(np.int16)
+
+fs = sorted(glob.glob(&quot;frames/frame_*.png&quot;))
+prev, stalls = None, 0
+for f in fs:
+    a = load(f)
+    if prev is not None:
+        changed = int((np.abs(a - prev).max(axis=2) &gt; 8).sum())
+        if changed &lt;= 300:            # 近似&quot;这一帧没动&quot;
+            stalls += 1
+    prev = a
+print(&quot;静止帧对 =&quot;, stalls, &quot;/&quot;, len(fs) - 1, &quot; 单帧尺寸 =&quot;, a.shape[:2])
+
+first, last = load(fs[0]), load(fs[-1])
+d = np.abs(first - last).max(axis=2)
+print(&quot;循环首末帧差异：changed(&gt;8) =&quot;, int((d &gt; 8).sum()), &quot; max =&quot;, d.max())
+</code></pre>
+<blockquote>
+<p><strong>判定标准</strong>：静止帧对必须为 0；循环首末帧「差异&gt;30 的像素」必须为 0（残差只允许来自有意保留的颗粒）。</p>
+</blockquote>
+<h3 id="33">3.3 视听检查（指标测不到的那部分）<a class="headerlink" href="#33" aria-hidden="true">#</a></h3>
+<ul>
+<li>[ ] <strong>真实窗口</strong>连续播放一整轮（无头环境测不出光栅滞后）</li>
+<li>[ ] 逐幕确认"正在变化的元素"不顿挫</li>
+<li>[ ] 把成片放大到 200%（或 4K 上采样）看纯红区域有没有色带</li>
+</ul>
+<hr />
+<h2 id="4">4. 本机环境的坑（都踩过，别重踩）<a class="headerlink" href="#4" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>坑</th>
+<th>现象</th>
+<th>正确做法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PowerShell 读 UTF-8 文件</strong></td>
+<td><code>Get-Content -Raw</code> 按本地码页解码，中文/西里尔全成乱码，<strong>连行号都错位</strong>（曾误报"JS 括号不平衡"）</td>
+<td>用 node 读：<code>fs.readFileSync(p,'utf8')</code>；或 <code>[System.IO.File]::ReadAllText($p,[Text.Encoding]::UTF8)</code></td>
+</tr>
+<tr>
+<td><strong>自动变量</strong></td>
+<td><code>$home = ...</code> 报"无法覆盖变量 HOME"（PowerShell 变量名不区分大小写）</td>
+<td>别用 <code>$home</code>/<code>$args</code>/<code>$pid</code> 等；换名 <code>$pg</code>/<code>$cmdArgs</code></td>
+</tr>
+<tr>
+<td><strong>调用 GUI 程序</strong></td>
+<td><code>&amp; chrome.exe ...</code> 不等待就返回，<code>$LASTEXITCODE</code> 为空，截图还没写出来</td>
+<td><code>Start-Process -Wait -PassThru</code>，用返回值的 <code>.ExitCode</code></td>
+</tr>
+<tr>
+<td><strong>Chrome 被已有实例接管</strong></td>
+<td>启动瞬间退出、不截图</td>
+<td>每次给独立 <code>--user-data-dir</code>；必要时按命令行里的 profile 关键字 Kill 残留进程</td>
+</tr>
+<tr>
+<td><strong>中文路径传给 Chrome</strong></td>
+<td><code>file:///C:/Users/.../视频工作流/...</code> 被破坏 → <code>ERR_NAME_NOT_RESOLVED</code> / 页面加载失败</td>
+<td>复制到纯 ASCII 临时目录再传</td>
+</tr>
+<tr>
+<td><strong><code>--window-size</code> 不是视口</strong></td>
+<td>设 1920×1080 只得到 <strong>1898×926</strong> 的视口，页面等比缩放变成 0.857 并留黑边</td>
+<td>用 CDP <code>Emulation.setDeviceMetricsOverride{width,height,deviceScaleFactor:1}</code> 强制视口</td>
+</tr>
+<tr>
+<td><strong>无头环境测帧率</strong></td>
+<td>没有垂直同步，rAF 可以跑到 164fps，测不出合成/光栅开销</td>
+<td>帧率必须<strong>真实窗口</strong>测；并且加 <code>--disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows</code>，否则窗口失焦会被节流（曾出现 654ms 的假长帧）</td>
+</tr>
+<tr>
+<td><strong><code>--virtual-time-budget</code></strong></td>
+<td>虚拟时间会破坏一切基于真实时间的测量</td>
+<td>测性能时不要带它；只在"加载完就截图"时用</td>
+</tr>
+<tr>
+<td><strong>webfont 未就绪</strong></td>
+<td>抓到的帧掉字体</td>
+<td>抓帧前等 <code>document.fonts.ready</code>；抓帧时机在页面里用 <code>window.__seek(t)</code> 等两个 rAF</td>
+</tr>
+<tr>
+<td><strong>git push 失败</strong></td>
+<td><code>Recv failure: Connection was reset</code></td>
+<td>本机直连 GitHub 不通，走本地代理：<code>git -c http.proxy=http://127.0.0.1:7890 push</code>（本仓库已写入 <code>.git/config</code> 本地配置）</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="5">5. 页面里要留的两个钩子（做视频的页面必备）<a class="headerlink" href="#5" aria-hidden="true">#</a></h2>
+<pre><code class="language-js">/* ① 精确寻址：设定时刻 → 渲染 → 等两帧绘制完成再返回 */
+window.__seek = function (t) {
+  playing = false; t = t; render(t);
+  return new Promise(res =&gt; requestAnimationFrame(() =&gt; requestAnimationFrame(() =&gt; res(t))));
+};
+
+/* ② 逐幕帧间隔统计（真实窗口里用）：?perf=1，pms=窗口毫秒，pskip=跳过启动 */
+</code></pre>
+<p>另外建议留这些 URL 参数（渲染与排查都用得上）：
+<code>?pure=1</code> 隐藏全部界面 · <code>&amp;hud=0</code> 关场记 · <code>&amp;guides=0</code> 关构造网格线 · <code>?quant=1</code> 回到量化顿挫 · <code>&amp;grain=0</code> 关颗粒。</p>
+<hr />
+<h2 id="6">6. 下次做一个新动效视频的清单<a class="headerlink" href="#6" aria-hidden="true">#</a></h2>
+<ol>
+<li>定画幅、时长、帧率 → <strong>总帧数 = fps × 时长</strong>；最后一帧是 <code>(n-1)/fps</code>，不含整点（否则循环会重复一帧）</li>
+<li>画面上留好 <code>window.__seek</code> 钩子，并把界面元素做成可关（<code>?pure=1</code> 一套）</li>
+<li>动笔时先定<strong>数值连续性</strong>：连续运动绝不量化；机械感靠缓动曲线 + 硬切 + 时长节奏</li>
+<li>每幕设计完，检查两端：<strong>入场结束到落幕之间不许定格</strong></li>
+<li>每帧在动的元素，只许动 <code>transform</code> / <code>opacity</code>；揭示用 <code>overflow:hidden + translate</code>，不用 <code>clip-path</code></li>
+<li>抓 3～5 个关键时刻的静帧看构图，不要等渲染完 600 帧才发现问题</li>
+<li>跑 §3.1 静态检查 → §3.2 三条动态指标 → §3.3 真实窗口连续播放</li>
+<li>逐帧渲染 → 编码 → ffprobe 核对 <code>nb_frames</code> / <code>duration</code> / <code>r_frame_rate</code></li>
+<li>留档：帧母版 + 编码命令 + 本页清单</li>
+</ol>
+<hr />
+<h2 id="7-2026-10-13">7. 当前资产与状态（2026-10-13）<a class="headerlink" href="#7-2026-10-13" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>资产</th>
+<th>位置</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>成片母版</td>
+<td><code>.scratch/frames-30fps/</code></td>
+<td>600 帧 / 1920×1080 / 30fps / ≈0.45 GB（<strong>不需要可直接删，编码只是 6 秒的事</strong>）</td>
+</tr>
+<tr>
+<td>抓帧脚本</td>
+<td><code>tools/render-frames.cjs</code></td>
+<td>可用，支持 <code>fps / 总帧数 / 起始帧 / 帧数 / 画幅</code> 参数</td>
+</tr>
+<tr>
+<td>动效页面</td>
+<td><a href="index.html"><code>constructivism-motion-20s.html</code></a></td>
+<td>已上线 look4end.com/motion/</td>
+</tr>
+<tr>
+<td>设计理念</td>
+<td><a href="./01-动效设计理念.html"><code>01-动效设计理念.md</code></a></td>
+<td>§8 卡顿三重诊断、§8.4 数值台阶、§9.3 离线渲染</td>
+</tr>
+<tr>
+<td>mp4 成片</td>
+<td>—</td>
+<td><strong>暂缓</strong>（按站主决定先不做视频；管线已就绪，随时可出）</td>
+</tr>
+</tbody>
+</table></div>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="01-动效设计理念.html">← 01-动效设计理念</a>
+    <a href="index.html">动效原型</a>
+    <a href="../">站点首页</a>
+    <span></span>
+  </nav>
+</div>
+
+</body>
+</html>

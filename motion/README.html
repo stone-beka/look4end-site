@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>构成主义动效（视频）· 设计理念与制作经验 · 视频设计</title>
+<meta name="description" content="构成主义动效（视频）· 设计理念与制作经验">
+<link rel="stylesheet" href="../notes/kit/kv.css">
+<link rel="stylesheet" href="../notes/doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="README.html">← 视频设计</a>
+    <span class="doc__no">01 / 03</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="_1">构成主义动效（视频）· 设计理念与制作经验</h1>
+<blockquote>
+<p>与 <a href="../notes/README.html"><code>../constructivism/</code></a>（<strong>网页</strong>设计系统）平行的第二套资料。
+网页讲「一帧里怎么构图」，这里讲「二十秒里怎么构图」。
+基准实现：<a href="index.html"><code>../../constructivism-motion-20s.html</code></a> —— 双击即可打开，单文件、无构建。</p>
+<p><strong>当前交付形态：HTML（在线打开）</strong>。视频线暂缓：离线逐帧渲染的完整流程与脚本已就绪
+（见 §9.3 与 <code>../../tools/render-frames.cjs</code>），
+600 帧母版也已渲染好，需要成片时编码只需几秒。</p>
+</blockquote>
+<hr />
+<h2 id="_2">从这里开始<a class="headerlink" href="#_2" aria-hidden="true">#</a></h2>
+<p><strong>只有 1 分钟？</strong> 打开 <a href="index.html"><code>../../constructivism-motion-20s.html</code></a>，按空格看一轮 20 秒，按 <code>H</code> 进纯净模式再看一轮。</p>
+<p><strong>要动手改？</strong> 按这个顺序：</p>
+<ol>
+<li>读 <a href="./01-动效设计理念.html"><code>01-动效设计理念.md</code></a> —— <strong>§0 媒介差异</strong>与 <strong>§3 通用/不通用对照表</strong>是核心，先搞清哪些网页法则不能搬</li>
+<li>用 <strong>§2 节奏表</strong> 决定各幕时长与功能</li>
+<li>用 <strong>§5 动效语汇</strong> 选动作（只有六种，且时长区间是 400–1200ms）</li>
+<li>交付前跑 <strong>§4.2 首末帧像素验收</strong></li>
+</ol>
+<p><strong>要动手做一支新片？</strong> 直接看 <a href="./02-视频制作·结构主义经验.html"><code>02-视频制作·结构主义经验.md</code></a> 的 <strong>§0 一页速查（8 条硬经验）</strong> 与 <strong>§6 出片管线</strong>，照单执行。</p>
+<hr />
+<h2 id="_3">文件清单<a class="headerlink" href="#_3" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>文件</th>
+<th>内容</th>
+<th>什么时候看</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="./01-动效设计理念.html"><code>01-动效设计理念.md</code></a></td>
+<td>媒介差异、力量来源五个决策、<strong>实测色彩面积表</strong>、六幕节奏表、通用/不通用对照表、循环点硬约束、动效语汇、<strong>卡顿三重诊断（节奏/光栅/数值）</strong>、离线逐帧渲染流程、已知限制</td>
+<td>动手前必读 + 交付前查</td>
+</tr>
+<tr>
+<td><a href="./02-视频制作·结构主义经验.html"><code>02-视频制作·结构主义经验.md</code></a></td>
+<td><strong>结构主义视频的 8 条硬经验速查表</strong>、五轮排查复盘（含误判）、四步出片管线与实测参数、<strong>验收清单与可复用脚本</strong>、本机环境 11 个坑、下次做新片的清单</td>
+<td>要动手做时按它执行</td>
+</tr>
+<tr>
+<td><code>../../tools/render-frames.cjs</code></td>
+<td><strong>离线逐帧渲染脚本</strong>（CDP 驱动无头 Chrome，按精确 <code>t</code> 抓帧）。出片走这条路，不要在线录屏</td>
+<td>出片时用</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="_4">三句话讲完「构成主义动效」<a class="headerlink" href="#_4" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>它是什么</strong>：把构成主义海报的静态构图拆成时间轴——红场、黑斜块、巨字、几何原语按 0.4–1.2s 的镜头级动作依次入场，20 秒讲完一轮。</li>
+<li><strong>和网页版的区别</strong>：网页是用户驱动、单帧必须完整可读，所以红压到 5–15%、动效压到 120–320ms；视频是播放器驱动、信息在时间里累积，所以<strong>红可以整幅铺底、动作可以拉到一秒</strong>。</li>
+<li><strong>做视频时的核心公式</strong>：<blockquote>
+<p>大红场 + 黑斜切巨块 + 纸色巨字 + 分段机械动效 + 红黑反色重音 + 编号跳变 + ≥0.4s 黑场收束 + 首末帧像素一致</p>
+</blockquote>
+</li>
+</ol>
+<hr />
+<h2 id="10">最重要的实测结论（10 条）<a class="headerlink" href="#10" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>结论</th>
+<th>影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>基准实现的平均红色面积 ≈ 45%</strong>（01/03/04/06 幕单帧 62–69%；02/05 幕反而纸占 81–83%）</td>
+<td>网页「红 ≤15%」是单帧构图律，<strong>搬到视频会直接做坏</strong>。见 §1 决策 1、§3</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>循环点的纯黑停留最初只有 50ms（30fps 下 1.5 帧）</strong>，成片里读作故障闪帧</td>
+<td>收紧快门对合区间后留出 <strong>0.55s</strong>。硬约束：<strong>≥0.4s / 12 帧</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong><code>КОНСТРУКТИВИЗМ</code> 在 188px 时溢出画框切掉末字</strong></td>
+<td>巨字<strong>必须实测宽高</strong>。收到 164px 后占画幅宽约 86%，气势不减</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>动效时长区间是 400–1200ms</strong>，不是网页的 120–320ms</td>
+<td>网页那档时长是「交互反馈」的感知阈值；放到视频里像卡帧</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>首末帧可做像素级验收</strong>：<code>mean=0.691/255</code>、<code>max=10/255</code>、差异&gt;30 的像素 <strong>0 个</strong>（残差只是颗粒换贴图）</td>
+<td>判定标准：「差异&gt;30 的像素」为 0 才算无缝循环</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>「感觉卡」实测不是掉帧</strong>：每帧 6.1ms（≈164fps 余量），关掉颗粒层/放射线数字不变；真凶是①机械跳步（设计意图，可用 Tweaks 切成连续）②颗粒层「平移同一张贴图」（真缺陷，已改为 4 张独立贴图轮换）</td>
+<td>见 §8。掉帧要优化性能，顿挫要改设计，先分清</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>半调网点写成同心圆环会退化成斜线摩尔纹</strong>：<code>repeating-radial-gradient(circle at 0 0, …)</code> 的圆心在元素左上角，距原点上千像素处就是近乎平行的弧线</td>
+<td>真网点用 <code>radial-gradient()</code> + <code>background-size</code> 铺固定网格（已修）</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>「只有变化中的元素卡」= 光栅滞后，不是掉帧</strong>：<code>clip-path</code> 揭示 / <code>width</code> / <code>background-position</code> 逐帧变化会让该元素每帧重新栅格化。rAF 帧间隔测不出来（主线程正常），只能查属性</td>
+<td>换成外层 <code>overflow:hidden</code>+内层 <code>translate</code>、<code>scaleX</code>、子元素 <code>transform</code>（已全改）</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>量化跳步在视频里读作卡顿，而且写进了数值</strong>：实测某段 21 帧中 <strong>14 帧画面完全静止（67%）</strong>，其余帧一次跳 12 万～25 万像素</td>
+<td>离线渲染也救不了（不是时序问题）。机械感改由缓动+硬切+时长承担，默认已改连续（<code>?quant=1</code> 可回退）</td>
+</tr>
+<tr>
+<td>10</td>
+<td><strong>判别口诀：离线渲染出来的视频仍然卡 → 不是渲染问题，是数值里写了台阶</strong></td>
+<td>前三轮都在优化"怎么画得更快"，真凶是"数值本来就在跳"。先验证数值连续，再谈性能</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="_5">与网页设计系统的关系<a class="headerlink" href="#_5" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>网页 <a href="../notes/README.html"><code>../constructivism/</code></a></th>
+<th>视频（本文档）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>九条形式法则</td>
+<td>全部适用</td>
+<td>6 条通用、2 条放宽、1 条（红面积）<strong>反着来</strong></td>
+</tr>
+<tr>
+<td>动效时长</td>
+<td>120 / 200 / 320ms</td>
+<td>400–1200ms</td>
+</tr>
+<tr>
+<td>红色政策</td>
+<td>单帧 ≤15%</td>
+<td>时间平均 30–55%，单帧峰值可 100%</td>
+</tr>
+<tr>
+<td>独有硬约束</td>
+<td>对比度 AA、焦点环可见、<code>prefers-reduced-motion</code></td>
+<td><strong>无缝循环</strong>、帧号可关、首末帧像素一致</td>
+</tr>
+<tr>
+<td>共享资产</td>
+<td><code>constructivism-kit/kv.css</code> 的色板/字体/质感配方</td>
+<td>同一套色板与字体（含西里尔覆盖核实）</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="_6">版本沿革<a class="headerlink" href="#_6" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>版本</th>
+<th>文件</th>
+<th>采用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>v1（基准）</strong></td>
+<td><a href="index.html"><code>constructivism-motion-20s.html</code></a></td>
+<td>✅ 主版本</td>
+</tr>
+<tr>
+<td>v2（对照）</td>
+<td><a href="index.html"><code>constructivism-motion-20s-v2.html</code></a></td>
+<td>❌ 按网页法则重做后力量感流失，保留为反例（其可复用部分见 §10）</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="_7">待办<a class="headerlink" href="#_7" aria-hidden="true">#</a></h2>
+<ul>
+<li>[ ] 中文标题上得意黑（自托管 <code>SmileySans-Oblique.woff2</code>）</li>
+<li>[ ] 配乐按 100 / 120 BPM 做卡点（与 0.4–0.7s 动作同量级）</li>
+<li>[ ] 竖屏 9:16 与方形 1:1 版本（<strong>不能直接裁切</strong>，需重新分配斜轴与字号）</li>
+<li>[ ] 4K 输出时同步放大半调网点阵（否则网点变细）</li>
+</ul>
+<hr />
+<p><em>生成时间：2026-10-13 · 所有面积为 1920×1080 画幅下的实测像素占比，循环差异为无头 Chrome 抓帧比对结果</em></p>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <span></span>
+    <a href="index.html">动效原型</a>
+    <a href="../">站点首页</a>
+    <a href="01-动效设计理念.html">01-动效设计理念 →</a>
+  </nav>
+</div>
+
+</body>
+</html>

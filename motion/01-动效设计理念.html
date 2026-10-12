@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>构成主义动效（视频）设计理念 v1.0 · 视频设计</title>
+<meta name="description" content="构成主义动效（视频）设计理念 v1.0">
+<link rel="stylesheet" href="../notes/kit/kv.css">
+<link rel="stylesheet" href="../notes/doc.css">
+</head>
+<body>
+
+<div class="kv-axis" aria-hidden="true"></div>
+
+<div class="doc">
+  <header class="doc__top">
+    <a class="doc__back" href="README.html">← 视频设计</a>
+    <span class="doc__no">02 / 03</span>
+  </header>
+
+  <article class="doc__body">
+<h1 id="v10">构成主义动效（视频）设计理念 v1.0</h1>
+<blockquote>
+<p>基准实现：<a href="index.html"><code>../../constructivism-motion-20s.html</code></a> — 1920×1080 / 20 秒 / 六幕 / 无缝循环 / 单文件
+姊妹文档（<strong>网页</strong>）：<a href="../notes/01-美学谱系与形式法则.html"><code>../constructivism/01-美学谱系与形式法则.md</code></a>、<a href="../notes/02-设计系统规格.html"><code>02-设计系统规格.md</code></a>
+本文只讲<strong>时间媒介</strong>。网页那份的九条形式法则有 4 条在视频里不成立，第 3 节给出实测依据。
+配套经验：<a href="./02-视频制作·结构主义经验.html"><code>02-视频制作·结构主义经验.md</code></a>（8 条硬经验速查 + 出片管线 + 验收脚本 + 本机环境的坑）。</p>
+</blockquote>
+<hr />
+<h2 id="0">0. 为什么视频必须单独一份文档<a class="headerlink" href="#0" aria-hidden="true">#</a></h2>
+<p>同一套构成主义，在网页和视频里是两门手艺。把网页的构图法则直接搬到视频上会<strong>明确地做坏</strong>——本项目的 v2 就是一次实证：它严格遵守网页法则（红 ≤15%、斜轴 -15°、动效 120–320ms），结果力量感消失，被判定「不如最初版」。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>网页</th>
+<th>视频</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>时间</td>
+<td>用户驱动（滚动 / hover / 点击）</td>
+<td>播放器驱动，<strong>观众无法干预</strong></td>
+</tr>
+<tr>
+<td>单帧 vs 时间轴</td>
+<td>每一帧都必须是完整可读的构图</td>
+<td>单帧可以「不完整」，<strong>信息在时间里累积</strong></td>
+</tr>
+<tr>
+<td>面积法则</td>
+<td>红 ≤15%（保证正文可读）</td>
+<td>用<strong>时间平均面积</strong>衡量，单帧可以整幅铺红</td>
+</tr>
+<tr>
+<td>动效时长</td>
+<td>120–320ms（交互反馈的感知阈值）</td>
+<td>0.4–1.2s（<strong>镜头级动作</strong>，观众在看而不是在操作）</td>
+</tr>
+<tr>
+<td>可读性约束</td>
+<td>正文必须过 WCAG AA</td>
+<td>只有「承载文字的少数几帧」需要过</td>
+</tr>
+<tr>
+<td>声音</td>
+<td>通常无</td>
+<td>有时间性，可与画面互为节拍器</td>
+</tr>
+<tr>
+<td>循环</td>
+<td>不适用</td>
+<td>无缝循环是硬约束</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>一句话</strong>：网页是在<strong>一帧里</strong>讲完构图，视频是在<strong>二十秒里</strong>讲完构图。用单帧的克制换时间的爆发，是视频这边的基本盘。</p>
+<hr />
+<h2 id="1">1. 力量从哪来：基准实现的五个决策<a class="headerlink" href="#1" aria-hidden="true">#</a></h2>
+<p>「有力量」不是形容词，是五个可复现的决策叠加：</p>
+<h3 id="1field">决策 1：红色不是点缀，是<strong>色场（field）</strong><a class="headerlink" href="#1field" aria-hidden="true">#</a></h3>
+<p>整幅朱红铺底，黑色斜切巨块压在上面。红色在 01 / 03 / 04 / 06 四幕里是<strong>背景</strong>而不是强调色。</p>
+<p>实测各幕色彩面积（1920×1080 全画幅像素占比）：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>幕</th>
+<th>时间码</th>
+<th>红</th>
+<th>墨</th>
+<th>纸</th>
+<th>结构</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01 ВПЕРЁД</td>
+<td>0.0–3.0s</td>
+<td><strong>61.7%</strong></td>
+<td>32.8%</td>
+<td>5.2%</td>
+<td>红场 + 黑斜块</td>
+</tr>
+<tr>
+<td>02 НАШ ТРУД</td>
+<td>3.0–7.0s</td>
+<td>2.4%</td>
+<td>15.9%</td>
+<td>81.4%</td>
+<td>纸场 + 黑字</td>
+</tr>
+<tr>
+<td>03 ПРОЛЕТАРИИ</td>
+<td>7.0–11.0s</td>
+<td><strong>66.5%</strong></td>
+<td>27.2%</td>
+<td>6.0%</td>
+<td>红场 + 白圆 + 黑楔</td>
+</tr>
+<tr>
+<td>04 СТРОЙКА</td>
+<td>11.0–14.5s</td>
+<td><strong>69.1%</strong></td>
+<td>20.7%</td>
+<td>9.0%</td>
+<td>红网格满幅</td>
+</tr>
+<tr>
+<td>05 КОНСТРУКТИВИЗМ</td>
+<td>14.5–17.5s</td>
+<td>4.3%</td>
+<td>11.6%</td>
+<td>83.3%</td>
+<td>纸场 + 网点 + 黑巨字</td>
+</tr>
+<tr>
+<td>06 ВПЕРЁД К ПОБЕДЕ</td>
+<td>17.5–20.0s</td>
+<td><strong>68.6%</strong></td>
+<td>6.5%</td>
+<td>24.6%</td>
+<td>红场 + 白圆 + 快门收束</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>平均红色面积 ≈ 45%</strong>（网页法则上限 15% 的 3 倍）。红/纸交替本身就是节拍器：红 → 纸 → 红 → 红 → 纸 → 红。</p>
+<blockquote>
+<p>⚠️ 这是本文档最重要的修正：<strong>网页的「红只占 5–15%」是单帧构图律，不能迁移到视频</strong>。视频要按时间平均面积（建议 30–55%）与单帧峰值（可到 100%）两个指标管，而不是按单帧构图管。</p>
+</blockquote>
+<h3 id="2">决策 2：黑不是文字色，是<strong>斜切巨块</strong><a class="headerlink" href="#2" aria-hidden="true">#</a></h3>
+<p><code>--ink</code> 在视频里主要承担「体量」而不是「可读性」：整块的黑色斜切多边形（01 幕右侧、03 幕左侧的楔形、06 幕的快门）与红色形成硬碰撞。文字反而常常是纸色压在红上。</p>
+<h3 id="3">决策 3：字号要<strong>超出安全区</strong><a class="headerlink" href="#3" aria-hidden="true">#</a></h3>
+<p>「一个字占满整幅」是常规操作。基准实现的峰值字级 <strong>164–292px</strong>，画幅宽度 1920px（占比 8.5–15%）。
+反面教训：<code>КОНСТРУКТИВИЗМ</code>（14 字母）在 188px 时会<strong>溢出画框切掉末字</strong>，已收到 164px（占画幅宽约 86%）。<strong>巨字必须实测宽高，不能凭感觉给字号</strong>。</p>
+<h3 id="4">决策 4：动效要<strong>分段、突然、有阻尼</strong><a class="headerlink" href="#4" aria-hidden="true">#</a></h3>
+<p>全部动效只允许两种曲线：<code>linear</code>（等速横扫）与 <code>steps()</code> 量化跳步。禁止 <code>ease-in-out</code>、禁止回弹/弹性。位移一律<strong>硬切</strong>：色块从画外平移进来，不做淡入。</p>
+<p>量化跳步是「机械感」的核心——把连续进度切成 3–12 段再取值（<code>Math.floor(p*n)/n</code>），于是运动呈现为<strong>顿挫的阶梯</strong>而不是丝滑滑动。</p>
+<h3 id="5">决策 5：红黑<strong>反色</strong>当重音<a class="headerlink" href="#5" aria-hidden="true">#</a></h3>
+<p>同一画面内，纸色文字压在红块上、黑字压在纸面上、红块切断字面——红与黑互换角色即构成重音，不需要渐变、阴影或发光。</p>
+<hr />
+<h2 id="2_1">2. 时间结构<a class="headerlink" href="#2_1" aria-hidden="true">#</a></h2>
+<h3 id="21">2.1 六幕节奏表<a class="headerlink" href="#21" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>时码</th>
+<th>时长</th>
+<th>功能</th>
+<th>主色</th>
+<th>核心动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td>0.0–3.0</td>
+<td>3.0s</td>
+<td>起（宣告）</td>
+<td>红 + 黑</td>
+<td>红色斜带自左横扫入场 → 巨字硬切展开 → 黑块下沉 → 位置编号</td>
+</tr>
+<tr>
+<td>02</td>
+<td>3.0–7.0</td>
+<td>4.0s</td>
+<td>承（结构）</td>
+<td>纸 + 黑</td>
+<td>逐字跳出，红色标尺拉开，几何方块跳变入场</td>
+</tr>
+<tr>
+<td>03</td>
+<td>7.0–11.0</td>
+<td>4.0s</td>
+<td>转（冲突）</td>
+<td>红 + 纸 + 黑</td>
+<td>放射线机械转动 → 白圆涨出 → <strong>黑楔自右刺入</strong> → 竖排标签展开</td>
+</tr>
+<tr>
+<td>04</td>
+<td>11.0–14.5</td>
+<td>3.5s</td>
+<td>展（建造）</td>
+<td>红网格</td>
+<td>84 格斜向波次填充 → 红色斜杠横扫 → 描边字被擦出 → 实心翻转 → 年份跳变</td>
+</tr>
+<tr>
+<td>05</td>
+<td>14.5–17.5</td>
+<td>3.0s</td>
+<td>点题</td>
+<td>纸 + 黑</td>
+<td>半调网点浮现 → 红块扫过字底 → 巨字逐字左右对撞入场</td>
+</tr>
+<tr>
+<td>06</td>
+<td>17.5–20.0</td>
+<td>2.5s</td>
+<td>合（收束）</td>
+<td>红 + 黑</td>
+<td>白圆涨出 → 大字入场 → <strong>快门上下对合 → 全黑停留 0.55s</strong> → 循环</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>节奏规律</strong>：三长（4.0/4.0s）两中（3.5/3.0s）一短（2.5s）。收束幕最短，因为它的任务只是「关灯」。</p>
+<h3 id="22">2.2 幕内结构（固定四拍）<a class="headerlink" href="#22" aria-hidden="true">#</a></h3>
+<p>每一幕内部都是同一种四拍，这是「像一部片子」而不是「像一堆动图」的原因：</p>
+<ol>
+<li><strong>底</strong>：底色/色场就位（≤0.2s，硬切）</li>
+<li><strong>主</strong>：主体（巨字或几何原语）入场（0.4–0.7s）</li>
+<li><strong>咬</strong>：一个次要元素切断/压住主体（0.2–0.5s）</li>
+<li><strong>记</strong>：编号、年份、位置标记跳变出现（瞬时，不滚动）</li>
+</ol>
+<hr />
+<h2 id="3_1">3. 与网页设计系统的对照：哪条通用，哪条不通用<a class="headerlink" href="#3_1" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>网页法则（<code>../constructivism/01-*.md</code>）</th>
+<th>视频里</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>法则 1 对角线是默认动势（15°–45°）</td>
+<td>✅ <strong>通用</strong></td>
+<td>视频里斜轴还多一层作用：它是<strong>运动方向</strong>，斜带横扫的轨迹就是斜轴本身</td>
+</tr>
+<tr>
+<td>法则 2 红/黑/白三色且比例失衡（红 5–15%）</td>
+<td>🔴 <strong>不通用</strong></td>
+<td>见 §1 决策 1。视频按时间平均面积管，单帧可 100%</td>
+</tr>
+<tr>
+<td>法则 3 几何原语只用四种</td>
+<td>✅ <strong>通用</strong></td>
+<td>圆 / 矩形 / 三角楔 / 线；视频里三角楔升格为「切割动作」</td>
+</tr>
+<tr>
+<td>法则 4 字号对比 ≥6:1</td>
+<td>✅ <strong>通用且要更狠</strong></td>
+<td>视频无正文阅读负担，实测峰值 164–292px / 标签 22px ≈ 7.5–13:1</td>
+</tr>
+<tr>
+<td>法则 5 照片是材料不是配图</td>
+<td>⚠️ <strong>可选</strong></td>
+<td>基准实现完全没用照片（纯几何 + 半调网点块），零版权风险</td>
+</tr>
+<tr>
+<td>法则 6 图文必须咬合</td>
+<td>✅ <strong>通用</strong></td>
+<td>视频里升级为「文字与色块在时间上互相打断」</td>
+</tr>
+<tr>
+<td>法则 7 网格要露出来并可被打破</td>
+<td>✅ <strong>通用</strong></td>
+<td>网格在视频里是<strong>逐格填充的动画主体</strong>（04 幕）</td>
+</tr>
+<tr>
+<td>法则 8 质感来自廉价印刷</td>
+<td>✅ <strong>通用</strong></td>
+<td>颗粒、半调、硬边偏移阴影；套印错位在视频里可用<strong>逐帧抖动</strong>强化</td>
+</tr>
+<tr>
+<td>法则 9 动效必须机械化</td>
+<td>⚠️ <strong>通用，但「机械化」的含义要改</strong></td>
+<td>网页那份把它落实为 <code>steps()</code> 量化；<strong>视频里量化会读成卡顿</strong>（见 §8.4），机械感必须靠「果断缓动 + 硬切 + 时长节奏」承担</td>
+</tr>
+<tr>
+<td>规格 §1.2 对比度实测表（朱红 4.15:1 仅大字）</td>
+<td>⚠️ <strong>部分</strong></td>
+<td>视频里只有「承载文字那几帧」需要过；巨字全部远超阈值</td>
+</tr>
+<tr>
+<td>规格 §3.1 不对称布局、不居中</td>
+<td>⚠️ <strong>放宽</strong></td>
+<td>视频里 05/06 幕用了中心对称构图（「巨字居中占满」是海报传统）</td>
+</tr>
+<tr>
+<td>规格 §6 禁止超过 400ms 的动画</td>
+<td>🔴 <strong>不通用</strong></td>
+<td>视频里 0.4–1.2s 是主运动区间；400ms 以下反而像卡帧</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="4_1">4. 循环点规范（硬约束）<a class="headerlink" href="#4_1" aria-hidden="true">#</a></h2>
+<p>无缝循环是视频相对网页<strong>独有</strong>的硬要求，也是基准实现踩过坑的地方。</p>
+<h3 id="41">4.1 三条硬约束<a class="headerlink" href="#41" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>收束后必须留 ≥0.4s 纯黑停留</strong>（30fps 下 12 帧）。
+   - 教训：最初实现中快门在 <code>t=19.95</code> 才完全合拢，留给循环点的纯黑只有 <strong>50ms（1.5 帧）</strong>。实测该时刻画面仍是「红缝里的大字」，紧接着跳到下一轮的黑场 —— 成片里读作<strong>故障闪帧</strong>而不是收束。
+   - 修正：把对合区间从 <code>lin(L, 0.85, 1.60)</code> 收紧到 <code>lin(L, 0.80, 1.15)</code>，合拢于 <code>t=19.45</code>，留出 <strong>0.55s 全黑</strong>。</li>
+<li><strong>帧号 / 时间码必须可关</strong>。场记 HUD 在循环点会从 <code>КАДР 0597</code> 跳回 <code>0000</code>，是可见的闪动。基准实现提供 <code>K</code> 键 / Tweaks 开关 / <code>?hud=0</code>。</li>
+<li><strong>首末帧必须像素级一致</strong>（除有意保留的颗粒抖动）。</li>
+</ol>
+<h3 id="42">4.2 验收方法（可复现）<a class="headerlink" href="#42" aria-hidden="true">#</a></h3>
+<p>用无头浏览器抓 <code>t=0.02</code> 与 <code>t=19.99</code> 两帧做像素差：</p>
+<pre><code>mean=0.691 / 255   max=10 / 255   差异&gt;30 的像素 = 0 个
+</code></pre>
+<p>残差全部来自颗粒换贴图（见 §8），属于有意保留的抖动。<strong>判定标准：「差异&gt;30 的像素」必须为 0</strong>；<code>max</code> 残差应 ≤ 12/255，若明显超标说明某一层没对齐。</p>
+<hr />
+<h2 id="5_1">5. 动效语汇（只允许这六种）<a class="headerlink" href="#5_1" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>动作</th>
+<th>实现</th>
+<th>时长</th>
+<th>用在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>斜扫入场</strong></td>
+<td>色块从画外平移 + 旋转，连续缓动</td>
+<td>0.6–0.7s</td>
+<td>01 幕红斜带、04 幕红斜杠</td>
+</tr>
+<tr>
+<td><strong>硬边滑入</strong></td>
+<td>外层 <code>overflow:hidden</code> + 内层 <code>translate</code></td>
+<td>0.3–0.9s</td>
+<td>巨字、竖排标签、描边字（<strong>不用 <code>clip-path</code></strong>，见 §8.1）</td>
+</tr>
+<tr>
+<td><strong>逐字/逐行跳出</strong></td>
+<td>每个字独立延迟 + 连续缓动</td>
+<td>单字 0.3–0.5s，字间 35–75ms</td>
+<td>02 幕、05 幕</td>
+</tr>
+<tr>
+<td><strong>果断缓动</strong></td>
+<td><code>1-(1-p)³</code>：起步快、到位果断、无回弹无过冲</td>
+<td>0.4–1.6s</td>
+<td>除硬切外的全部动作</td>
+</tr>
+<tr>
+<td><strong>硬切</strong></td>
+<td>单帧瞬时切换（<code>hard()</code>），一次事件而不是连续运动</td>
+<td>瞬时</td>
+<td>标签出现、全片反相</td>
+</tr>
+<tr>
+<td><strong>编号跳变</strong></td>
+<td>直接替换文本，<strong>不做滚动计数</strong></td>
+<td>瞬时</td>
+<td>年份 1929→1932、元素计数</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>禁止</strong>：回弹/弹性缓动；<code>ease-in-out</code> 默认缓动；模糊、辉光、渐变。</p>
+<blockquote>
+<p>⛔ <strong>重要更正：视频里不要用量化跳步。</strong>
+早期版本把动作进度量化成 3–12 段（<code>Math.floor(p*n)/n</code> / <code>steps()</code>），以为那就是"机械感"。实测（从成品 mp4 逐帧量 01 幕红斜带横扫的 21 帧）：<strong>14 帧画面完全没变（67% 静止）</strong>，其余帧一次跳 12 万～25 万像素——观感就是"一顿一顿"。而且这个顿挫<strong>写在数值里，离线逐帧渲染也救不了</strong>：它不是时序问题，是内容问题。</p>
+<p>修正：<strong>机械化由三样东西承担 —— 果断的缓动曲线、硬切、时长节奏</strong>，而不是把数值切成台阶。量化跳步降级为可选风格（Tweaks「机械跳步」/ <code>?quant=1</code>），<strong>默认关闭</strong>。</p>
+</blockquote>
+<hr />
+<h2 id="8">8. 卡顿感诊断（实测）<a class="headerlink" href="#8" aria-hidden="true">#</a></h2>
+<p>「感觉卡一卡的」有两个完全不同的成因，必须先分清再动手——<strong>掉帧</strong>要优化性能，<strong>顿挫</strong>要改设计。用 <code>?perf=1</code>（页面跑 8 秒，把 rAF 帧间隔分布打到左上角）在无头 Chrome 实测：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>变体</th>
+<th>p50</th>
+<th>p95</th>
+<th>max</th>
+<th>&gt;33ms 的帧</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全开（基线）</td>
+<td>6.1ms</td>
+<td>6.1ms</td>
+<td>115ms</td>
+<td>2 / 1293</td>
+</tr>
+<tr>
+<td>关颗粒层</td>
+<td>6.1ms</td>
+<td>6.1ms</td>
+<td>103ms</td>
+<td>2 / 1313</td>
+</tr>
+<tr>
+<td>关放射线</td>
+<td>6.1ms</td>
+<td>6.2ms</td>
+<td>133ms</td>
+<td>2 / 1298</td>
+</tr>
+<tr>
+<td>全关</td>
+<td>6.1ms</td>
+<td>6.2ms</td>
+<td>103ms</td>
+<td>2 / 1316</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>结论：没有掉帧。</strong> 每帧 6.1ms（≈164fps 的余量），超时帧只有启动那 2 帧，且与颗粒层、<code>repeating-conic-gradient</code> 放射线都无关。所以「卡」是<strong>设计上的顿挫</strong>，来源两个：</p>
+<ol>
+<li><strong>机械跳步（设计意图，不是缺陷）</strong>：所有动作都用 <code>Math.floor(p*n)/n</code> 量化成 3–12 段，进度不再连续 → 动作是「跳」的。这就是 v1 的工业机械感本身。读成卡顿时，用 Tweaks「机械跳步」切成连续即可。</li>
+<li><strong>颗粒层的位移抖动（真缺陷，已修）</strong>：原实现每 50ms 把整张噪点贴图 <code>background-position</code> 跳一次，等于<strong>平移同一张图案</strong>——人眼会追踪这种相关性，读作「整幅画面在抖」。已改为 <strong>4 张独立噪点贴图轮换</strong>（12.5Hz），并顺势把内联 <code>feTurbulence</code> 换成 canvas 预生成的位图（<code>kv.css</code> 早已警告过全屏 SVG 滤镜的重栅格化代价）。</li>
+</ol>
+<blockquote>
+<p>一般规律：<strong>胶片颗粒要「换一张」（独立随机），不要「平移同一张」</strong>。平移会产生可被追踪的相关性——这就是「像素级正确、观感却在抖」的根因。</p>
+</blockquote>
+<h3 id="81">8.1 决定性线索：只有「变化中的元素」卡<a class="headerlink" href="#81" aria-hidden="true">#</a></h3>
+<p>实测过程中用户给出了最关键的描述：</p>
+<blockquote>
+<p>动起来的元素是一卡一卡的，尤其是在<strong>移动过程中自身也在变化</strong>的元素；等这个变化完成，它剩下的动作就流畅了。</p>
+</blockquote>
+<p>这不是掉帧（掉帧会均匀影响整幅画面），而是<strong>光栅滞后</strong>：元素每帧都要重新栅格化，主线程不掉帧、<code>rAF</code> 间隔完全正常，但光栅线程交付慢一拍 —— 于是"只有正在变化的那个元素"看起来一顿一顿。</p>
+<p>三类属性会触发逐帧重栅格化，<strong>必须换成合成器友好的等价写法</strong>：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>危险写法</th>
+<th>后果</th>
+<th>等价替换</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>clip-path: inset()</code> 逐帧揭示</td>
+<td>那块巨字每帧重新栅格化</td>
+<td>外层 <code>overflow:hidden</code> + 内层 <code>translate</code> 滑入</td>
+</tr>
+<tr>
+<td><code>width</code> / <code>height</code> 逐帧变化</td>
+<td>每帧重排 + 重绘整块</td>
+<td><code>transform: scaleX()</code> + <code>transform-origin</code></td>
+</tr>
+<tr>
+<td><code>background-position</code> 逐帧移动</td>
+<td>整块背景每帧重新填充</td>
+<td>背景挪到子元素，动它的 <code>transform</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>⚠️ <strong>rAF 帧间隔指标测不出这一类问题。</strong> 主线程完全正常，光栅滞后只体现在观感上。碰到"只有变化中的元素卡"时不要看帧率，直接查该元素有没有在动非合成属性。</p>
+</blockquote>
+<h3 id="82">8.2 另一条硬规则：任何一幕都不许「定格」<a class="headerlink" href="#82" aria-hidden="true">#</a></h3>
+<p>「卡」的第二种来源是节奏而非渲染：<strong>动作做完就冻结、然后硬切</strong>。实测相邻 0.05s 的两帧做像素差，四幕的保持段全是 <code>changed = 0 px</code>（画面完全静止）——观众读作"动一下停一下"。而当时唯一"整段都在动"的第 04 幕（红色格子斜向波次持续填充），用户反馈<strong>不卡</strong>。</p>
+<p>结论：入场动作可以短促、可以机械跳步，但<strong>从入场结束到落幕之间必须有持续动势</strong>。本项目给每幕补了连续的缓移/缓转/爬行（斜带缓移、圆徽慢转、放射线持续转、网点爬行、网格呼吸），并且这些环境动势一律用<strong>连续插值</strong>而不是 <code>step()</code> 量化。</p>
+<h3 id="83">8.3 真实窗口按幕统计<a class="headerlink" href="#83" aria-hidden="true">#</a></h3>
+<p><code>?perf=1&amp;pskip=3000</code>（跳过启动阶段），165Hz 屏、缩放 0.89：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>幕</th>
+<th>p50</th>
+<th>p95</th>
+<th>长帧</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>01</td>
+<td>6.1</td>
+<td>6.1</td>
+<td>9 / 475（几乎全在启动阶段）</td>
+</tr>
+<tr>
+<td>02</td>
+<td>6.1</td>
+<td>6.2</td>
+<td>0 / 660</td>
+</tr>
+<tr>
+<td>03</td>
+<td>6.1</td>
+<td>6.1</td>
+<td>2 / 655</td>
+</tr>
+<tr>
+<td>04</td>
+<td>6.1</td>
+<td>6.1</td>
+<td>2 / 574</td>
+</tr>
+<tr>
+<td>05</td>
+<td>6.1</td>
+<td>6.1</td>
+<td>1 / 494</td>
+</tr>
+<tr>
+<td>06</td>
+<td>6.1</td>
+<td>6.2</td>
+<td>0 / 412</td>
+</tr>
+</tbody>
+</table></div>
+<p>垂直同步间隔是 6.06ms —— <code>p50</code> 与 <code>p95</code> 都等于它，长帧率 ~1%，<strong>主线程层面已经完全干净</strong>。剩下的观感问题只能从 §8.1（光栅）与 §8.2（节奏）解决。</p>
+<blockquote>
+<p>排查顺序：<strong>先 8.2 看节奏（有没有定格），再 8.1 查属性（有没有动非合成属性），最后 8.4 查数值（有没有量化台阶）——这三条都不成立时才去怀疑性能。</strong> 如果仍要求绝对均匀的帧，走 §9.3 的离线逐帧渲染——那条路根本不经过浏览器调度。</p>
+</blockquote>
+<h3 id="84">8.4 数值层面的顿挫：量化跳步（最隐蔽的一类）<a class="headerlink" href="#84" aria-hidden="true">#</a></h3>
+<p>前两节讲「节奏」和「光栅」，第三类顿挫来自<strong>数值本身</strong>：把动画进度量化成台阶。</p>
+<p>实测方法（可直接复用）：<strong>从成品视频里抽出某段动作的连续帧，逐对做像素差</strong>。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>版本</th>
+<th>01 幕红斜带横扫 21 帧的逐帧变化</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>量化 <code>Math.floor(p*6)/6</code></td>
+<td><code>0,0,0,0,0,0,86711,0,0,249508,17,16,249493,…</code> → <strong>67% 的帧对完全静止</strong></td>
+<td>⛔ 一顿一顿</td>
+</tr>
+<tr>
+<td>连续 <code>1-(1-p)³</code></td>
+<td><code>13664,176216,201603,179390,158382,138736,120438,103373,87656,73270,…</code> → 单调衰减，无静止帧</td>
+<td>✅ 流畅且果断</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>判别口诀：如果"离线逐帧渲染出来的视频"仍然卡，那就不是渲染/时序问题，而是数值里写了台阶。</strong> 去查所有 <code>Math.floor(p*n)/n</code>、<code>steps()</code>、离散取整。</p>
+<p>这条最值得记：前三轮我都在优化"怎么画得更快"（合成层、光栅、调度），而真正的元凶是"数值本来就在跳"。<strong>先验证数值是否连续，再谈性能。</strong></p>
+</blockquote>
+<hr />
+<h2 id="6">6. 文字与字幕<a class="headerlink" href="#6" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>主标</strong>：西里尔口号，全大写，<code>letter-spacing</code> 收紧到 -0.045em，行高 0.8–0.95。口号词表（按力度排序）：</li>
+<li><code>ВПЕРЁД!</code>（前进）· <code>НАШ ТРУД</code>（我们的劳动）· <code>ПРОЛЕТАРИИ</code>（无产者）· <code>СТРОЙКА</code>（建设）· <code>КОНСТРУКТИВИЗМ</code>（构成主义）· <code>ВПЕРЁД К ПОБЕДЕ</code>（向着胜利）</li>
+<li><strong>中文副标</strong>：一行，<strong>水平排布</strong>（中文笔画密度高，旋转后识别率明显下降），字重 900 与西文视觉重量对齐，字号约为主标的 1/5–1/4。</li>
+<li><strong>技术标签</strong>：等宽体 + 宽度字距（0.18em），承担「暴露构造」的工程师语义：<code>ПЕЧАТЬ В 2 ЦВЕТА</code>、<code>12 КОЛОНОК</code>、<code>МАСШТАБ 1:1</code>、<code>ТИРАЖ 5000</code>、<code>ЭЛЕМЕНТ 064 / 084</code>。</li>
+<li><strong>字体</strong>：西里尔必须确认覆盖 —— <code>Rubik</code> / <code>Oswald</code> / <code>PT Sans</code> / <code>JetBrains Mono</code> 均含西里尔；<code>Anton</code> / <code>Bebas Neue</code> / <code>Archivo Black</code> <strong>不含</strong>，一旦出现俄文就掉字体。中文标题首选得意黑（需自托管），缺失时回落 Noto Sans SC 900。</li>
+</ul>
+<hr />
+<h2 id="7">7. 质感（廉价印刷）<a class="headerlink" href="#7" aria-hidden="true">#</a></h2>
+<p>强度上限仍然是「缩到 50% 看，几乎看不见」：</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>效果</th>
+<th>手段</th>
+<th>强度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>纸张纤维颗粒</td>
+<td>内联 SVG <code>feTurbulence</code>（baseFrequency 0.85）+ <code>mix-blend-mode: multiply</code></td>
+<td>opacity 0.07–0.08</td>
+</tr>
+<tr>
+<td>半调网点</td>
+<td><code>repeating-radial-gradient</code> 点阵（点 1.5px / 间距 6px）</td>
+<td>只在「材料块」上</td>
+</tr>
+<tr>
+<td>硬边偏移阴影</td>
+<td><code>box-shadow: 8px 8px 0</code>（无模糊）</td>
+<td>少量</td>
+</tr>
+<tr>
+<td>印刷标记</td>
+<td>四角套准十字、构造网格线（33% / 66% 红线）</td>
+<td>常驻，可 <code>G</code> 关</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="9">9. 画幅、录屏与交付<a class="headerlink" href="#9" aria-hidden="true">#</a></h2>
+<h3 id="81_1">8.1 推荐参数<a class="headerlink" href="#81_1" aria-hidden="true">#</a></h3>
+<pre><code>画幅      1920×1080（16:9）
+帧率      30fps（基准实现的场记帧号与时间码就是按 30fps 计的，导出帧率与它一致即可）
+时长      20.00s，循环播放
+录屏 URL  constructivism-motion-20s.html?pure=1&amp;hud=0      ← 隐藏控件条与场记
+抓帧 URL  constructivism-motion-20s.html?t=15.5&amp;pure=1&amp;hud=0  ← 定格任意时刻
+</code></pre>
+<h3 id="82_1">8.2 交互键位（录制前）<a class="headerlink" href="#82_1" aria-hidden="true">#</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>键</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>空格</code></td>
+<td>播放 / 暂停</td>
+</tr>
+<tr>
+<td><code>← / →</code></td>
+<td>±0.25s 微调</td>
+</tr>
+<tr>
+<td><code>0</code></td>
+<td>回到开头</td>
+</tr>
+<tr>
+<td><code>H</code></td>
+<td>纯净模式（隐藏全部界面）</td>
+</tr>
+<tr>
+<td><code>K</code></td>
+<td>场记开关（帧号 / 时间码）</td>
+</tr>
+<tr>
+<td><code>G</code></td>
+<td>构造网格线开关</td>
+</tr>
+<tr>
+<td><code>I</code></td>
+<td>全片反相印刷</td>
+</tr>
+</tbody>
+</table></div>
+<p>Tweaks 面板（右下）：版画颗粒、<strong>机械跳步</strong>、构造网格线、场记、红黑反色、颗粒强度、斜切角度、播放速度。</p>
+<p>正片之外的诊断参数：<code>?perf=1</code> 打印帧间隔分布（<code>&amp;pms=20000</code> 跑满一轮、<code>&amp;pskip=3000</code> 跳过启动阶段）；<code>&amp;grain=0</code> 关颗粒、<code>&amp;quant=0</code> 切连续动效、<code>&amp;guides=0</code> 关构造网格线，用于 A/B 与出片。</p>
+<blockquote>
+<p>⚠️ 两个已踩过的坑：
+① <strong>半调网点不要用 <code>repeating-radial-gradient(circle at 0 0, ...)</code></strong> —— 那是<strong>以元素左上角为圆心</strong>的同心圆环，在距原点上千像素处曲率趋近于零，会退化成近乎平行的弧线（斜线摩尔纹），而且不同位置的稀疏方向还会变。真网点用 <code>radial-gradient()</code> + <code>background-size</code> 铺固定网格。
+② <strong>颗粒要「换一张」不要「平移同一张」</strong>，理由见 §8。</p>
+</blockquote>
+<h3 id="93">9.3 出片：离线逐帧渲染（<strong>推荐</strong>），不要在线录屏<a class="headerlink" href="#93" aria-hidden="true">#</a></h3>
+<p><strong>为什么不用「浏览器播放 + 录屏」</strong>：在线播放要同时跟合成器、光栅线程、垂直同步赛跑。§8 的每一次修复（<code>clip-path</code>、<code>width</code>、<code>background-position</code>、颗粒位移）都是在把这条赛道的损失压低，但它<strong>永远不可能归零</strong>——丢帧与光栅滞后是浏览器调度的固有噪声。</p>
+<p><strong>离线逐帧渲染把「时间」变成参数</strong>：每一帧按精确的 <code>t</code> 单独渲染，编码器按固定帧率输出；帧间隔由编码器保证，与浏览器调度完全无关。同一份 HTML 既是预览也是渲染源，不存在「预览和成片不一致」。</p>
+<p>流程（本仓库 <code>tools/render-frames.cjs</code>）：</p>
+<pre><code class="language-bash"># 1) 启动一个带调试端口的无头 Chrome，打开同一份 HTML
+chrome --headless=new --remote-debugging-port=9223 \
+       --window-size=1920,1080 --force-device-scale-factor=1 \
+       --user-data-dir=&lt;临时目录&gt; \
+       &quot;file:///&lt;绝对路径&gt;/constructivism-motion-20s.html?pure=1&amp;hud=0&quot;
+
+# 2) 逐帧渲染（帧 i 对应 t = i / fps；30fps × 20s = 600 帧）
+node tools/render-frames.cjs 9223 frames 30 600
+
+# 3) 编码
+ffmpeg -y -framerate 30 -i frames/frame_%04d.png \
+       -c:v libx264 -preset medium -crf 15 -pix_fmt yuv420p -tune animation \
+       -movflags +faststart constructivism-20s-30fps.mp4
+</code></pre>
+<p>要点：</p>
+<ul>
+<li><strong>总帧数 = fps × 20</strong>；帧 i 对应 <code>t = i/fps</code>，<strong>最后一帧是 19.9667s 而不是 20s</strong>（20s == 0s），所以循环天然无缝。</li>
+<li>页面里的 <code>window.__seek(t)</code> 是渲染钩子：设定时刻 → 渲染 → <strong>等两帧绘制完成</strong>再返回，保证抓到的不是半成品帧。</li>
+<li><code>?pure=1&amp;hud=0</code> 关掉控件条与场记；<code>&amp;guides=0</code> 可再关掉构造网格线（想保留"暴露构造"的印刷味就别加）。</li>
+<li>纯色为主的画面用 <code>-tune animation -crf 15</code> 即可，色带风险低；担心朱红渐变可降到 <code>-crf 12</code>。</li>
+<li><strong>成片固定 30fps 就够</strong>：屏幕即使是 165Hz，播放器也会把每帧稳定显示约 5.5 次刷新，不会像在线渲染那样抖。</li>
+<li>逐帧序列本身就是「母版」：可直接导入剪辑软件，改帧率/画幅/调色都不必重渲染。</li>
+</ul>
+<h3 id="94">9.4 备选：在线录屏<a class="headerlink" href="#94" aria-hidden="true">#</a></h3>
+<p>只在「边改边看、快速出草稿」时用：全屏 + <code>?pure=1&amp;hud=0</code>，播一整轮后停止，裁掉首尾各一轮取中间完整循环段。<strong>它的时序质量上限就是浏览器调度质量</strong>，定稿不要用它。</p>
+<hr />
+<h2 id="10">10. 已知限制与待办<a class="headerlink" href="#10" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>项</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>视频成片（mp4）</strong></td>
+<td>暂缓。600 帧 1920×1080 母版已在 <code>.scratch/frames-30fps/</code>，编码一条命令、约 6 秒（§9.3）</td>
+</tr>
+<tr>
+<td>中文标题字体</td>
+<td>当前为系统黑体 / Noto Sans SC 900 回落；要上得意黑需自托管 <code>SmileySans-Oblique.woff2</code></td>
+</tr>
+<tr>
+<td>半调网点在 4K 上采样</td>
+<td>点阵按 6px 网格铺设，1920 下正常；若改 4K 输出需同步放大点阵（否则网点变细）</td>
+</tr>
+<tr>
+<td>视频压缩对纯朱红的影响</td>
+<td><code>#cc0000</code> 在低码率 H.264 下会有色带；建议 ≥12 Mbps 或改用 H.265 / ProRes</td>
+</tr>
+<tr>
+<td>音频</td>
+<td>当前无配乐。20s 循环建议按 100 BPM（每拍 0.6s）或 120 BPM（每拍 0.5s）做卡点，正好与 0.4–0.7s 的动作时长同量级</td>
+</tr>
+<tr>
+<td>竖屏 / 方形版本</td>
+<td>未做。九条法则里「斜轴 + 极端字号对比」在 9:16 下需重新分配，不能直接裁切</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="11">11. 版本沿革<a class="headerlink" href="#11" aria-hidden="true">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>版本</th>
+<th>文件</th>
+<th>定位</th>
+<th>结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>v1（基准）</strong></td>
+<td><a href="index.html"><code>constructivism-motion-20s.html</code></a></td>
+<td>按「视频=时间媒介」直觉构建</td>
+<td>✅ <strong>采用</strong>。力量感来自大红场 + 黑斜块 + 超大字号 + 分段机械动效</td>
+</tr>
+<tr>
+<td>v2（对照）</td>
+<td><a href="index.html"><code>constructivism-motion-20s-v2.html</code></a></td>
+<td>严格按<strong>网页</strong>形式法则重做（红 ≤15%、斜轴 -15°、动效 120–320ms、左对齐不对称）</td>
+<td>❌ 作为主视觉被否 —— 红被压到 5–15%、动效被压到 0.32s 后力量感明显流失。<strong>保留为本文 §0 与 §3 的实证反例</strong>，其可复用的部分：贯穿主梁、真实套印错位、编号下沉到各幕、无字体的几何标签</td>
+</tr>
+</tbody>
+</table></div>
+  </article>
+
+  <nav class="doc__nav" aria-label="翻页">
+    <a href="README.html">← README</a>
+    <a href="index.html">动效原型</a>
+    <a href="../">站点首页</a>
+    <a href="02-视频制作·结构主义经验.html">02-视频制作·结构主义经验 →</a>
+  </nav>
+</div>
+
+</body>
+</html>
