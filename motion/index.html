@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>构成主义动效 — 20 秒无缝循环 / 原型 v0</title>
+<meta name="description" content="苏联构成主义风格的 20 秒无缝循环动效原型：六幕、大红场、机械节奏、六种几何原语。可播放、定格、调参。">
+<meta name="theme-color" content="#cc0000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Rubik:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   构成主义动效 — 设计令牌
+   三色体系 + 两色点缀（禁止圆角 / 渐变 / 柔和阴影 / 柔和字重）
+   ============================================================ */
+:root{
+  --red:   #cc0000;   /* 苏维埃红 */
+  --ink:   #1a1a1a;   /* 纯黑（版画油墨） */
+  --paper: #f2e8d5;   /* 泛黄纸 */
+  --gold:  #d4a843;   /* 金星（点缀，面积 < 5%） */
+  --brown: #8b4513;   /* 棕（弱化文字） */
+
+  --skew: -11deg;     /* 斜切角（Tweaks 可调） */
+  --grid-op: .15;     /* 构造网格线 */
+  --grain-op: .075;   /* 版画颗粒 */
+
+  --fs-display:'Rubik','Oswald',Impact,Haettenschweiler,'Arial Narrow',sans-serif;
+  --fs-cond:'Oswald','Rubik','Arial Narrow',Impact,sans-serif;
+  --fs-mono:'Space Mono','Courier New',monospace;
+  --fs-cn:'PingFang SC','Microsoft YaHei','Noto Sans SC','Source Han Sans SC',sans-serif;
+}
+body.invert{ --red:#1a1a1a; --ink:#cc0000; }
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:#0b0b0b;color:var(--paper);
+  font-family:var(--fs-display);
+  overflow:hidden;
+}
+/* ---------- 站点外壳（不进画布；纯净模式下一起隐藏） ----------
+   画布在 1920×1080 时是满屏铺满的，浅色字会压在浅色画面上 → 导航必须自带黑底铭牌。 */
+#sitebar{
+  position:fixed;left:22px;top:18px;z-index:900;display:flex;gap:18px;align-items:baseline;
+  background:var(--ink);border-bottom:6px solid var(--red);padding:10px 16px 12px;
+  font-family:var(--fs-cond);font-size:14px;letter-spacing:.16em;text-transform:uppercase;
+}
+#sitebar a{color:var(--paper);text-decoration:none;border-bottom:3px solid var(--red);padding-bottom:3px}
+#sitebar a:hover{background:var(--red);color:var(--paper)}
+#sitebar a:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+#sitebar .sb-title{color:var(--gold);letter-spacing:.1em}
+.skip{
+  position:fixed;left:50%;top:-70px;transform:translateX(-50%);z-index:999;
+  background:var(--red);color:var(--paper);padding:12px 20px;text-decoration:none;
+  font-family:var(--fs-cond);letter-spacing:.16em;
+}
+.skip:focus{top:0}
+.noscript{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:999;max-width:56ch;
+  background:var(--paper);color:var(--ink);border:6px solid var(--red);padding:24px 28px;
+  font-family:var(--fs-cn);line-height:1.75;font-size:16px;
+}
+body.pure #sitebar,body.pure .skip,body.pure .noscript{display:none}
+
+body.pure #bar,body.pure #tweaks{display:none}
+body.noHud .hud{display:none}   /* 录屏用：关掉帧号/时间码，否则循环点会看到编号从 0597 跳回 0000 */
+
+/* ---------- 舞台：固定 1920×1080，等比缩放，不拉伸 ---------- */
+#frame{
+  position:fixed;left:50%;top:50%;
+  width:1920px;height:1080px;
+  transform-origin:center center;
+  overflow:hidden;background:var(--ink);
+  outline:1px solid #2a2a2a;
+  box-shadow:0 0 0 1px #000,0 30px 80px rgba(0,0,0,.6);
+}
+#frame::after{ /* 极轻暗角，模拟放映 */
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:60;
+  background:radial-gradient(120% 90% at 50% 45%,transparent 55%,rgba(0,0,0,.42) 100%);
+}
+
+/* ---------- 场景容器 ---------- */
+.scene{position:absolute;inset:0;visibility:hidden;opacity:0}
+.scene .fill{position:absolute;inset:0}
+
+/* ---------- 通用排版 ---------- */
+.ch{display:inline-block;white-space:pre}
+.cn{font-family:var(--fs-cn);font-weight:900;letter-spacing:.02em}
+.mono{font-family:var(--fs-mono)}
+
+/* ============================================================
+   01 · ВПЕРЁД!
+   ============================================================ */
+.s1 .band{
+  position:absolute;left:-8%;top:-32%;width:78%;height:168%;
+  background:var(--red);transform:translateX(-125%) rotate(var(--skew));
+}
+.s1 .block{
+  position:absolute;left:44%;top:52%;width:31%;height:36%;
+  background:var(--ink);opacity:0;
+}
+.s1 .stripes{
+  position:absolute;left:0;bottom:0;width:100%;height:86px;opacity:0;
+  border-top:4px solid var(--red);
+}
+/* 斜条纹爬行：铺在子元素上用 transform（合成器），不用 background-position（每帧重绘整块） */
+.s1 .stripes > i{
+  position:absolute;inset:-40px;display:block;will-change:transform;
+  background:repeating-linear-gradient(45deg,var(--red) 0 11px,transparent 11px 22px);
+}
+/* 揭示/展开一律用「外层 overflow:hidden + 内层 translate」，不用 clip-path。
+   clip-path 逐帧变化会让这块巨字每帧重新栅格化：主线程不掉帧，但光栅会滞后一帧，
+   观感就是"正在变化的元素一卡一卡，变化结束后剩下的位移反而顺"。 */
+/* 条带左边界必须与标题的 left 对齐：否则 -105% 的滑出距离不够，
+   标题尾部会露出一截（曾在循环起始帧留下 8715 个差异像素）。 */
+.s1 .wstrip{position:absolute;left:132px;right:0;top:272px;height:236px;overflow:hidden;z-index:3}
+.s1 .title{
+  position:absolute;left:0;top:14px;
+  font:900 208px/0.86 var(--fs-display);
+  color:var(--paper);letter-spacing:-.02em;
+  transform:translateX(-105%);will-change:transform;
+}
+.s1 .sub{
+  position:absolute;left:140px;top:556px;z-index:3;opacity:0;
+  font:700 34px/1 var(--fs-cond);color:var(--paper);letter-spacing:.34em;
+}
+.s1 .sub .cn{font-size:30px;letter-spacing:.18em;margin-left:18px}
+.s1 .year{
+  position:absolute;right:96px;bottom:120px;z-index:3;opacity:0;
+  font:700 26px/1 var(--fs-mono);color:var(--gold);letter-spacing:.22em;
+}
+
+/* ============================================================
+   02 · НАШ ТРУД
+   ============================================================ */
+.s2 .fill{background:var(--paper)}
+.s2 .diag{
+  position:absolute;left:-10%;top:60%;width:120%;height:14px;
+  background:var(--ink);transform:rotate(calc(var(--skew) / 2)) scaleX(0);
+  transform-origin:left center;
+}
+.s2 .title{
+  position:absolute;left:104px;top:150px;z-index:3;
+  font:900 292px/0.78 var(--fs-display);color:var(--ink);
+  letter-spacing:-.035em;transform:rotate(calc(var(--skew) / 2));
+}
+.s2 .title .ch{transform:translateY(90px);opacity:0}
+.s2 .rule{
+  /* scaleX 而不是 width：width 逐帧变化要重排 + 重绘整块 */
+  position:absolute;left:112px;top:718px;height:20px;width:268px;
+  background:var(--red);transform:scaleX(0);transform-origin:left center;will-change:transform;
+}
+.s2 .sub{
+  position:absolute;left:112px;top:772px;opacity:0;
+  font:900 44px/1 var(--fs-cn);color:var(--ink);letter-spacing:.06em;
+}
+.s2 .sub em{font-style:normal;background:var(--red);color:var(--paper);padding:2px 12px 6px}
+.s2 .stamp{
+  position:absolute;left:118px;top:846px;opacity:0;
+  font:700 24px/1 var(--fs-mono);color:var(--brown);letter-spacing:.28em;
+}
+.s2 .badge{
+  position:absolute;right:198px;top:166px;width:286px;height:286px;
+  opacity:0;transform:scale(.4);
+}
+.s2 .badge .disc{
+  position:absolute;inset:0;border-radius:50%;background:var(--red);
+  border:6px solid var(--ink);
+}
+.s2 .badge svg{position:absolute;inset:26px;color:var(--paper)}
+
+/* ============================================================
+   03 · ПРОЛЕТАРИИ
+   ============================================================ */
+.s3 .fill{background:var(--red)}
+.s3 .spokes{
+  position:absolute;right:-300px;top:50%;width:1180px;height:1180px;
+  transform:translateY(-50%);border-radius:50%;opacity:0;will-change:transform;
+  background:repeating-conic-gradient(from 0deg,var(--paper) 0deg 3deg,transparent 3deg 12deg);
+}
+.s3 .circle{
+  position:absolute;right:214px;top:50%;width:640px;height:640px;
+  margin-top:-320px;border-radius:50%;background:var(--paper);
+  transform:scale(.2);
+}
+.s3 .wedge{
+  position:absolute;right:0;top:0;width:47%;height:100%;
+  background:var(--ink);
+  clip-path:polygon(100% 0,100% 100%,0 50%);
+  transform:translateX(102%);
+}
+.s3 .vstrip{position:absolute;left:126px;top:78px;width:136px;height:1000px;overflow:hidden;z-index:3}
+.s3 .vert{
+  position:absolute;left:0;top:0;
+  writing-mode:vertical-rl;
+  font:900 96px/1 var(--fs-display);color:var(--paper);
+  letter-spacing:.03em;transform:translateY(-102%);will-change:transform;
+}
+.s3 .sub{
+  position:absolute;left:132px;bottom:104px;z-index:3;opacity:0;
+  font:900 34px/1.4 var(--fs-cn);color:var(--paper);letter-spacing:.2em;
+}
+.s3 .sub .mono{display:block;font-size:24px;color:var(--gold);letter-spacing:.3em;margin-top:10px}
+.s3 .tick{
+  position:absolute;left:0;bottom:0;width:100%;height:10px;
+  background:repeating-linear-gradient(90deg,var(--ink) 0 10px,transparent 10px 26px);
+  opacity:0;
+}
+
+/* ============================================================
+   04 · СТРОЙКА
+   ============================================================ */
+.s4 .grid{
+  position:absolute;inset:0;display:grid;
+  grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(7,1fr);
+  gap:6px;padding:44px;
+}
+.s4 .grid i{display:block;background:var(--red);transform:scale(0)}
+.s4 .grid i.paper{background:var(--paper)}
+.s4 .grid i.gold{background:var(--gold)}
+.s4 .bar{
+  position:absolute;left:-10%;top:37%;width:120%;height:12px;
+  background:var(--red);transform:rotate(var(--skew)) scaleX(0);
+  transform-origin:left center;
+}
+.s4 .ostrip{position:absolute;left:0;right:0;top:352px;height:250px;overflow:hidden;z-index:4}
+.s4 .outline{
+  position:absolute;left:0;right:0;top:0;text-align:center;
+  font:900 210px/1 var(--fs-display);letter-spacing:.02em;
+  color:transparent;-webkit-text-stroke:3px var(--paper);
+  transform:translateX(-104%);will-change:transform;
+}
+.s4 .flash{
+  position:absolute;inset:0;background:var(--red);opacity:0;z-index:3;
+}
+.s4 .num{
+  position:absolute;left:0;right:0;bottom:214px;text-align:center;z-index:4;opacity:0;
+  font:700 62px/1 var(--fs-mono);color:var(--gold);letter-spacing:.14em;
+}
+.s4 .counter{
+  position:absolute;left:60px;top:62px;z-index:4;opacity:0;
+  font:400 26px/1 var(--fs-mono);color:var(--paper);letter-spacing:.18em;
+}
+.s4 .sub{
+  position:absolute;left:0;right:0;bottom:142px;text-align:center;z-index:4;opacity:0;
+  font:900 36px/1 var(--fs-cn);color:var(--paper);letter-spacing:.42em;
+}
+
+/* ============================================================
+   05 · КОНСТРУКТИВИЗМ
+   ============================================================ */
+.s5 .fill{background:var(--paper)}
+.s5 .halftone{
+  position:absolute;inset:0;opacity:0;overflow:hidden;
+  /* 真·半调网点：固定网格上的圆点。
+     ⚠️ 不要用 repeating-radial-gradient(circle at 0 0, ...) —— 那是**以元素左上角为圆心**的
+     同心圆环，在距原点上千像素处曲率趋近于零，会退化成近乎平行的弧线（看起来是斜线摩尔纹）。 */
+}
+/* 网点铺在子元素上，用 transform 爬行（走合成器）；用 background-position 会让整块每帧重栅格化 */
+.s5 .halftone > i{
+  position:absolute;inset:-80px;display:block;
+  background-image:radial-gradient(rgba(26,26,26,.22) 1.6px,transparent 1.7px);
+  background-size:7px 7px;
+  will-change:transform;
+}
+.s5 .wipe{
+  /* 用 scaleX 而不是 width：width 动画每帧都会触发布局+重绘整块（518k px/帧） */
+  position:absolute;left:0;top:352px;height:270px;width:1920px;background:var(--red);z-index:1;
+  transform:scaleX(0);transform-origin:left center;will-change:transform;
+}
+.s5 .title{
+  position:absolute;left:0;right:0;top:372px;text-align:center;z-index:2;
+  /* 188px 时 14 个字母宽约 1900px，最后一个 М 会被画框切掉 —— 收到 164px 后仍占满约 86% 画幅 */
+  font:900 164px/1 var(--fs-display);color:var(--ink);letter-spacing:-.045em;
+}
+.s5 .title .ch{opacity:0}
+.s5 .plate{
+  position:absolute;right:150px;bottom:158px;z-index:3;opacity:0;
+  background:var(--ink);color:var(--paper);
+  padding:14px 26px 18px;transform:rotate(3deg) translateY(40px);
+  font:700 30px/1 var(--fs-mono);letter-spacing:.2em;
+}
+.s5 .sub{
+  position:absolute;left:152px;bottom:170px;z-index:3;opacity:0;
+  font:900 58px/1 var(--fs-cn);color:var(--ink);letter-spacing:.24em;
+}
+.s5 .underline{
+  position:absolute;left:154px;bottom:150px;height:16px;width:0;background:var(--ink);z-index:4;
+}
+
+/* ============================================================
+   06 · ВПЕРЁД К ПОБЕДЕ
+   ============================================================ */
+.s6 .fill{background:var(--red)}
+.s6 .circle{
+  position:absolute;left:50%;top:50%;width:720px;height:720px;margin:-360px 0 0 -360px;
+  border-radius:50%;background:var(--paper);transform:scale(.5);
+}
+.s6 .center{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;z-index:2;gap:22px;
+}
+.s6 .title{
+  font:900 104px/1 var(--fs-display);color:var(--ink);letter-spacing:.01em;
+}
+.s6 .sub{
+  font:900 32px/1 var(--fs-cn);color:var(--ink);letter-spacing:.4em;
+}
+.s6 .bar{position:absolute;left:0;width:100%;height:540px;background:var(--ink);z-index:3}
+.s6 .bar.top{top:0;transform:scaleY(0);transform-origin:top center;will-change:transform}
+.s6 .bar.bottom{bottom:0;transform:scaleY(0);transform-origin:bottom center;will-change:transform}
+
+/* ============================================================
+   常驻印刷层：构造网格 / 套准十字 / 颗粒 / 场记
+   ============================================================ */
+#guides{position:absolute;inset:0;z-index:50;pointer-events:none;opacity:var(--grid-op)}
+#guides .v{position:absolute;top:0;bottom:0;width:2px;background:var(--red)}
+#guides .h{position:absolute;left:0;right:0;height:2px;background:var(--red)}
+#guides .frame{position:absolute;inset:58px;border:2px solid var(--red)}
+#guides .v.a{left:33.333%} #guides .v.b{left:66.666%}
+#guides .h.a{top:33.333%}  #guides .h.b{top:66.666%}
+#guides .cx{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border:2px solid var(--red);border-radius:50%}
+
+.regmark{position:absolute;width:44px;height:44px;z-index:52;color:var(--paper);opacity:.55;pointer-events:none}
+.regmark.tl{left:20px;top:20px} .regmark.tr{right:20px;top:20px}
+.regmark.bl{left:20px;bottom:20px} .regmark.br{right:20px;bottom:20px}
+
+#grain{
+  position:absolute;inset:-40px;z-index:55;pointer-events:none;opacity:0;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:220px 220px;
+}
+.hud{
+  position:absolute;left:74px;bottom:64px;z-index:56;pointer-events:none;
+  font:400 22px/1.7 var(--fs-mono);color:var(--paper);opacity:.55;letter-spacing:.16em;
+}
+.hud b{font-weight:700;color:var(--gold);letter-spacing:.16em}
+
+/* ============================================================
+   控制条（在画布外，不进入录屏）
+   ============================================================ */
+#bar{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%);
+  display:flex;align-items:center;gap:14px;z-index:900;
+  background:#141414;border:3px solid var(--paper);padding:12px 16px;
+}
+#bar button{
+  font:700 15px/1 var(--fs-cond);letter-spacing:.12em;text-transform:uppercase;
+  background:var(--ink);color:var(--paper);border:3px solid var(--paper);
+  padding:10px 14px;cursor:pointer;border-radius:0;
+}
+#bar button:hover{background:var(--red);color:var(--paper)}
+#bar button:active{transform:translate(2px,2px)}
+#bar button[aria-pressed="true"]{background:var(--red);color:var(--paper)}
+#bar button:focus-visible,#tweaks input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+#scrub{
+  -webkit-appearance:none;appearance:none;width:min(52vw,620px);height:14px;
+  background:var(--ink);border:3px solid var(--paper);cursor:pointer;
+}
+#scrub::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:22px;background:var(--red);border:3px solid var(--paper);
+}
+#scrub::-moz-range-thumb{width:16px;height:22px;background:var(--red);border:3px solid var(--paper);border-radius:0}
+#tc{font:400 15px/1 var(--fs-mono);color:var(--paper);letter-spacing:.1em;min-width:190px;text-align:center}
+
+/* ---------- Tweaks ---------- */
+#tweaks{
+  position:fixed;right:22px;bottom:22px;z-index:901;
+  background:#141414;border:3px solid var(--paper);padding:16px 18px 18px;width:284px;
+  display:none;
+}
+#tweaks.on{display:block}
+#tweaks h3{
+  font:700 15px/1 var(--fs-cond);letter-spacing:.24em;text-transform:uppercase;
+  color:var(--red);border-bottom:3px solid var(--paper);padding-bottom:10px;margin-bottom:14px;
+}
+#tweaks label{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  font:700 13px/1.3 var(--fs-cond);letter-spacing:.1em;color:var(--paper);margin:12px 0;
+}
+#tweaks input[type=checkbox]{
+  -webkit-appearance:none;appearance:none;width:22px;height:22px;flex:none;
+  border:3px solid var(--paper);background:var(--ink);cursor:pointer;
+}
+#tweaks input[type=checkbox]:checked{background:var(--red)}
+#tweaks input[type=range]{width:118px;height:10px;-webkit-appearance:none;appearance:none;background:var(--ink);border:2px solid var(--paper);cursor:pointer}
+#tweaks input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:18px;background:var(--red);border:2px solid var(--paper)}
+#tweaks .hint{font:400 11px/1.6 var(--fs-mono);color:var(--brown);border-top:2px solid #333;padding-top:10px;margin-top:14px;letter-spacing:.06em}
+#tweakBtn{
+  position:fixed;right:22px;bottom:22px;z-index:902;
+  font:700 15px/1 var(--fs-cond);letter-spacing:.12em;
+  background:var(--ink);color:var(--paper);border:3px solid var(--paper);padding:12px 16px;cursor:pointer;
+}
+#tweakBtn:hover{background:var(--red)}
+body.pure #tweakBtn{display:none}
+/* 动效性能：把每帧都在动的元素提到独立合成层，让 transform 走合成器而不是每帧重绘。
+   不做这一步时真实窗口实测 p95 12.0ms / 掉帧 5.2%（做了之后的数字见文档 §8）。 */
+.s1 .band,.s1 .title,.s1 .sub,.s1 .block,
+.s2 .badge,.s2 .diag,.s2 .sub,
+.s3 .circle,.s3 .wedge,.s3 .vert,.s3 .sub,
+.s5 .title,.s5 .sub,
+.s6 .circle,.s6 .center{ will-change:transform; }
+
+@media (prefers-reduced-motion:reduce){ #grain{display:none} }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#frame">跳到动效画面</a>
+
+<nav id="sitebar" aria-label="站点">
+  <a href="/">← 回报纸首页</a>
+  <a href="/notes/">设计笔记</a>
+  <span class="sb-title">构成主义动效 · 20 秒循环</span>
+</nav>
+
+<noscript>
+  <p class="noscript">本页的动效需要 JavaScript。开启后：<kbd>空格</kbd> 播放 / 暂停，
+  <kbd>H</kbd> 纯净模式，右下角 <strong>Tweaks</strong> 调参（套印错位 / 颗粒 / 机械跳步 / 播放速度）。</p>
+</noscript>
+
+<div id="frame" data-screen-label="stage 1920x1080">
+
+  <!-- ============ 01 ВПЕРЁД! ============ -->
+  <section class="scene s1" data-screen-label="01 ВПЕРЁД">
+    <div class="band"></div>
+    <div class="block"></div>
+    <div class="wstrip"><h1 class="title" lang="ru">ВПЕРЁД!</h1></div>
+    <p class="sub">一九一七<span class="cn">前进</span></p>
+    <div class="stripes"><i></i></div>
+    <p class="year">ОКТЯБРЬ · 1917</p>
+  </section>
+
+  <!-- ============ 02 НАШ ТРУД ============ -->
+  <section class="scene s2" data-screen-label="02 НАШ ТРУД">
+    <div class="fill"></div>
+    <div class="diag"></div>
+    <h2 class="title" lang="ru"><span data-split>НАШ</span><br><span data-split>ТРУД</span></h2>
+    <div class="rule"></div>
+    <p class="sub">我们的劳动 <em>一切为了生产</em></p>
+    <p class="stamp">МОСКВА · 1920</p>
+    <div class="badge">
+      <div class="disc"></div>
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M50 2 57 36 88 20 66 44 98 50 66 56 88 80 57 64 50 98 43 64 12 80 34 56 2 50 34 44 12 20 43 36Z"
+              fill="currentColor"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============ 03 ПРОЛЕТАРИИ ============ -->
+  <section class="scene s3" data-screen-label="03 ПРОЛЕТАРИИ">
+    <div class="fill"></div>
+    <div class="spokes"></div>
+    <div class="circle"></div>
+    <div class="wedge"></div>
+    <div class="vstrip"><p class="vert" lang="ru">ПРОЛЕТАРИИ</p></div>
+    <p class="sub">全世界无产者，联合起来<span class="mono">ВСЕХ СТРАН · СОЕДИНЯЙТЕСЬ</span></p>
+    <div class="tick"></div>
+  </section>
+
+  <!-- ============ 04 СТРОЙКА ============ -->
+  <section class="scene s4" data-screen-label="04 СТРОЙКА">
+    <div class="fill"></div>
+    <div class="grid"></div>
+    <div class="flash"></div>
+    <div class="bar"></div>
+    <div class="ostrip"><div class="outline" lang="ru">СТРОЙКА</div></div>
+    <div class="counter mono">ЭЛЕМЕНТ 000 / 084</div>
+    <div class="num mono">1929</div>
+    <p class="sub cn">建 设 · 五 年 计 划</p>
+  </section>
+
+  <!-- ============ 05 КОНСТРУКТИВИЗМ ============ -->
+  <section class="scene s5" data-screen-label="05 КОНСТРУКТИВИЗМ">
+    <div class="fill"></div>
+    <div class="halftone"><i></i></div>
+    <div class="wipe"></div>
+    <h2 class="title" data-split lang="ru">КОНСТРУКТИВИЗМ</h2>
+    <p class="sub">构成主义</p>
+    <div class="underline"></div>
+    <div class="plate mono">1920 — 1930</div>
+  </section>
+
+  <!-- ============ 06 ВПЕРЁД К ПОБЕДЕ ============ -->
+  <section class="scene s6" data-screen-label="06 ВПЕРЁД К ПОБЕДЕ">
+    <div class="fill"></div>
+    <div class="circle"></div>
+    <div class="center">
+      <p class="title" lang="ru">ВПЕРЁД К ПОБЕДЕ</p>
+      <p class="sub">向 着 胜 利</p>
+    </div>
+    <div class="bar top"></div>
+    <div class="bar bottom"></div>
+  </section>
+
+  <!-- ============ 常驻印刷层 ============ -->
+  <div id="guides">
+    <div class="v a"></div><div class="v b"></div>
+    <div class="h a"></div><div class="h b"></div>
+    <div class="frame"></div>
+    <div class="cx"></div>
+  </div>
+
+  <svg class="regmark tl" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 0v13M20 27v13M0 20h13M27 20h13" stroke="currentColor" stroke-width="2"/></svg>
+  <svg class="regmark tr" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 0v13M20 27v13M0 20h13M27 20h13" stroke="currentColor" stroke-width="2"/></svg>
+  <svg class="regmark bl" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 0v13M20 27v13M0 20h13M27 20h13" stroke="currentColor" stroke-width="2"/></svg>
+  <svg class="regmark br" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 0v13M20 27v13M0 20h13M27 20h13" stroke="currentColor" stroke-width="2"/></svg>
+
+  <div id="grain"></div>
+  <div class="hud">
+    <span id="hudFrame">КАДР 0000</span><br>
+    <b id="hudTC">00:00:00 / 00:20:00</b>
+  </div>
+</div>
+
+<!-- ============ 控制条 ============ -->
+<div id="bar" role="group" aria-label="播放控制">
+  <button id="play" aria-label="播放或暂停">▶ 播放</button>
+  <input id="scrub" type="range" min="0" max="20" step="0.01" value="0" aria-label="时间轴">
+  <span id="tc">00:00.00 / 00:20.00</span>
+  <button id="loop" aria-pressed="true" aria-label="循环播放">循环</button>
+  <button id="pure" aria-label="纯净模式（隐藏所有界面）">纯净模式</button>
+  <button id="fs" aria-label="全屏">全屏</button>
+</div>
+
+<button id="tweakBtn" aria-expanded="false" aria-controls="tweaks">Tweaks</button>
+
+<!-- ============ Tweaks ============ -->
+<aside id="tweaks" aria-label="参数调节">
+  <h3>Tweaks</h3>
+  <label>版画颗粒 <input type="checkbox" id="twGrain" checked></label>
+  <label>颗粒抖动 <input type="checkbox" id="twGrainJit"></label>
+  <label>机械跳步 <input type="checkbox" id="twQuant"></label>
+  <label>构造网格线 <input type="checkbox" id="twGuides" checked></label>
+  <label>场记（帧号/时间码） <input type="checkbox" id="twHud" checked></label>
+  <label>红黑反色 <input type="checkbox" id="twInvert"></label>
+  <label>颗粒强度 <input type="range" id="twGrainAmt" min="0" max="18" step="1" value="8"></label>
+  <label>斜切角度 <input type="range" id="twSkew" min="-14" max="0" step="1" value="-11"></label>
+  <label>播放速度 <input type="range" id="twSpeed" min="25" max="200" step="25" value="100"></label>
+  <p class="hint">空格 播放/暂停 · ←/→ ±0.25s · 0 回到开头 · H 纯净模式 · G 网格线 · I 反色</p>
+</aside>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ========== 时间基 ========== */
+  var DUR = 20;                 // 总时长（秒）
+  var t = 0;                    // 当前时间
+  var playing = true;
+  var loop = true;
+  var speed = 1;
+  var last = 0;
+
+  /* ========== 工具 ========== */
+  function $(s, r){ return (r||document).querySelector(s); }
+  function $$(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+  function cl(v, a, b){ a = (a===undefined?0:a); b = (b===undefined?1:b); return v<a?a:(v>b?b:v); }
+  function lin(time, s, d){ return cl((time-s)/d); }                    // 线性进度
+  function out(time, s, d){ var p = lin(time,s,d); return 1-Math.pow(1-p,3); }
+  var QNT = false;  /* 机械跳步：**默认关闭**。
+       实测（从成品 mp4 逐帧量）S1 红斜带横扫那 21 帧里 14 帧画面完全没变（67% 静止），
+       其余帧一次跳 12 万～25 万像素 —— 这就是"一顿一顿"的来源，而且它写进了数值，
+       离线逐帧渲染也救不了。机械感改由「果断缓动 + 硬切 + 时长节奏」承担。
+       想回到 v1 的量化顿挫：Tweaks 勾「机械跳步」，或 URL 加 ?quant=1。 */
+  var grainJitter = false;   /* 颗粒抖动开关：默认静止，见 render() 里的说明 */
+  function easeOut3(p){ return 1 - Math.pow(1 - cl(p), 3); }   // 果断、无回弹
+  function step(p, n){
+    p = cl(p);
+    if(QNT){ n = n || 4; return Math.floor(p*n)/n; }           // 量化：停一会儿、跳一下
+    return easeOut3(p);                                        // 连续：同样时长，均匀到位
+  }
+  function mix(a, b, p){ return a+(b-a)*p; }
+  function set(el, prop, val){ if(el) el.style[prop] = val; }
+
+  /* ========== 文字拆字（用于逐字入场） ========== */
+  $$('[data-split]').forEach(function(el){
+    var txt = el.textContent;
+    el.textContent = '';
+    Array.prototype.slice.call(txt).forEach(function(ch){
+      var sp = document.createElement('span');
+      sp.className = 'ch';
+      sp.textContent = (ch === ' ') ? '\u00A0' : ch;
+      el.appendChild(sp);
+    });
+  });
+
+  /* ========== 04 场景网格生成 12×7 ========== */
+  var gridCells = [];
+  (function(){
+    var g = $('.s4 .grid');
+    for(var r=0; r<7; r++){
+      for(var c=0; c<12; c++){
+        var i = document.createElement('i');
+        i.dataset.c = c; i.dataset.r = r;
+        if((r*12+c) % 9 === 4) i.className = 'paper';
+        if((r*12+c) === 41)    i.className = 'gold';
+        g.appendChild(i);
+        gridCells.push(i);
+      }
+    }
+  })();
+
+  /* ========== 场景定义：start / end / update(local) ========== */
+  var scenes = [
+    /* ---- 01 ВПЕРЁД! 0.0 – 3.0 ---- */
+    { el:$('.s1'), start:0.0, end:3.0, update:function(L){
+        var band  = $('.band', this.el), title = $('.title', this.el);
+        var block = $('.block', this.el), sub = $('.sub', this.el);
+        var str   = $('.stripes', this.el), yr = $('.year', this.el);
+
+        var b1 = step(lin(L, 0.00, 0.70), 6);            // 红色斜带横行侵入
+        var a1 = lin(L, 0.70, 2.30);                     // ↓ 入场后**连续**缓移（保持段不许冻结）
+        set(band, 'transform', 'translateX(' + (mix(-125,0,b1) + a1*4.2) + '%) rotate(var(--skew))');
+
+        var b2 = out(L, 0.55, 1.00);                     // 标题自左硬滑入（不用 clip-path）
+        var a2 = lin(L, 1.00, 2.00);
+        set(title, 'transform', 'translateX(' + (mix(-105,0,b2) + a2*1.6) + '%)');
+
+        var b3 = step(lin(L, 0.85, 1.45), 4);            // 黑色块面下沉
+        var a3 = lin(L, 1.45, 3.00);
+        set(block, 'opacity', b3);
+        set(block, 'transform', 'translateY(' + (mix(150,0,b3) + a3*12) + 'px)');
+
+        var b4 = step(lin(L, 1.20, 1.70), 5);
+        var a4 = lin(L, 1.70, 3.00);
+        set(sub, 'opacity', b4);
+        set(sub, 'transform', 'translateX(' + (mix(-60,0,b4) + a4*16) + 'px)');
+
+        var b5 = step(lin(L, 1.55, 2.10), 6);
+        set(str, 'opacity', b5);
+        set($('.stripes > i', this.el), 'transform', 'translate3d(' + (L*54) + 'px,0,0)');  // 斜条纹持续爬行
+        set(yr,  'opacity', step(lin(L, 1.9, 2.3), 4));
+      }
+    },
+
+    /* ---- 02 НАШ ТРУД 3.0 – 7.0 ---- */
+    { el:$('.s2'), start:3.0, end:7.0, update:function(L){
+        var chars = $$('.ch', this.el);
+        chars.forEach(function(ch, i){
+          var p = step(lin(L, 0.05 + i*0.075, 0.42), 3);
+          set(ch, 'transform', 'translateY(' + mix(96,0,p) + 'px)');
+          set(ch, 'opacity', p);
+        });
+
+        var d1 = step(lin(L, 0.25, 0.90), 5);            // 对角黑杠拉开
+        set($('.diag', this.el), 'transform',
+            'rotate(calc(var(--skew) / 2)) scaleX(' + (d1 + lin(L,0.90,4.0)*0.035) + ')');
+
+        var r1 = step(lin(L, 1.35, 1.95), 6);            // 红色标尺（到位后继续向右爬）
+        set($('.rule', this.el), 'transform', 'scaleX(' + (r1 + lin(L,1.95,4.0)*58/268) + ')');
+
+        var s1 = step(lin(L, 1.55, 2.10), 4);
+        set($('.sub', this.el), 'opacity', s1);
+        set($('.sub', this.el), 'transform', 'translateY(' + (mix(26,0,s1) - lin(L,2.10,4.0)*12) + 'px)');
+
+        set($('.stamp', this.el), 'opacity', step(lin(L, 2.0, 2.4), 4));
+
+        var bp = step(lin(L, 0.45, 1.55), 10);           // 圆徽：跳步旋转入场，之后持续慢转
+        var rot = mix(-120,0,bp) + lin(L,1.55,4.0)*18;
+        set($('.badge', this.el), 'opacity', bp>0?1:0);
+        set($('.badge', this.el), 'transform',
+            'scale(' + mix(0.4,1,step(lin(L,0.45,1.1),4)) + ') rotate(' + rot + 'deg)');
+      }
+    },
+
+    /* ---- 03 ПРОЛЕТАРИИ 7.0 – 11.0 ---- */
+    { el:$('.s3'), start:7.0, end:11.0, update:function(L){
+        var sp = $('.spokes', this.el);
+        var spP = step(lin(L, 0.10, 1.20), 12);          // 放射线机械转动
+        set(sp, 'opacity', cl(lin(L,0.10,0.60))*0.34);
+        set(sp, 'transform',
+            'translateY(-50%) rotate(' + (spP*360 + lin(L,1.20,4.00)*54) + 'deg)');  // 之后持续慢转
+
+        var cp = out(L, 0.05, 0.80);
+        set($('.circle', this.el), 'transform',
+            'scale(' + (mix(0.2,1,step(cp,6)) + lin(L,0.80,4.0)*0.03) + ')');
+
+        var wp = step(lin(L, 0.60, 1.40), 7);            // 黑色楔形自右刺入
+        set($('.wedge', this.el), 'transform',
+            'translateX(' + (mix(102,0,wp) - lin(L,1.40,4.0)*6) + '%)');
+
+        var vp = out(L, 1.05, 1.95);                     // 竖排标签自上而下滑入
+        set($('.vert', this.el), 'transform',
+            'translateY(' + (mix(-102,0,vp) - lin(L,1.95,4.0)*1.2) + '%)');
+
+        var s1 = step(lin(L, 2.0, 2.5), 4);
+        set($('.sub', this.el), 'opacity', s1);
+        set($('.sub', this.el), 'transform', 'translateX(' + (mix(-46,0,s1) + lin(L,2.5,4.0)*18) + 'px)');
+
+        set($('.tick', this.el), 'opacity', cl(lin(L, 2.4, 2.9))*0.9);
+      }
+    },
+
+    /* ---- 04 СТРОЙКА 11.0 – 14.5 ---- */
+    { el:$('.s4'), start:11.0, end:14.5, update:function(L){
+        var filled = 0;
+        var amb = Math.max(0, L - 1.30);                 // 波次填满后的持续呼吸（防止定格）
+        gridCells.forEach(function(cell){
+          var c = +cell.dataset.c, r = +cell.dataset.r;
+          var delay = c*0.045 + r*0.075;                 // 斜向波
+          var p = step(lin(L, 0.05 + delay, 0.28), 3);
+          var br = 1 + Math.sin(amb*1.9 + (c + r)*0.42)*0.022;
+          set(cell, 'transform', 'scale(' + (p*br) + ')');
+          if(p >= 1) filled++;
+        });
+        $('.counter', this.el).textContent =
+          'ЭЛЕМЕНТ ' + ('00'+filled).slice(-3) + ' / 084';
+
+        var bp = step(lin(L, 0.10, 0.95), 6);            // 红色斜杠横扫（到位后继续缓长）
+        set($('.bar', this.el), 'transform',
+            'rotate(var(--skew)) scaleX(' + (bp + lin(L,0.95,3.5)*0.06) + ')');
+
+        set($('.counter', this.el), 'opacity', step(lin(L,0.55,0.95),3));
+
+        var wp = out(L, 1.00, 1.90);                     // 描边字自左滑入（不用 clip-path）
+        set($('.outline', this.el), 'transform', 'translateX(' + mix(-104,0,wp) + '%)');
+
+        var fp = lin(L, 1.95, 2.05);                     // 苏维埃翻转：描边 → 实心
+        var on = fp > 0.5;
+        set($('.outline', this.el), 'color', on ? 'var(--paper)' : 'transparent');
+        set($('.outline', this.el), '-webkit-text-stroke', on ? '0' : '3px var(--paper)');
+        set($('.flash', this.el), 'opacity', on ? (1 - lin(L,2.05,2.25))*0.9 : 0);
+
+        var np = step(lin(L, 1.35, 2.55), 4);            // 年份跳数
+        $('.num', this.el).textContent = String(1929 + Math.min(3, Math.floor(np*4)));
+        set($('.num', this.el), 'opacity', step(lin(L,1.25,1.65),3));
+
+        set($('.sub', this.el), 'opacity', step(lin(L, 2.15, 2.60), 4));
+      }
+    },
+
+    /* ---- 05 КОНСТРУКТИВИЗМ 14.5 – 17.5 ---- */
+    { el:$('.s5'), start:14.5, end:17.5, update:function(L){
+        var hp = lin(L, 0.00, 0.70);
+        set($('.halftone', this.el), 'opacity', hp);
+        set($('.halftone', this.el), 'transform', 'scale(' + mix(1.08,1,hp) + ')');
+        set($('.halftone > i', this.el), 'transform',
+            'translate3d(' + (L*26) + 'px,' + (L*11) + 'px,0)');   // 网点持续爬行（合成器层，不重绘）
+
+        var wp = step(lin(L, 0.60, 1.55), 8);            // 红块自左扫过字底（到位后继续缓长）
+        set($('.wipe', this.el), 'transform',
+            'scaleX(' + (wp + lin(L,1.55,3.0)*70/1920) + ')');
+
+        var chars = $$('.ch', this.el);                  // 逐字左右对撞入场
+        chars.forEach(function(ch, i){
+          var dir = (i % 2 === 0) ? -1 : 1;
+          var p = step(lin(L, 0.10 + i*0.035, 0.48), 4);
+          set(ch, 'transform', 'translateX(' + (dir * mix(170,0,p)) + 'px)');
+          set(ch, 'opacity', p);
+        });
+        set($('.title', this.el), 'transform', 'translateX(' + (lin(L,0.70,3.0)*26) + 'px)');  // 巨字持续缓移
+
+        var s1 = step(lin(L, 1.75, 2.20), 4);
+        set($('.sub', this.el), 'opacity', s1);
+        set($('.sub', this.el), 'transform', 'translateY(' + mix(28,0,s1) + 'px)');
+        set($('.underline', this.el), 'width', (step(lin(L,1.9,2.4),6)*212) + 'px');
+
+        var pp = step(lin(L, 2.05, 2.55), 5);
+        set($('.plate', this.el), 'opacity', pp);
+        set($('.plate', this.el), 'transform',
+            'rotate(' + mix(9,3,pp) + 'deg) translateY(' + mix(44,0,pp) + 'px)');
+      }
+    },
+
+    /* ---- 06 ВПЕРЁД К ПОБЕДЕ 17.5 – 20.0 ---- */
+    { el:$('.s6'), start:17.5, end:20.0, update:function(L){
+        set($('.circle', this.el), 'transform',
+            'scale(' + (mix(0.5,1.15,step(lin(L,0.00,0.55),5)) + lin(L,0.55,2.5)*0.05) + ')');
+
+        var cp = step(lin(L, 0.10, 0.60), 4);
+        set($('.center', this.el), 'opacity', cp);
+        set($('.center', this.el), 'transform',
+            'translateY(' + (mix(30,0,cp) - lin(L,0.60,2.0)*16) + 'px)');
+
+        /* 快门对合必须在循环点前留足纯黑停留：0.80+1.15=1.95（t=19.45），
+           循环前有 0.55s 全黑 —— 少于 0.4s（30fps 下 12 帧）会读成故障闪帧。 */
+        var shutter = step(lin(L, 0.80, 1.15), 6);       // 快门式收束：上下黑条对合
+        set($('.bar.top', this.el),    'transform', 'scaleY(' + shutter + ')');
+        set($('.bar.bottom', this.el), 'transform', 'scaleY(' + shutter + ')');
+      }
+    }
+  ];
+
+  /* ========== 常驻层引用 ========== */
+  var frame = $('#frame');
+  var grain = $('#grain');
+  var grainTiles = [], grainIdx = -1;
+  /* 印刷颗粒：用 canvas 一次性生成 4 张**独立**噪点 PNG 贴图，替代内联 SVG feTurbulence。
+     两个原因：① feTurbulence 每次重绘都要重跑滤镜（kv.css 已警告全屏常驻的代价）；
+     ② 更关键的是——颗粒必须"换一张"，不能"平移同一张"：平移会让整幅画面跟着抖，读作卡顿。 */
+  (function makeGrain(){
+    var S = 220;
+    function noise(n){
+      var t = document.createElement('canvas'); t.width = t.height = n;
+      var x = t.getContext('2d'), im = x.createImageData(n, n), d = im.data;
+      for(var i=0; i<d.length; i+=4){ var v = (Math.random()*255)|0; d[i]=d[i+1]=d[i+2]=v; d[i+3]=255; }
+      x.putImageData(im, 0, 0);
+      return t;
+    }
+    for(var k=0; k<4; k++){
+      var c = document.createElement('canvas'); c.width = c.height = S;
+      var ctx = c.getContext('2d');
+      ctx.globalAlpha = 0.55; ctx.drawImage(noise(55), 0, 0, S, S);   // 粗团块（模拟纸张纤维）
+      ctx.globalAlpha = 0.45; ctx.drawImage(noise(S), 0, 0);          // 细颗粒
+      ctx.globalAlpha = 1;
+      grainTiles.push('url(' + c.toDataURL('image/png') + ')');
+    }
+    grain.style.backgroundImage = grainTiles[0];
+    grainIdx = 0;
+  })();
+  var hudFrame = $('#hudFrame');
+  var hudTC = $('#hudTC');
+  var guides = $('#guides');
+
+  /* ========== 单帧渲染（可被拖动时间轴反复调用，完全无状态） ========== */
+  function render(time){
+    time = ((time % DUR) + DUR) % DUR;
+    for(var i=0; i<scenes.length; i++){
+      var sc = scenes[i];
+      var on = (time >= sc.start && time < sc.end);
+      sc.el.style.opacity    = on ? 1 : 0;
+      sc.el.style.visibility = on ? 'visible' : 'hidden';
+      if(on) sc.update(time - sc.start);
+    }
+
+    /* 颗粒：默认**静止**（不换贴图）。
+       12.5Hz 换贴图虽然比"平移同一张"正确，但在 60/165Hz 屏上仍是一次全画面跳动，
+       和"每帧都在动"的动效混在一起会被读成卡顿。需要胶片感时用 Tweaks 打开「颗粒抖动」。 */
+    if(grainJitter){
+      var g = Math.floor(time / 0.08);
+      var gi = ((g % grainTiles.length) + grainTiles.length) % grainTiles.length;
+      if(gi !== grainIdx){ grainIdx = gi; grain.style.backgroundImage = grainTiles[gi]; }
+    }
+
+    // 场记
+    hudFrame.textContent = 'КАДР ' + ('0000' + Math.floor(time*30)).slice(-4);
+    hudTC.textContent = fmt(time) + ' / ' + fmt(DUR);
+    scrub.value = time;
+    tc.textContent = time.toFixed(2) + ' / 20.00';
+  }
+
+  function fmt(s){
+    var f = Math.floor((s % 1) * 30);
+    var ss = Math.floor(s) % 60, mm = Math.floor(s/60);
+    return ('0'+mm).slice(-2) + ':' + ('0'+ss).slice(-2) + ':' + ('0'+f).slice(-2);
+  }
+
+  /* ========== 播放循环 ========== */
+  var scrub = $('#scrub'), tc = $('#tc');
+
+  function tick(now){
+    if(!last) last = now;
+    var dt = (now - last) / 1000;
+    last = now;
+    if(playing && dt < 0.5){
+      t += dt * speed;
+      if(t >= DUR){
+        if(loop){ t -= DUR; }
+        else { t = DUR - 0.001; playing = false; syncPlay(); }
+      }
+      render(t);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function syncPlay(){ $('#play').textContent = playing ? '❚❚ 暂停' : '▶ 播放'; }
+
+  /* ========== 交互绑定 ========== */
+  $('#play').addEventListener('click', function(){
+    playing = !playing; last = 0; syncPlay();
+  });
+
+  scrub.addEventListener('input', function(){
+    playing = false; syncPlay();
+    t = parseFloat(scrub.value); render(t);
+  });
+
+  $('#loop').addEventListener('click', function(){
+    loop = !loop;
+    this.setAttribute('aria-pressed', String(loop));
+  });
+
+  $('#pure').addEventListener('click', function(){ document.body.classList.toggle('pure'); });
+
+  $('#fs').addEventListener('click', function(){
+    if(document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen();
+  });
+
+  var tweakPanel = $('#tweaks'), tweakBtn = $('#tweakBtn');
+  tweakBtn.addEventListener('click', function(){
+    var on = tweakPanel.classList.toggle('on');
+    tweakBtn.setAttribute('aria-expanded', String(on));
+  });
+
+  $('#twGrain').addEventListener('change', function(){
+    grain.style.display = this.checked ? '' : 'none';
+  });
+  $('#twQuant').addEventListener('change', function(){
+    QNT = this.checked; render(t);      /* 关掉 = 连续动效；立刻重绘当前帧 */
+  });
+  $('#twGrainJit').addEventListener('change', function(){ grainJitter = this.checked; });
+  $('#twGrainAmt').addEventListener('input', function(){
+    document.documentElement.style.setProperty('--grain-op', (this.value/100));
+    grain.style.opacity = (this.value/100);
+  });
+  $('#twGuides').addEventListener('change', function(){
+    guides.style.display = this.checked ? '' : 'none';
+  });
+  $('#twInvert').addEventListener('change', function(){
+    document.body.classList.toggle('invert', this.checked);
+  });
+  $('#twSkew').addEventListener('input', function(){
+    document.documentElement.style.setProperty('--skew', this.value + 'deg');
+  });
+  $('#twSpeed').addEventListener('input', function(){
+    speed = this.value / 100;
+  });
+  $('#twHud').addEventListener('change', function(){
+    document.body.classList.toggle('noHud', !this.checked);
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.target.tagName === 'INPUT') return;
+    var k = e.key;
+    if(k === ' '){ e.preventDefault(); playing = !playing; last = 0; syncPlay(); }
+    else if(k === 'ArrowRight'){ playing = false; syncPlay(); t = (t + 0.25) % DUR; render(t); }
+    else if(k === 'ArrowLeft'){  playing = false; syncPlay(); t = (t + DUR - 0.25) % DUR; render(t); }
+    else if(k === '0'){ t = 0; render(t); }
+    else if(k === 'h' || k === 'H'){ document.body.classList.toggle('pure'); }
+    else if(k === 'k' || k === 'K'){ document.body.classList.toggle('noHud');
+      $('#twHud').checked = !document.body.classList.contains('noHud'); }
+    else if(k === 'g' || k === 'G'){ guides.style.display = (guides.style.display === 'none') ? '' : 'none'; }
+    else if(k === 'i' || k === 'I'){ document.body.classList.toggle('invert'); }
+  });
+
+  /* ========== 画布等比缩放（不拉伸、不裁切） ========== */
+  function fit(){
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    s = Math.min(s, 1.6);
+    window.__scale = s;
+    frame.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  /* ========== 初始化状态 ========== */
+  grain.style.opacity = 0.08;
+
+  var params = new URLSearchParams(location.search);
+  if(params.has('t')){
+    t = parseFloat(params.get('t')) || 0;
+    playing = false;
+  }
+  if(params.get('pure') === '1') document.body.classList.add('pure');
+  if(params.get('hud') === '0') document.body.classList.add('noHud');   /* 录屏：?pure=1&hud=0 */
+
+  /* ========== 诊断：?perf=1 按幕统计帧间隔（默认 20 秒跑满一轮） ==========
+     ⚠️ 必须在**真实窗口**（有垂直同步、真 GPU）里测。无头环境没有 vsync，测不出合成开销。 */
+  if(params.get('perf') === '1'){
+    var _rt = [], _origRender = render;
+    render = function(tt){ window.__t = tt; var a = performance.now(); _origRender(tt); _rt.push(performance.now() - a); };
+    (function(){
+      var win = parseInt(params.get('pms') || '20000', 10);
+      var skip = parseInt(params.get('pskip') || '0', 10);   /* 跳过启动阶段（字体加载/首次绘制）*/
+      var SEG = [0, 3.0, 7.0, 11.0, 14.5, 17.5, 20.0];
+      var B = [[], [], [], [], [], []];
+      function seg(t){ for(var i=0;i<6;i++){ if(t >= SEG[i] && t < SEG[i+1]) return i; } return 5; }
+      function srt(a){ return a.slice().sort(function(x,y){ return x - y; }); }
+      function q(a,p){ return a[Math.min(a.length-1, Math.floor(a.length*p))]; }
+      var t0 = performance.now(), prev = t0;
+      function probe(now){
+        var dt = now - prev; prev = now;
+        if(now - t0 < skip){ requestAnimationFrame(probe); return; }   /* 启动阶段不计入 */
+        B[seg(typeof window.__t === 'number' ? window.__t : 0)].push(dt);
+        if(now - t0 < win){ requestAnimationFrame(probe); return; }
+        var out = [], i, j;
+        for(i=0;i<6;i++){
+          var a = srt(B[i]);
+          if(!a.length){ out.push('S' + (i+1) + ':none'); continue; }
+          var vs = q(a,.05), drop = 0;
+          for(j=0;j<a.length;j++){ if(a[j] > vs*1.5) drop++; }
+          out.push('S' + (i+1) + ' p50=' + q(a,.5).toFixed(1) + ' p95=' + q(a,.95).toFixed(1)
+                 + ' max=' + a[a.length-1].toFixed(1) + ' drop=' + drop + '/' + a.length);
+        }
+        var r = srt(_rt);
+        var s = 'PERF render p50=' + q(r,.5).toFixed(2) + ' p95=' + q(r,.95).toFixed(2)
+              + ' | ' + out.join(' | ') + ' | scale=' + (window.__scale||0).toFixed(2);
+        document.title = s;
+        var el = document.createElement('div');
+        el.id = 'perfout';
+        el.style.cssText = 'position:fixed;left:10px;top:10px;z-index:9999;background:#fff;color:#000;'
+          + 'font:14px/1.5 monospace;padding:8px;border:2px solid #000;max-width:96vw';
+        el.textContent = s;
+        document.body.appendChild(el);
+      }
+      requestAnimationFrame(probe);
+    })();
+  }
+  if(params.get('grain') === '0') grain.style.display = 'none';            /* A/B：关颗粒 */
+  if(params.get('guides') === '0') guides.style.display = 'none';         /* 出片：关构造网格线 */
+  if(params.get('quant') === '1'){ QNT = true; $('#twQuant').checked = true; }   /* ?quant=1 回到量化顿挫 */
+
+  /* ========== 离线逐帧渲染钩子 ==========
+     供 CDP 抓帧脚本调用：设定精确时刻 → 渲染 → 等两帧绘制完成再返回。
+     逐帧离线渲染的时序由编码器保证，不受浏览器垂直同步/光栅调度影响，
+     是出片（而不是在线预览）的正确做法。 */
+  window.__seek = function(tt){
+    playing = false;
+    t = tt;
+    render(t);
+    return new Promise(function(res){
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ res(tt); }); });
+    });
+  };
+
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    playing = false;                 // 尊重系统偏好：停在 15s 的构图帧
+    t = 15;
+  }
+
+  syncPlay();
+  render(t);
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
