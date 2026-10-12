@@ -178,20 +178,20 @@
 </tr>
 <tr>
 <td>ffmpeg / ffprobe</td>
-<td><code>C:\Users\23077\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-9.0.2-full_build\bin\</code></td>
+<td><code>C:\...\WinGet\...\ffmpeg-9.0.2-full_build\bin\</code></td>
 </tr>
 <tr>
 <td>Python（Pillow / numpy）</td>
-<td><code>C:\Users\23077\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe</code></td>
+<td><code>C:\...\.dsh\...\python\python.exe</code></td>
 </tr>
 <tr>
 <td>抓帧脚本</td>
-<td><code>tools/render-frames.cjs</code></td>
+<td><code>src/tools/render-frames.cjs</code></td>
 </tr>
 </tbody>
 </table></div>
 <blockquote>
-<p>ffmpeg 不在 PATH 上，本机另有多处副本（剪映自带、<code>D:\google_download\</code>、<code>E:\ai-movie\node_modules\ffmpeg-static\</code>）。
+<p>ffmpeg 不在 PATH 上，本机另有多处副本（剪映自带、<code>D:\...\google_download\</code>、<code>E:\...\ai-movie\node_modules\ffmpeg-static\</code>）。
 Windows 下可用 <code>Get-ChildItem &lt;根&gt; -Filter ffmpeg.exe -Recurse -Depth 4</code> 找。</p>
 </blockquote>
 <h3 id="22">2.2 四步流程<a class="headerlink" href="#22" aria-hidden="true">#</a></h3>
@@ -208,7 +208,7 @@ Start-Process chrome.exe -ArgumentList @(
   &quot;file:///$tmp/base.html?pure=1&amp;hud=0&quot;)
 
 # ③ 逐帧渲染（帧 i 对应 t = i/fps；30fps × 20s = 600 帧）
-node tools/render-frames.cjs 9223 &quot;$tmp\frames&quot; 30 600 0 600 1920 1080
+node src/tools/render-frames.cjs 9223 &quot;$tmp\frames&quot; 30 600 0 600 1920 1080
 
 # ④ 编码
 $ff = &quot;&lt;ffmpeg 路径&gt;\ffmpeg.exe&quot;
@@ -424,7 +424,7 @@ window.__seek = function (t) {
 </tr>
 <tr>
 <td>抓帧脚本</td>
-<td><code>tools/render-frames.cjs</code></td>
+<td><code>src/tools/render-frames.cjs</code></td>
 <td>可用，支持 <code>fps / 总帧数 / 起始帧 / 帧数 / 画幅</code> 参数</td>
 </tr>
 <tr>

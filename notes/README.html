@@ -24,13 +24,18 @@
 <p><strong>这个文件夹装的是「设计 HTML」这件事本身的经验</strong>：一个具体风格（构成主义）的美学考据，
 加上从实现过程中沉淀出来的、可跨项目复用的规则与踩坑。</p>
 <p><strong>边界</strong>：<strong>动画 / 视频那条线不在这里</strong>。动效短片、片头、motion 相关的美学积累属于独立轨道
-（在 <code>C:\Users\23077\Desktop\work_place\视频工作流\</code> 下的 <code>docs\constructivism-video\</code> 与
+（在 <code>C:\...\视频工作流\</code> 下的 <code>docs\constructivism-video\</code> 与
 <code>constructivism-motion-*.html</code>）。两者共享"构成主义"这个主题，但交付物、技术栈、
 评审标准都不同，所以分开。</p>
 </blockquote>
 <hr />
 <h2 id="_1">目录结构<a class="headerlink" href="#_1" aria-hidden="true">#</a></h2>
-<p><strong>工作目录和上线目录是分开的</strong>：<code>.md</code> 是源，<code>上线/</code> 里只有网页文件。</p>
+<p><strong>工作目录和上线目录是分开的</strong>：<code>.md</code> 是源，产物里只有网页文件。</p>
+<blockquote>
+<p><strong>下面画的是「本机源项目」的布局。</strong> 在 <code>look4end-site</code> 仓库里，这个目录是
+<code>src/notes/</code>，产物目录是仓库根的 <code>notes/</code> —— 构建脚本会自己判断该写哪儿，不用手改路径。
+仓库层面的完整工作流见仓库根的 <code>WORKFLOW.md</code>。</p>
+</blockquote>
 <pre><code>结构主义html/
 ├── README.md                    本文件
 │
@@ -129,7 +134,7 @@
 </tr>
 <tr>
 <td>要做完验收</td>
-<td><a href="./10-验证工作流.html"><code>10-验证工作流.md</code></a> + <code>verify/</code> 里的脚本</td>
+<td><a href="./10-验证工作流.html"><code>10-验证工作流.md</code></a> + <code>src/verify/</code> 里的脚本</td>
 </tr>
 </tbody>
 </table></div>
@@ -200,7 +205,7 @@
 <hr />
 <h2 id="_5">已落地的原型<a class="headerlink" href="#_5" aria-hidden="true">#</a></h2>
 <p>原型在<strong>另一个工作区</strong>（本目录刻意与它解耦，方便单独分享/带走）：</p>
-<pre><code>C:\Users\23077\Desktop\work_place\视频工作流\soviet-press\index.html
+<pre><code>C:\...\视频工作流\soviet-press\index.html
 </code></pre>
 <p>用 A 组美学 + B 组规则做的第一个页面：报纸首页 → 三个板块转场进入三张海报 → 底部挂着文章条 → 点击上滑展开 → <code>ESC</code> 收回文章 → 再按 <code>ESC</code> 退回报纸（与浏览器后退键同一条路径）。</p>
 <p>自包含，双击即可在浏览器打开。同目录的 <code>_shots\</code> 里有各状态截图。</p>
@@ -223,15 +228,15 @@
 - <strong>StyleKit 构成主义规则的原文</strong> —— 由用户提供并声明已抓取确认，本环境未二次核验，记为「用户实测来源」</p>
 <p>详见 <a href="./03-资源清单.html"><code>03-资源清单.md</code></a> 的「交付缺口清单」。</p>
 <hr />
-<h2 id="verify">怎么用 <code>verify/</code> 里的脚本<a class="headerlink" href="#verify" aria-hidden="true">#</a></h2>
+<h2 id="srcverify">怎么用 <code>src/verify/</code> 里的脚本<a class="headerlink" href="#srcverify" aria-hidden="true">#</a></h2>
 <blockquote>
 <p>⚠️ Windows 默认<strong>禁止运行未签名的 <code>.ps1</code></strong>。下面统一加 <code>-ExecutionPolicy Bypass</code>。
 脚本本身都带 UTF-8 BOM（PowerShell 5.1 读无 BOM 的 UTF-8 会乱码 —— 见 <a href="./09-踩坑清单.html"><code>09-踩坑清单.md</code></a> F6）。</p>
 </blockquote>
-<pre><code class="language-powershell">cd C:\Users\23077\Desktop\结构主义html
+<pre><code class="language-powershell">cd C:\...\结构主义html
 
 # 原型页在另一个工作区 —— 用变量指过去，脚本本身与项目解耦
-$proj = 'C:\Users\23077\Desktop\work_place\视频工作流\soviet-press'
+$proj = 'C:\...\视频工作流\soviet-press'
 
 # 静态检查（每次改完都跑）
 powershell -ExecutionPolicy Bypass -File .\verify\static-check.ps1 -Dir $proj

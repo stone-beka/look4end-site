@@ -29,10 +29,16 @@ look4end-site/
 │   ├── kit/kv.css               构成主义样式套件：配色 / 字体 / 网格的唯一来源
 │   └── doc.css                  文档页版式：正文栏、目录、表格
 ├── motion/                      视频设计（动效这条线）
-│   ├── index.html               动效原型：构成主义 20 秒无缝循环
+│   ├── index.html               动效原型：构成主义 20 秒无缝循环（手写单文件，不走构建）
 │   ├── README.html              视频设计总览
 │   ├── 01-动效设计理念.html       时间结构、动效语汇、循环点规范、卡顿诊断
 │   └── 02-视频制作·结构主义经验.html 五轮排查复盘、出片管线、验收清单、本机环境的坑
+├── src/                         源与工具（上面两层的产物都从这里构建）
+│   ├── notes/                   设计笔记的 .md 源 + build.py + kit/ + doc.css
+│   ├── motion/                  视频设计的 .md 源 + build.py
+│   ├── verify/                  验证脚本：静态检查 / 截图 / 功能测试 / 单元测试
+│   └── tools/render-frames.cjs  离线逐帧出片（CDP 驱动无头 Chrome）
+├── WORKFLOW.md                  工作流：怎么改、怎么构建、怎么验证、怎么发
 ├── style.css                    旧版样式，现在只有 404.html 还在用
 ├── 404.html                     访问不存在的地址时显示
 ├── og-image.png                 分享卡片预览图（1200×630）
@@ -42,18 +48,31 @@ look4end-site/
 
 ## 改内容
 
-**这一批 HTML 是构建产物，不是手写源。** 正文以 Markdown 为源，由本机的构建脚本生成；
-源文件和脚本不在这个仓库里。直接手改 HTML，下一次构建就会把它盖掉 ——
-要改正文，去改源，重新构建，再把产物覆盖过来。
+**`notes/` 和 `motion/` 里的 HTML 是构建产物，不是手写源。** 正文以 Markdown 为源，
+源和构建脚本都在 [`src/`](src/)。直接手改 HTML，下一次构建就会把它盖掉。
+
+```bash
+pip install markdown           # 唯一依赖
+python src/notes/build.py      # 重建 notes/
+python src/motion/build.py     # 重建 motion/（不碰 motion/index.html）
+```
+
+两个脚本会自动判断产物目录，也可以用 `--out` 指定。
 
 只有这几样是直接手改的：
 
 | 想改什么 | 改哪儿 |
 |---|---|
-| 配色、字体、间距、网格 | `notes/kit/kv.css`（`:root` 里的变量） |
-| 文档页版式（正文栏、目录、表格） | `notes/doc.css` |
+| 配色、字体、间距、网格 | `src/notes/kit/kv.css`（`:root` 里的变量） |
+| 文档页版式（正文栏、目录、表格） | `src/notes/doc.css` |
 | 首页 | `index.html` + `press.css` / `press.js` |
+| 动效原型 | `motion/index.html`（独立单文件，不走构建） |
 | 错误页 | `404.html` |
+
+> ⚠️ `notes/kit/kv.css` 看起来像"手改的样式表"，其实是 `src/notes/kit/kv.css` 的副本。
+
+完整工作流——验证脚本怎么用、视频怎么出片、站点有哪些已知技术事实——见
+**[WORKFLOW.md](WORKFLOW.md)**。
 
 ## 发布
 

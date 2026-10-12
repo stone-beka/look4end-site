@@ -22,7 +22,7 @@
 <h1 id="10">10 · 验证工作流</h1>
 <blockquote>
 <p>本次抓到的问题里，<strong>大多数靠看代码发现不了</strong>。这份文档是那套"能真的抓到问题"的验证手段。
-配套脚本在 <code>verify/</code>，可直接改路径复用。</p>
+配套脚本在仓库的 <code>src/verify/</code>，可直接改路径复用。</p>
 </blockquote>
 <hr />
 <h2 id="0">0. 决策表：什么该用什么手段验<a class="headerlink" href="#0" aria-hidden="true">#</a></h2>
@@ -75,14 +75,14 @@
 <p><strong>结论：一张截图 + 一次精算，抵得上一小时读代码。</strong></p>
 <hr />
 <h2 id="1">1. 静态检查（每次改完都跑）<a class="headerlink" href="#1" aria-hidden="true">#</a></h2>
-<p><code>verify/static-check.ps1</code> 一次跑完四项：</p>
+<p><code>src/verify/static-check.ps1</code> 一次跑完四项：</p>
 <ol>
 <li><strong>HTML 标签栈式配平</strong> —— 比正则计数可靠（正则会被 <code>&lt;p&gt;</code> / <code>&lt;path&gt;</code> 前缀搞混）</li>
 <li><strong>CSS 大括号配平 + 未定义变量检测</strong></li>
 <li><strong><code>node --check</code> 校验 JS 语法</strong>（前提：本机有 node）</li>
 <li><strong>JS 里 <code>getElementById</code> 引用的 id 是否都真实存在</strong> —— 这条能抓到"改了 HTML 忘了改 JS"</li>
 </ol>
-<pre><code class="language-powershell">$proj = 'C:\Users\23077\Desktop\work_place\视频工作流\soviet-press'
+<pre><code class="language-powershell">$proj = 'C:\...\视频工作流\soviet-press'
 powershell -ExecutionPolicy Bypass -File .\verify\static-check.ps1 -Dir $proj
 </code></pre>
 <hr />

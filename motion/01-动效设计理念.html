@@ -651,7 +651,7 @@
 <h3 id="93">9.3 出片：离线逐帧渲染（<strong>推荐</strong>），不要在线录屏<a class="headerlink" href="#93" aria-hidden="true">#</a></h3>
 <p><strong>为什么不用「浏览器播放 + 录屏」</strong>：在线播放要同时跟合成器、光栅线程、垂直同步赛跑。§8 的每一次修复（<code>clip-path</code>、<code>width</code>、<code>background-position</code>、颗粒位移）都是在把这条赛道的损失压低，但它<strong>永远不可能归零</strong>——丢帧与光栅滞后是浏览器调度的固有噪声。</p>
 <p><strong>离线逐帧渲染把「时间」变成参数</strong>：每一帧按精确的 <code>t</code> 单独渲染，编码器按固定帧率输出；帧间隔由编码器保证，与浏览器调度完全无关。同一份 HTML 既是预览也是渲染源，不存在「预览和成片不一致」。</p>
-<p>流程（本仓库 <code>tools/render-frames.cjs</code>）：</p>
+<p>流程（本仓库 <code>src/tools/render-frames.cjs</code>）：</p>
 <pre><code class="language-bash"># 1) 启动一个带调试端口的无头 Chrome，打开同一份 HTML
 chrome --headless=new --remote-debugging-port=9223 \
        --window-size=1920,1080 --force-device-scale-factor=1 \
@@ -659,7 +659,7 @@ chrome --headless=new --remote-debugging-port=9223 \
        &quot;file:///&lt;绝对路径&gt;/constructivism-motion-20s.html?pure=1&amp;hud=0&quot;
 
 # 2) 逐帧渲染（帧 i 对应 t = i / fps；30fps × 20s = 600 帧）
-node tools/render-frames.cjs 9223 frames 30 600
+node src/tools/render-frames.cjs 9223 frames 30 600
 
 # 3) 编码
 ffmpeg -y -framerate 30 -i frames/frame_%04d.png \
