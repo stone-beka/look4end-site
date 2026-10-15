@@ -17,3 +17,12 @@ CLAUDE.md
 # 历史遗留的临时文件命名（半成品，写完整了才改名盖上）。留着当兜底：
 # .gitignore 挡得住 git status，挡不住 `git add -A`，万一残留也别让它进仓库。
 *.l4e-tmp-*
+
+# 工作区专属（不进公开仓库）：
+#   AGENTS.md / CLAUDE.md 是本机工作笔记，含工作区路径与内部约定
+#   构建.bat 是本机快捷方式
+#   _本地素材-* 是本地素材
+AGENTS.md
+构建.bat
+_本地素材-*/
+_shots/
