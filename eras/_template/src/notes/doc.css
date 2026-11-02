@@ -1,0 +1,12 @@
+.doc { background: var(--era-paper, #f7f5f0); color: var(--era-ink, #111); }
+.doc__bar { display: flex; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 2px solid currentColor; }
+.doc__bar a { color: inherit; }
+.doc__body, .doc__index { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+.doc__body h1, .doc__body h2, .doc__body h3 { line-height: 1.15; }
+.doc__body table { border-collapse: collapse; width: 100%; display: block; overflow-x: auto; }
+.doc__body th, .doc__body td { border: 1px solid currentColor; padding: .4rem .6rem; text-align: left; }
+.doc__body pre { overflow-x: auto; padding: 1rem; border: 1px solid currentColor; }
+.doc__body code { font-family: ui-monospace, Consolas, monospace; }
+.doc__index ul { list-style: none; padding: 0; }
+.doc__index li { border-bottom: 1px solid currentColor; }
+.doc__index a { display: block; padding: .8rem 0; color: inherit; }

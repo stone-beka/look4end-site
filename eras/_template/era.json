@@ -1,0 +1,10 @@
+{
+  "slug": "template",
+  "order": 999,
+  "name": "（改我：时代名）",
+  "years": "（改我：年代，如 1919–1925）",
+  "summary": "（改我：一句话，不超过 60 字）",
+  "status": "draft",
+  "notes": { "dir": "notes", "label": "设计笔记" },
+  "arrival": "entry.css"
+}

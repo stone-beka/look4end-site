@@ -1,0 +1,16 @@
+:root {
+  --era-ink: #111;
+  --era-paper: #f7f5f0;
+  --era-accent: #a02020;
+}
+html, body { margin: 0; }
+body.era-template {
+  background: var(--era-paper);
+  color: var(--era-ink);
+  font-family: "Noto Serif SC", "Songti SC", serif;
+}
+.era { min-height: 100vh; max-width: 64rem; margin: 0 auto; padding: 12vh 1.25rem; }
+.era__kicker { letter-spacing: .3em; text-transform: uppercase; color: var(--era-accent); }
+.era__title { font-size: clamp(2.5rem, 10vw, 7rem); line-height: .95; margin: .2em 0; }
+.era__lead { max-width: 36ch; }
+.era__link { color: inherit; }

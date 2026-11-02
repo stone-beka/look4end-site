@@ -30,3 +30,6 @@ _shots/
 __pycache__/
 *.pyc
 _shots/
+
+# 时代模板的构建产物（复制成新时代的才需要）
+eras/_template/notes/

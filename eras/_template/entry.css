@@ -1,0 +1,10 @@
+@media (prefers-reduced-motion: no-preference) {
+  .era > * { animation: era-in .7s cubic-bezier(.2, .7, .2, 1) both; }
+  .era > :nth-child(2) { animation-delay: .08s; }
+  .era > :nth-child(3) { animation-delay: .16s; }
+  .era > :nth-child(4) { animation-delay: .24s; }
+  @keyframes era-in {
+    from { opacity: 0; transform: translateY(1.2rem); }
+    to { opacity: 1; transform: none; }
+  }
+}
