@@ -109,6 +109,14 @@ class BuildAllTest(unittest.TestCase):
         self.assertEqual(proc.returncode, 1)
         self.assertIn("绝对路径", proc.stderr)
 
+    def test_code_sample_links_not_checked(self):
+        d = self.make_era("a-1", 10)
+        with open(os.path.join(d, "index.html"), "w", encoding="utf-8") as fh:
+            fh.write('<!DOCTYPE html><html><body><a href="notes/">笔记</a>'
+                     '<pre><code>&lt;script src="press.js"&gt;&lt;/script&gt;</code></pre></body></html>')
+        proc = self.run_build()
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+
     def test_idempotent(self):
         self.make_era("a-1", 10)
         self.assertEqual(self.run_build().returncode, 0)

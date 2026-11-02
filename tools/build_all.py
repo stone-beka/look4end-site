@@ -14,6 +14,12 @@ import sys
 
 import era_lib
 
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INTRO = "这里按时代陈列视觉美学。每个时代都是独立的世界，页面、字体、动效互不共享。"
 LINK_RE = re.compile(r'(?:href|src)="([^"]+)"')
@@ -51,6 +57,14 @@ def write_file(path, text, root):
     print("  生成 %s" % os.path.relpath(path, root))
 
 
+def _refs(text):
+    """只取真正的链接/资源引用：先剥注释与代码块（示例代码里的 src="x" 不能算断链）。"""
+    text = re.sub(r"(?is)<!--.*?-->", "", text)
+    for tag in ("pre", "code", "script", "style"):
+        text = re.sub(r"(?is)<%s\b.*?</%s>" % (tag, tag), "", text)
+    return LINK_RE.findall(text)
+
+
 def _era_web_files(era_dir):
     for dirpath, dirnames, filenames in os.walk(era_dir):
         dirnames[:] = [d for d in dirnames if d not in {"src", "__pycache__", ".git"}]
@@ -66,7 +80,7 @@ def check_links(root):
         base = os.path.dirname(path)
         with open(path, encoding="utf-8") as fh:
             text = fh.read()
-        for target in LINK_RE.findall(text):
+        for target in _refs(text):
             if target.startswith(EXTERNAL):
                 continue
             clean = target.split("#", 1)[0].split("?", 1)[0]
@@ -90,7 +104,7 @@ def check_isolation(root, eras):
             rel = os.path.relpath(path, root).replace(os.sep, "/")
             with open(path, encoding="utf-8") as fh:
                 text = fh.read()
-            for ref in LINK_RE.findall(text):
+            for ref in _refs(text):
                 if ref.startswith(EXTERNAL):
                     continue
                 clean = ref.split("#", 1)[0].split("?", 1)[0]
