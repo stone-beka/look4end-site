@@ -1,0 +1,11 @@
+{
+  "slug": "soviet-1923",
+  "order": 10,
+  "name": "苏联构成主义",
+  "years": "1919–1925",
+  "summary": "红黑白三色、几何原语、硬边斜切——把海报当作论证。",
+  "status": "published",
+  "notes": { "dir": "notes", "label": "设计笔记" },
+  "motion": { "entry": "motion/index.html", "label": "动效原型" },
+  "legacy": ["/notes/", "/motion/", "/assets/"]
+}

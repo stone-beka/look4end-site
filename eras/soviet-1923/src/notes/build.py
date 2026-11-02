@@ -339,7 +339,7 @@ INDEX = """<!DOCTYPE html>
 <meta property="og:site_name" content="{site}">
 <meta property="og:title" content="{site}">
 <meta property="og:description" content="{sub}">
-<meta property="og:url" content="https://look4end.com/">
+<meta property="og:url" content="https://look4end.com/eras/soviet-1923/notes/">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="{site}">
