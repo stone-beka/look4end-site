@@ -171,16 +171,20 @@
 
 ### 6.3 URL 规则
 
+> **勘误（2026-11-02 实施时）**：时代包物理目录是 `eras/<slug>/`，静态托管下 URL 直接映射文件路径，
+> 所以线上地址带 `eras/` 前缀。这样门可以用相对链接 `eras/<slug>/`，本地双击也能预览，
+> 不需要 `_redirects` 代理层。以下表格为准。
+
 | 内容 | 地址 |
 |---|---|
 | 门 | `/` |
-| 时代入口 | `/<slug>/` |
-| 时代笔记 | `/<slug>/notes/…` |
-| 时代动效 | `/<slug>/motion/…` |
-| 时代素材 | `/<slug>/assets/…` |
+| 时代入口 | `/eras/<slug>/` |
+| 时代笔记 | `/eras/<slug>/notes/…` |
+| 时代动效 | `/eras/<slug>/motion/…` |
+| 时代素材 | `/eras/<slug>/assets/…` |
 
 - 站内链接**一律相对路径**，禁止以 `/` 开头（保证本地双击可预览、迁移目录不炸）。
-- 旧地址 301：`/<legacy>/*` → `/<slug>/<legacy>:splat`。例：`/notes/01-…` → `/soviet-1923/notes/01-…`。
+- 旧地址 301：`/<legacy>/*` → `/eras/<slug>/<legacy>:splat`。例：`/notes/01-…` → `/eras/soviet-1923/notes/01-…`。
 - `_redirects` 由构建生成，不手写。
 
 ### 6.4 边界规则（构建期强制）

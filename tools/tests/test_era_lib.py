@@ -93,10 +93,10 @@ class LoadErasTest(unittest.TestCase):
 class RedirectsTest(unittest.TestCase):
     def test_soviet_legacy(self):
         out = era_lib.render_redirects([era(slug="soviet-1923", legacy=["/notes/", "/motion/", "/assets/"])])
-        self.assertIn("/notes /soviet-1923/notes 301", out)
-        self.assertIn("/notes/* /soviet-1923/notes/:splat 301", out)
-        self.assertIn("/motion/* /soviet-1923/motion/:splat 301", out)
-        self.assertIn("/assets/* /soviet-1923/assets/:splat 301", out)
+        self.assertIn("/notes /eras/soviet-1923/notes 301", out)
+        self.assertIn("/notes/* /eras/soviet-1923/notes/:splat 301", out)
+        self.assertIn("/motion/* /eras/soviet-1923/motion/:splat 301", out)
+        self.assertIn("/assets/* /eras/soviet-1923/assets/:splat 301", out)
 
     def test_no_legacy_no_rules(self):
         out = era_lib.render_redirects([era()])

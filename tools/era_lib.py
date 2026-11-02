@@ -7,13 +7,14 @@ import os
 import re
 
 SITE = "https://look4end.com"
+ERA_ROOT = "eras"
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 STATUSES = ("published", "draft")
 REQUIRED = ("slug", "order", "name", "years", "summary", "status")
 SKIP_TOP = {"tools", "docs", "core", "node_modules", "__pycache__"}
 
 GATE_ITEM = """      <li class="era">
-        <a class="era__link" href="{slug}/">
+        <a class="era__link" href="eras/{slug}/">
           <span class="era__years">{years}</span>
           <span class="era__name">{name}</span>
           <span class="era__summary">{summary}</span>
@@ -107,8 +108,8 @@ def render_redirects(eras):
             prefix = legacy.strip("/")
             if not prefix:
                 continue
-            lines.append("/%s /%s/%s 301" % (prefix, slug, prefix))
-            lines.append("/%s/* /%s/%s/:splat 301" % (prefix, slug, prefix))
+            lines.append("/%s /%s/%s/%s 301" % (prefix, ERA_ROOT, slug, prefix))
+            lines.append("/%s/* /%s/%s/%s/:splat 301" % (prefix, ERA_ROOT, slug, prefix))
     return "\n".join(lines) + "\n"
 
 

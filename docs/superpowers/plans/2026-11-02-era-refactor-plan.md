@@ -162,10 +162,10 @@ class LoadErasTest(unittest.TestCase):
 class RedirectsTest(unittest.TestCase):
     def test_soviet_legacy(self):
         out = era_lib.render_redirects([era(slug="soviet-1923", legacy=["/notes/", "/motion/", "/assets/"])])
-        self.assertIn("/notes /soviet-1923/notes 301", out)
-        self.assertIn("/notes/* /soviet-1923/notes/:splat 301", out)
-        self.assertIn("/motion/* /soviet-1923/motion/:splat 301", out)
-        self.assertIn("/assets/* /soviet-1923/assets/:splat 301", out)
+        self.assertIn("/notes /eras/soviet-1923/notes 301", out)
+        self.assertIn("/notes/* /eras/soviet-1923/notes/:splat 301", out)
+        self.assertIn("/motion/* /eras/soviet-1923/motion/:splat 301", out)
+        self.assertIn("/assets/* /eras/soviet-1923/assets/:splat 301", out)
 
     def test_no_legacy_no_rules(self):
         out = era_lib.render_redirects([era()])
@@ -242,13 +242,14 @@ import os
 import re
 
 SITE = "https://look4end.com"
+ERA_ROOT = "eras"
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 STATUSES = ("published", "draft")
 REQUIRED = ("slug", "order", "name", "years", "summary", "status")
 SKIP_TOP = {"tools", "docs", "core", "node_modules", "__pycache__"}
 
 GATE_ITEM = """      <li class="era">
-        <a class="era__link" href="{slug}/">
+        <a class="era__link" href="eras/{slug}/">
           <span class="era__years">{years}</span>
           <span class="era__name">{name}</span>
           <span class="era__summary">{summary}</span>
@@ -342,8 +343,8 @@ def render_redirects(eras):
             prefix = legacy.strip("/")
             if not prefix:
                 continue
-            lines.append("/%s /%s/%s 301" % (prefix, slug, prefix))
-            lines.append("/%s/* /%s/%s/:splat 301" % (prefix, slug, prefix))
+            lines.append("/%s /%s/%s/%s 301" % (prefix, ERA_ROOT, slug, prefix))
+            lines.append("/%s/* /%s/%s/%s/:splat 301" % (prefix, ERA_ROOT, slug, prefix))
     return "\n".join(lines) + "\n"
 
 
@@ -1237,13 +1238,13 @@ powershell -ExecutionPolicy Bypass -File tools/verify/static-check.ps1 -Dir eras
 | 内容 | 地址 |
 |---|---|
 | 门 | `/` |
-| 时代入口 | `/<slug>/` |
-| 笔记 | `/<slug>/notes/…` |
-| 动效 | `/<slug>/motion/…` |
-| 素材 | `/<slug>/assets/…` |
+| 时代入口 | `/eras/<slug>/` |
+| 笔记 | `/eras/<slug>/notes/…` |
+| 动效 | `/eras/<slug>/motion/…` |
+| 素材 | `/eras/<slug>/assets/…` |
 
 - 站内链接一律相对路径，禁止以 `/` 开头。
-- 旧地址：`legacy` 里每条前缀 `p` 生成 `/p → /<slug>/p` 与 `/p/* → /<slug>/p/:splat` 的 301。
+- 旧地址：`legacy` 里每条前缀 `p` 生成 `/p → /eras/<slug>/p` 与 `/p/* → /eras/<slug>/p/:splat` 的 301。
 
 ## 5. 边界（构建会强制检查）
 
@@ -1393,7 +1394,7 @@ Get-ChildItem src -Force -ErrorAction SilentlyContinue
 
 ```diff
 -<meta property="og:url" content="https://look4end.com/">
-+<meta property="og:url" content="https://look4end.com/soviet-1923/notes/">
++<meta property="og:url" content="https://look4end.com/eras/soviet-1923/notes/">
 ```
 
 - [ ] **Step 7: 建 era.json、构建入口、时代说明**
@@ -1501,11 +1502,11 @@ powershell -ExecutionPolicy Bypass -File tools/verify/flow-test.ps1 -Page eras/s
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="0; url=/soviet-1923/">
+<meta http-equiv="refresh" content="0; url=/eras/soviet-1923/">
 <title>Look4End · 正在进入</title>
 </head>
 <body>
-<p><a href="/soviet-1923/">进入「苏联构成主义」 →</a></p>
+<p><a href="/eras/soviet-1923/">进入「苏联构成主义」 →</a></p>
 </body>
 </html>
 ```
@@ -1573,10 +1574,10 @@ exit /b 1
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="refresh" content="0; url=/soviet-1923/">
+<meta http-equiv="refresh" content="0; url=/eras/soviet-1923/">
 <title>Look4End · 正在进入</title>
 </head>
-<body><p><a href="/soviet-1923/">进入「苏联构成主义」 →</a></p></body>
+<body><p><a href="/eras/soviet-1923/">进入「苏联构成主义」 →</a></p></body>
 </html>
 '@ | Set-Content -Path index.html -Encoding UTF8
 git add eras tools/verify tools/render-frames.cjs index.html
@@ -1944,9 +1945,9 @@ Expected: GitHub 收到推送；Cloudflare Pages 约 30 秒后重建。
 ```powershell
 $urls = @(
   "https://look4end.com/",
-  "https://look4end.com/soviet-1923/",
-  "https://look4end.com/soviet-1923/notes/",
-  "https://look4end.com/soviet-1923/motion/",
+  "https://look4end.com/eras/soviet-1923/",
+  "https://look4end.com/eras/soviet-1923/notes/",
+  "https://look4end.com/eras/soviet-1923/motion/",
   "https://look4end.com/notes/01-%E7%BE%8E%E5%AD%A6%E8%B0%B1%E7%B3%BB%E4%B8%8E%E5%BD%A2%E5%BC%8F%E6%B3%95%E5%88%99",
   "https://look4end.com/motion/",
   "https://look4end.com/assets/lissitzky-wedge.jpg",
@@ -1960,12 +1961,22 @@ foreach ($u in $urls) {
 
 Expected：
 - 前四个 `200`
-- `/notes/01-…`、`/motion/`、`/assets/…` 返回 `301` 且 `Location` 指向 `/soviet-1923/…`
+- `/notes/01-…`、`/motion/`、`/assets/…` 返回 `301` 且 `Location` 指向 `/eras/soviet-1923/…`
 - `sitemap.xml` `200`，内容里没有 `/notes/` 旧路径
 
 - [ ] **Step 7: 更新交接状态**
 
 在 `WORKFLOW.md` 末尾写一段「2026-11-02 重构后实测」：构建、链接、tests、线上抽查结果。提交。
+
+---
+
+## 实施勘误（执行中发现的偏差，以此为准）
+
+1. **URL 带 `/eras/` 前缀**：时代包物理目录是 `eras/<slug>/`，静态托管下 URL 直接映射文件路径，所以门上的链接与线上地址都是 `/eras/<slug>/`。这样门用相对链接 `eras/<slug>/`，本地双击也能预览，不需要 `_redirects` 代理层。设计文档 §6.3 已同步勘误。
+2. **`tools/tests/__init__.py`**：`python -m unittest discover -s tools/tests -t tools` 需要测试目录是包，已补空 `__init__.py`。
+3. **子进程编码**：Windows 下 Python 子进程往管道里按 cp936 写中文会让父进程按 UTF-8 解码失败。`build_all.py` 与测试都显式给子进程设 `PYTHONIOENCODING=utf-8` 并用 `errors="replace"` 兜底。
+4. **draft 不进 sitemap**：`scan_pages` 扫到的是物理文件，所以 `build_all.py` 在生成 sitemap 前按 `status != published` 的 era 前缀过滤；draft 时代仍可构建、可本地预览。
+5. **`.gitignore` 提前补了 `__pycache__/`、`*.pyc`、`_shots/`**（原计划放在 Task 6），否则第一次提交会把 `.pyc` 带进仓库。
 
 ---
 
