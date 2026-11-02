@@ -150,5 +150,21 @@ class GateTest(unittest.TestCase):
         self.assertIn("说明", out)
 
 
+class GateRenderIntegrationTest(unittest.TestCase):
+    def test_template_and_css_are_safe(self):
+        repo = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        with open(os.path.join(repo, "tools", "templates", "gate.html"), encoding="utf-8") as fh:
+            tmpl = fh.read()
+        with open(os.path.join(repo, "core", "gate.css"), encoding="utf-8") as fh:
+            css = fh.read()
+        out = era_lib.render_gate([era(slug="a-1", name="甲")], tmpl, css, "说明")
+        self.assertIn("a-1/", out)
+        self.assertNotIn("{{", out)
+        self.assertNotIn("<script", out.lower())
+        self.assertNotIn("fonts.googleapis", out)
+        self.assertNotIn("@import", out)
+        self.assertLessEqual(len(css.splitlines()), 80)
+
+
 if __name__ == "__main__":
     unittest.main()
