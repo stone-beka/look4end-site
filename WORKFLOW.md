@@ -3,23 +3,27 @@
 > **这份文件的目的**：把仓库 clone 下来，只看仓库里的东西，就能理解这套工作怎么运转、
 > 并且能真的把内容改出来、重新构建、发布。
 >
-> 不需要任何仓库之外的信息。文中的本机路径都做了脱敏（`C:\...\xxx\`），
-> 只表达"有这么个目录"，不暴露完整路径。
+> 不需要任何仓库之外的信息。文中的本机路径都做了脱敏，只表达"有这么个目录"。
 
 ---
 
 ## 一、这个站是什么
 
-`look4end.com` —— 一个纯静态个人站，主题是**构成主义（Constructivism）**。
+`look4end.com` —— 一个纯静态的个人站，主线是**按时代陈列视觉美学**（穿越感来自每个时代自己的整页设计）。
 没有框架、没有构建步骤、没有后端。托管在 Cloudflare Pages，连的是本仓库。
 
-站上三层：
+站点分两层：
 
 | 层级 | 地址 | 是什么 |
 |---|---|---|
-| **创作** | `/` | 《ЛЕФ》构成主义报纸 → 三张海报（КЛИН 楔子 / КНИГИ 书籍 / БАШНЯ 塔）。点击海报有红色幕布转场，底部文章条点击上滑展开，`ESC` 收回（与浏览器后退键同一条路径） |
-| **设计笔记** | `/notes/` | HTML 设计经验 11 篇：构成主义美学考据 + 可跨项目复用的规则与踩坑 + 可运行的样式指南 |
-| **视频设计** | `/motion/` | 动效原型（构成主义 20 秒无缝循环）+ 动效设计理念 + 视频制作经验 3 篇 |
+| **时间门** | `/` | 极简索引：列出所有已发布时代，点进去。无 JS、无 Web 字体、无图片 |
+| **时代包** | `/eras/<slug>/` | 一个美学世界，自包含：页面、样式、脚本、素材、笔记、动效、说明 |
+
+当前只有一个时代：
+
+| 时代 | 地址 | 内容 |
+|---|---|---|
+| 苏联构成主义 | `/eras/soviet-1923/` | 《ЛЕФ》报纸首页 → 三张海报（КЛИН / КНИГИ / БАШНЯ）→ 文章抽屉；`notes/` 11 篇设计笔记；`motion/` 20 秒无缝循环动效 + 3 篇经验 |
 
 ---
 
@@ -27,41 +31,61 @@
 
 ```
 look4end-site/
-├── index.html  press.css  press.js  assets/     ← 首页（创作）。手写，不是产物
-├── notes/                                        ← 设计笔记【构建产物】
-├── motion/                                       ← 视频设计【构建产物】
-│   └── index.html                                ← 例外：动效原型，手写单文件，不走构建
-├── src/                                          ← ★ 全部源与工具
-│   ├── notes/          .md 源 + build.py + kit/ + doc.css
-│   ├── motion/         .md 源 + build.py
-│   ├── verify/         验证脚本（静态检查 / 截图 / 功能测试 / 单元测试）
-│   └── tools/          render-frames.cjs（离线逐帧出片）
-├── WORKFLOW.md                                   ← 本文件
-├── publish.bat                                   ← 双击发布
-└── 404.html  style.css  robots.txt  sitemap.xml  og-image.png
+├── index.html  core/eras.json  sitemap.xml  _redirects   ← 构建生成，不手改
+├── core/gate.css                                          ← 门的基础样式（手写）
+├── eras/
+│   ├── _template/                                          ← 新时代脚手架（复制即开工）
+│   └── soviet-1923/                                        ← 一个时代包
+│       ├── era.json  index.html  era.css  era.js  AGENTS.md
+│       ├── assets/
+│       ├── src/notes/*.md  src/motion/*.md  build.py       ← 源与构建脚本
+│       ├── notes/*.html                                    ← 产物
+│       └── motion/index.html（手写原型）+ *.html（产物）
+├── tools/
+│   ├── build_all.py    era_lib.py    templates/gate.html
+│   ├── tests/          纯逻辑单测（python -m unittest）
+│   ├── verify/         static-check / flow-test / shot / route-test / run_all
+│   └── render-frames.cjs                                   ← 离线逐帧出片
+├── docs/
+│   ├── ERA-CONTRACT.md                                     ← 时代契约
+│   └── superpowers/                                        ← 设计 / 计划文档
+├── 404.html  style.css  robots.txt  og-image.png  publish.bat
+└── _本地素材-作品截图/                                       ← 本地素材，不发布
 ```
 
-### 铁律：`notes/` 和 `motion/` 里的 `.html` 不要手改
+### 铁律：产物不要手改
 
-它们是构建产物，下一次构建会**整个覆盖**。要改正文，改 `src/` 里的 `.md`，然后重新构建。
+`index.html`、`core/eras.json`、`sitemap.xml`、`_redirects`、`eras/*/notes/*.html`、
+`eras/*/motion/*.html`（动效原型 `motion/index.html` 除外）都是**构建产物**，下一次构建会整个覆盖。
 
-**手改的只有这些**：
-
-| 想改什么 | 改哪儿 |
-|---|---|
-| 首页（报纸 / 海报 / 转场） | `index.html` + `press.css` + `press.js` |
-| 动效原型 | `motion/index.html`（独立单文件） |
-| 配色、字体、间距、网格 | `src/notes/kit/kv.css` → 构建后进 `notes/kit/kv.css` |
-| 文档页版式 | `src/notes/doc.css` → 构建后进 `notes/doc.css` |
-| 错误页 | `404.html` |
-| 分享卡片图 | `og-image.png` |
-
-> ⚠️ 容易踩的坑：`notes/kit/kv.css` 看起来像"手改的样式表"，但它其实是
-> `src/notes/kit/kv.css` 的副本。直接改 `notes/` 那份，下次构建就没了。
+**手改的只有**：`core/gate.css`、`tools/templates/gate.html`、`eras/<slug>/` 下的
+`index.html` / `era.css` / `era.js` / `entry.css` / `era.json` / `build.py` / `AGENTS.md`。
 
 ---
 
-## 三、改内容 → 构建 → 发布
+## 三、改内容 / 加时代
+
+### 改某个时代的内容
+
+```bash
+# 笔记正文：改 eras/soviet-1923/src/notes/*.md
+python eras/soviet-1923/build.py      # 或 python tools/build_all.py
+```
+
+### 加一个新时代
+
+```bash
+cp -r eras/_template eras/<slug>
+# 改 era.json（slug 必须等于目录名 / order / name / years / summary / status）
+# 改 AGENTS.md、index.html、era.css，写 src/notes/*.md
+python tools/build_all.py             # 门里会自动出现这个时代
+```
+
+做新时代时**只需要读** `docs/ERA-CONTRACT.md` + `eras/_template/AGENTS.md` + 本时代的 `src/`。
+
+---
+
+## 四、构建 / 验证 / 发布
 
 ### 依赖
 
@@ -71,35 +95,41 @@ look4end-site/
 pip install markdown
 ```
 
-（脚本只用标准库 + python-markdown，没有别的依赖。）
-
-### 重新构建
-
-两个脚本都会**自动判断产物目录**：放在 `src/<名字>/` 下就写到仓库的 `<名字>/`。
-所以在仓库里直接跑就行，不用参数：
+### 构建
 
 ```bash
-python src/notes/build.py      # 重建 notes/
-python src/motion/build.py     # 重建 motion/（不碰 motion/index.html）
+python tools/build_all.py
 ```
 
-想指定别处就加 `--out`：
+它会：依次跑每个时代的 `build.py` → 生成 `index.html` / `core/eras.json` / `sitemap.xml` / `_redirects`
+→ 跑五项体检（断链 / 跨时代引用 / 注册表 / 产物类型 / 门无脚本无字体无图）。
+任何一项失败退出码为 1。构建必须幂等：连续两次构建 `git diff` 为空。
+
+### 验证
 
 ```bash
-python src/notes/build.py --out /某处/notes
+python tools/verify/run_all.py            # 构建 + 单测 + 路由 + 静态检查
+python tools/verify/run_all.py --browser  # 再加无头浏览器交互链路与截图
 ```
 
-脚本会自己做四项自检，任何一项不过就在输出里告警：
+单项也可以跑：
 
-1. **围栏代码块成对**（``` 出现奇数次 = 没闭合，会把后半篇整个吞成代码块）
-2. **标题数对得上**（源里的 `#` 行数 vs 产物里的 `<h1..h4>` 数）
-3. **链接改写数对得上**（源里几条站内 `.md` 链接，产物里就该有几个 `.html` 链接）
-4. **产物里只有 `.html` 和 `.css`**
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tools\verify\static-check.ps1 -Dir .\eras\soviet-1923
+powershell -ExecutionPolicy Bypass -File .\tools\verify\flow-test.ps1 -Page .\eras\soviet-1923\index.html -TestScript .\tools\verify\example-flow-test.js
+powershell -ExecutionPolicy Bypass -File .\tools\verify\shot.ps1 -Page .\index.html -Out .\_shots
+```
 
-> 这三条不是摆设。构建这套站点时，第 1 条和第 3 条各抓到过一次真错
-> ——一次是把整篇变成了代码块，一次是链接全废。
+> Windows 默认禁止运行未签名 `.ps1`，所以要加 `-ExecutionPolicy Bypass`。
+> 这些脚本都带 UTF-8 BOM —— PowerShell 5.1 读没有 BOM 的 UTF-8 会乱码并报假语法错，改完要确认 BOM 还在。
+
+**经验之谈**：能靠"读代码"发现的 bug 是少数。绝大多数问题要么靠**截图逐张看**、
+要么靠**把数值算一遍**、要么靠**在真实浏览器里跑一遍**才能发现。
+详见 `eras/soviet-1923/notes/09-踩坑清单.html`。
 
 ### 发布
+
+**双击 `publish.bat`**，或手动：
 
 ```bash
 git add -A
@@ -107,80 +137,56 @@ git commit -m "说明你改了什么"
 git push
 ```
 
-或者双击 `publish.bat`（它做的就是上面三步，外加"上次没推成功的补推"）。
-
-**Cloudflare Pages 会从仓库自动重建，约 30 秒后 `look4end.com` 就是新的。**
-
----
-
-## 四、验证（改完的东西真的对吗）
-
-`src/verify/` 里有四个脚本。全部参数化（`-Dir` / `-Page`），换项目改路径就能用。
-
-> Windows 默认禁止运行未签名 `.ps1`，所以要加 `-ExecutionPolicy Bypass`。
-> 这些 `.ps1` 都带 UTF-8 BOM —— PowerShell 5.1 读**没有 BOM** 的 UTF-8 会乱码并报假语法错。
-
-```powershell
-# 1) 静态检查：HTML 标签配平 / CSS 语法与变量 / JS 语法 / id 引用 / 文档链接
-powershell -ExecutionPolicy Bypass -File .\src\verify\static-check.ps1 -Dir .\notes
-
-# 2) 纯逻辑单元测试（不需要浏览器）
-node .\src\verify\route-test.js
-
-# 3) 交互链路功能测试（无头浏览器，用 --dump-dom 读文本结果）
-powershell -ExecutionPolicy Bypass -File .\src\verify\flow-test.ps1 `
-  -Page .\index.html -TestScript .\src\verify\example-flow-test.js
-
-# 4) 多状态截图（记得逐张看）
-powershell -ExecutionPolicy Bypass -File .\src\verify\shot.ps1 `
-  -Page .\index.html -Out .\_shots
-```
-
-**经验之谈**：能靠"读代码"发现的 bug 是少数。绝大多数问题要么靠**截图逐张看**、
-要么靠**把数值算一遍**、要么靠**在真实浏览器里跑一遍**才能发现。
-详见 `notes/09-踩坑清单.html`。
+Cloudflare Pages 从仓库自动重建，约 30 秒后 `look4end.com` 就是新的。
 
 ---
 
 ## 五、视频线（出片）
 
-`src/tools/render-frames.cjs` 是**离线逐帧渲染**脚本：用 CDP 驱动无头 Chrome，
+`tools/render-frames.cjs` 是**离线逐帧渲染**脚本：用 CDP 驱动无头 Chrome，
 按精确时刻 `t` 抓帧，不受浏览器垂直同步/光栅调度影响。出片走这条路，**不要在线录屏**。
 
 ```bash
-node src/tools/render-frames.cjs <调试端口> <输出目录> <fps> <总帧数> [起始帧] [帧数] [宽] [高]
+node tools/render-frames.cjs <调试端口> <输出目录> <fps> <总帧数> [起始帧] [帧数] [宽] [高]
 ```
 
-前置条件：本机要有 **ffmpeg**（用来编码，抓帧本身不需要）。
-完整管线、验收清单、以及本机环境踩过的坑，见 `motion/02-视频制作·结构主义经验.html`。
-
-### 不在仓库里的东西
-
-| 东西 | 为什么不在 | 怎么拿回来 |
-|---|---|---|
-| **600 帧母版**（30fps × 20s） | 约 **421 MB**，不该进 git | 用 `render-frames.cjs` 重渲一遍，几分钟 |
-| 动效参考截图（212 张） | 约 15 MB 的中间产物 | 重新截 |
-| 旧站归档 | 站主 2026-10-12 归档在 `D:\...\look4end-归档\` | 与本站无关，别再复活 |
+前置条件：本机要有 **ffmpeg**（编码用；抓帧本身不需要）。
+完整管线、验收清单、本机环境的坑，见 `eras/soviet-1923/motion/02-视频制作·结构主义经验.html`。
 
 ---
 
 ## 六、站点技术事实（省得重新踩）
 
-- **纯静态**，无框架、无构建步骤、无后端。
-- **有外部字体依赖**：首页与文档页引 Google Fonts（`fonts.googleapis.com` /
-  `fonts.gstatic.com`）。断网或大陆网络下会退化成系统字体——版面不塌，
-  但构成主义的窄体/黑体特征会失去。这是已知的、**有意保留**的状态。
-- **中文文件名没问题**：`notes/01-美学谱系与形式法则.html` 线上正常访问。
-- **`.html` 会 308 跳转**：Cloudflare Pages 会把 `x.html` 跳到 `x`（干净 URL）。
-  这是正常行为，不是故障。所以 `sitemap.xml` 里一律写**无后缀**的规范地址。
-- **`.bat` 里不要写中文注释**：cmd.exe 会在某些字节位置从汉字中间切开一行，
-  报出毫无线索的错。中文只放在 `echo` 输出的行里。
+- **纯静态**，无框架、无构建步骤（构建是本地跑、产物进 git）。
+- **有外部字体依赖**：时代页面引 Google Fonts；断网或大陆网络下会退化成系统字体，
+  版面不塌，但风格特征会失去。门不加载任何 Web 字体。
+- **中文文件名没问题**：`eras/soviet-1923/notes/01-美学谱系与形式法则.html` 线上正常。
+- **`.html` 会 308 跳转**：Cloudflare Pages 会把 `x.html` 跳到 `x`（干净 URL），这是正常行为。
+- **`.bat` 里不要写中文注释**：cmd.exe 会在某些字节位置从汉字中间切开一行。
+- **旧地址 301**：`/notes/*`、`/motion/*`、`/assets/*` → `/eras/soviet-1923/…`，由 `_redirects` 生成。
 - **部署链路**：GitHub `stone-beka/look4end-site` → Cloudflare Pages → `look4end.com`。
-  域名在阿里云注册，**DNS 托管在 Cloudflare**——加解析记录要去 Cloudflare 后台。
+  域名在阿里云注册，DNS 托管在 Cloudflare——加解析记录要去 Cloudflare 后台。
 
 ---
 
-## 七、一句话交接
+## 七、2026-11-02 重构历史
 
-> 改 `src/` 里的 `.md` → `python src/notes/build.py`（或 `src/motion/build.py`）→ `git push`。
-> 别手改 `notes/` 和 `motion/` 里的 `.html`，那是产物。
+站点原来是「根目录就是苏联报纸 + `/notes/` + `/motion/` 平级散件」。为了让以后每个美学时代
+互不干扰，重构为「时间门 + 时代包」：
+
+| 阶段 | 结果 |
+|---|---|
+| P0 | 规则层 / 门模板 / 调度器 / 脚手架 / 契约文档 |
+| P1 | 苏联内容整体迁入 `eras/soviet-1923/`，产物哈希比对只允许 2 个文件变化（og:url + 3 条绝对链接）；旧地址 301 |
+| P2 | `/` 换成生成的极简索引 |
+| P3 | 文档分层（根 AGENTS / WORKFLOW / 每时代 AGENTS / 契约）、验证脚本参数化、一键验收 |
+
+设计文档：`docs/superpowers/specs/2026-11-02-era-architecture-design.md`
+实施计划：`docs/superpowers/plans/2026-11-02-era-refactor-plan.md`
+
+---
+
+## 八、一句话交接
+
+> 改 `eras/<slug>/src/*.md` → `python tools/build_all.py` → `git push`。
+> 别手改产物；加时代就复制 `eras/_template`。
