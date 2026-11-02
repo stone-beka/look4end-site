@@ -26,3 +26,7 @@ AGENTS.md
 构建.bat
 _本地素材-*/
 _shots/
+# Python 缓存 / 本地截图
+__pycache__/
+*.pyc
+_shots/
