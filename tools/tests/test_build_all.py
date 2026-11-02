@@ -117,15 +117,20 @@ class BuildAllTest(unittest.TestCase):
         proc = self.run_build()
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
 
+    def _snapshot(self):
+        paths = ("index.html", "core/eras.json", "sitemap.xml", "_redirects")
+        out = {}
+        for p in paths:
+            with open(os.path.join(self.tmp, p), "rb") as fh:
+                out[p] = fh.read()
+        return out
+
     def test_idempotent(self):
         self.make_era("a-1", 10)
         self.assertEqual(self.run_build().returncode, 0)
-        first = {p: open(os.path.join(self.tmp, p), "rb").read()
-                 for p in ("index.html", "core/eras.json", "sitemap.xml", "_redirects")}
+        first = self._snapshot()
         self.assertEqual(self.run_build().returncode, 0)
-        second = {p: open(os.path.join(self.tmp, p), "rb").read()
-                  for p in ("index.html", "core/eras.json", "sitemap.xml", "_redirects")}
-        self.assertEqual(first, second)
+        self.assertEqual(first, self._snapshot())
 
 
 if __name__ == "__main__":

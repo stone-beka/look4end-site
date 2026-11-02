@@ -2,8 +2,10 @@
   static-check.ps1 —— 静态检查：HTML 标签配平 / CSS 语法与变量 / JS 语法 / id 引用一致性
 
   用法：
-    powershell -ExecutionPolicy Bypass -File .\verify\static-check.ps1 -Dir "C:\...\视频工作流\soviet-press"
-    powershell -ExecutionPolicy Bypass -File .\verify\static-check.ps1 -Dir "C:\...\视频工作流\soviet-press" -Html index.html -Css press.css -Js press.js
+    powershell -ExecutionPolicy Bypass -File .\tools\verify\static-check.ps1 -Dir .\eras\soviet-1923
+    powershell -ExecutionPolicy Bypass -File .\tools\verify\static-check.ps1 -Dir .\eras\soviet-1923 -Html index.html -Css era.css -Js era.js
+
+  -Css / -Js 传空字符串表示该时代没有这两个文件，跳过检查。
 
   退出码：0 = 全部通过，1 = 有失败项（便于接进 CI）
 #>
@@ -11,8 +13,8 @@
 param(
   [Parameter(Mandatory = $true)][string]$Dir,
   [string]$Html = 'index.html',
-  [string]$Css  = 'press.css',
-  [string]$Js   = 'press.js'
+  [string]$Css  = 'era.css',
+  [string]$Js   = 'era.js'
 )
 
 $ErrorActionPreference = 'Continue'
@@ -95,7 +97,7 @@ if (Test-Path -LiteralPath $cssPath) {
   }
   if ($warn.Count) { $warn | Sort-Object -Unique | ForEach-Object { Write-Host "  [!!] $_" -ForegroundColor Yellow } }
   else { Ok '设计规则自查（缓动 / 圆角 / 阴影模糊值）通过' }
-} else { Fail "找不到 $Css" }
+} elseif ($Css) { Fail "找不到 $Css" }
 
 # ---------- 3) JS 语法 ----------
 $jsPath = Join-Path $Dir $Js
@@ -116,7 +118,7 @@ if (Test-Path -LiteralPath $jsPath) {
     if ($missing.Count) { Fail "JS 引用了 HTML 里不存在的 id：$($missing -join ', ')" }
     else { Ok "JS 引用的 $($ids.Count) 个 id 全部存在" }
   }
-} else { Fail "找不到 $Js" }
+} elseif ($Js) { Fail "找不到 $Js" }
 
 # ---------- 4) 文档相对链接 ----------
 $md = @(Get-ChildItem -File $Dir -Filter *.md -ErrorAction SilentlyContinue)
