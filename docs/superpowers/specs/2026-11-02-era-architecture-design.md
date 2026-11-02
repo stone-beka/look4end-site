@@ -113,7 +113,9 @@
 │       └── AGENTS.md
 ├── tools/
 │   ├── build_all.py           调度器：跑各 era build.py → 生成门/注册表/sitemap/redirects → 体检
+│   ├── era_lib.py             纯函数：slug/order 校验、sitemap URL 映射、redirects 生成、门渲染
 │   ├── templates/gate.html    门模板
+│   ├── tests/                 纯逻辑单元测试（python -m unittest）
 │   └── verify/                参数化检查脚本（沿用现有四个 + 新增隔离检查）
 ├── docs/
 │   ├── ERA-CONTRACT.md        唯一的跨时代文档
@@ -238,7 +240,7 @@
 1. 扫描 `eras/*/era.json`（跳过 `_` 开头），校验字段与 slug/order 唯一性。
 2. 依次运行每个 era 的 `build.py`（子进程，失败即整体失败并报 era 名）。
 3. 生成 `core/eras.json`（只含 published）、`/index.html`、`sitemap.xml`、`_redirects`
-   （旧地址 301 来自各 era 的 `legacy`；私有路径 404 来自 `tools/blocked-paths.json`）。
+   （旧地址 301 来自各 era 的 `legacy`；sitemap 不含 lastmod，保证构建幂等）。
 4. 跑体检（9.3），任一失败退出码 1。
 
 ### 9.2 幂等
@@ -258,7 +260,7 @@
 
 | 层 | 手段 | 通过标准 |
 |---|---|---|
-| 纯逻辑 | `node --test tools/verify/*.test.mjs`（注册表排序、slug 校验、redirects 生成、sitemap 条目、断链扫描） | 全绿 |
+| 纯逻辑 | `python -m unittest discover -s tools/tests -v`（注册表排序、slug 校验、redirects 生成、sitemap 映射、断链扫描） | 全绿 |
 | 静态 | `tools/verify/static-check.ps1 -Era eras/soviet-1923`（沿用现有脚本，参数化） | 0 失败 |
 | 截图 | `shot.ps1`：门、苏联入口、一张海报、文章抽屉、移动端 | 逐张人工看过 |
 | 功能 | `flow-test.ps1`：报纸→海报→抽屉→ESC 逐级返回 | 状态与 URL 一致 |
@@ -271,7 +273,7 @@
 | **P0 骨架** | 建 `eras/_template`、`tools/build_all.py`、`tools/templates/gate.html`、`docs/ERA-CONTRACT.md`；不动现有页面 | 无 | `build_all.py` 跑通且 `git diff` 为空（0 个 era） |
 | **P1 迁移** | 苏联整体迁入 `eras/soviet-1923/`；旧地址 301；`/` 暂 302 到 `/soviet-1923/` | URL 变、内容不变 | 旧 URL 全部 301 到新址；报纸两级返回正常；截图与迁移前一致 |
 | **P2 切换** | `/` 换成生成的极简索引；删临时 302 | 首页变化 | 门列出 1 个时代，可进入；无 JS/字体/图片请求 |
-| **P3 分层** | 根 `AGENTS.md` 瘦身、每 era `AGENTS.md`、`WORKFLOW.md` 重写、验证脚本参数化、`_redirects` 收敛（`/docs/*`、`/tools/*` 返回 404）、归档 `dev\look4end-site` 副本 | 无（除私有路径 404） | 新会话按根 AGENTS 能独立完成一次小改动 |
+| **P3 分层** | 根 `AGENTS.md` 瘦身、每 era `AGENTS.md`、`WORKFLOW.md` 重写、验证脚本参数化、归档本机旧克隆副本 | 无 | 新会话按根 AGENTS 能独立完成一次小改动 |
 
 ## 12. 风险与未决项
 
@@ -279,7 +281,7 @@
 |---|---|
 | 首页从报纸变成门，品牌观感变化 | 已接受；P1 期间 `/` 仍是报纸（302），随时可回滚 |
 | 外链（作品集、视频推广）断掉 | 301 + 上线后逐条实测 |
-| 整仓被 Cloudflare Pages 公开（含 `docs/`、`tools/`） | P3 用 `_redirects` 把 `/docs/*`、`/tools/*` 返回 404；era 的 `src/` 保持公开（沿用现有「clone 下来能接手」的做法） |
+| 整仓被 Cloudflare Pages 公开（含 `docs/`、`tools/`） | 已核实：`_redirects` 不支持 404 改写，无法用它挡住。当前**接受公开**（与现状一致）；若要隐藏，需改 Pages 构建输出目录，另立任务 |
 | 两份工作副本改错（本机另有一份旧克隆） | 迁移完成后归档/删除该副本 |
 | 字体越加越重 | 每个时代字体只在本时代页面加载；门零 Web 字体 |
 | 新时代的构建脚本各写一份 | 从 `_template/build.py` 复制；构建逻辑本地化是刻意的（一改不会全炸） |
