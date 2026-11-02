@@ -1,0 +1,7 @@
+# 由 tools/build_all.py 生成，不要手改
+/notes /eras/soviet-1923/notes 301
+/notes/* /eras/soviet-1923/notes/:splat 301
+/motion /eras/soviet-1923/motion 301
+/motion/* /eras/soviet-1923/motion/:splat 301
+/assets /eras/soviet-1923/assets 301
+/assets/* /eras/soviet-1923/assets/:splat 301

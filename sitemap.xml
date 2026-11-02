@@ -1,99 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 只列这个站真正有内容的页面。三条规矩：
-     1) 每个 <url> 只能有一个 <loc>（一个 <url> 塞两个会让整条失效）；
-     2) 写 Cloudflare Pages 的规范地址：带 .html 的地址会 308 跳到无后缀形式，
-        列重定向地址搜索引擎不会收录，所以这里一律用无后缀的；
-     3) 中文路径按 UTF-8 百分号编码。
-     改过目录结构后这份清单必须跟着改。 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://look4end.com/</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://look4end.com/motion/</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.9</priority>
+    <loc>https://look4end.com/eras/soviet-1923/</loc>
   </url>
   <url>
-    <loc>https://look4end.com/motion/README</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/motion/</loc>
   </url>
   <url>
-    <loc>https://look4end.com/motion/01-%E5%8A%A8%E6%95%88%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/motion/01-动效设计理念</loc>
   </url>
   <url>
-    <loc>https://look4end.com/motion/02-%E8%A7%86%E9%A2%91%E5%88%B6%E4%BD%9C%C2%B7%E7%BB%93%E6%9E%84%E4%B8%BB%E4%B9%89%E7%BB%8F%E9%AA%8C</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/motion/02-视频制作·结构主义经验</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.9</priority>
+    <loc>https://look4end.com/eras/soviet-1923/motion/README</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/01-%E7%BE%8E%E5%AD%A6%E8%B0%B1%E7%B3%BB%E4%B8%8E%E5%BD%A2%E5%BC%8F%E6%B3%95%E5%88%99</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/02-%E8%AE%BE%E8%AE%A1%E7%B3%BB%E7%BB%9F%E8%A7%84%E6%A0%BC</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/01-美学谱系与形式法则</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/03-%E8%B5%84%E6%BA%90%E6%B8%85%E5%8D%95</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/02-设计系统规格</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/04-%E6%8A%80%E6%9C%AF%E5%AE%9E%E7%8E%B0%E6%89%8B%E5%86%8C</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/03-资源清单</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/05-%E5%89%8D%E7%AB%AF%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/04-技术实现手册</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/06-%E7%B4%A0%E6%9D%90%E6%83%85%E6%8A%A5%E6%8A%A5%E5%91%8A</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/05-前端技术方案</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/07-%E8%AE%BE%E8%AE%A1%E8%A7%84%E5%88%99%E9%80%9F%E6%9F%A5</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/06-素材情报报告</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/08-%E4%BA%A4%E4%BA%92%E6%A8%A1%E5%BC%8F</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/07-设计规则速查</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/09-%E8%B8%A9%E5%9D%91%E6%B8%85%E5%8D%95</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/08-交互模式</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/10-%E9%AA%8C%E8%AF%81%E5%B7%A5%E4%BD%9C%E6%B5%81</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.8</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/09-踩坑清单</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/README</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.7</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/10-验证工作流</loc>
   </url>
   <url>
-    <loc>https://look4end.com/notes/kit/</loc>
-    <lastmod>2026-10-13</lastmod>
-    <priority>0.6</priority>
+    <loc>https://look4end.com/eras/soviet-1923/notes/README</loc>
+  </url>
+  <url>
+    <loc>https://look4end.com/eras/soviet-1923/notes/kit/</loc>
   </url>
 </urlset>
