@@ -186,7 +186,19 @@ node tools/render-frames.cjs <调试端口> <输出目录> <fps> <总帧数> [�
 
 ---
 
-## 八、一句话交接
+## 八、线上实测（2026-11-02 上线后）
+
+| 检查 | 结果 |
+|---|---|
+| `/` | 200，title「Look4End · 时代档案」，门里有 `eras/soviet-1923/` 入口 |
+| `/eras/soviet-1923/`、`/eras/soviet-1923/notes/`、`/eras/soviet-1923/motion/`、一篇笔记 | 全 200 |
+| `/notes/*`、`/motion/*`、`/assets/*` | 301 → `/eras/soviet-1923/…`，Location 实测正确 |
+| `sitemap.xml` | 200，19 条 URL，无旧路径 |
+| `/404` | 200 |
+
+---
+
+## 九、一句话交接
 
 > 改 `eras/<slug>/src/*.md` → `python tools/build_all.py` → `git push`。
 > 别手改产物；加时代就复制 `eras/_template`。
